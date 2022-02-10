@@ -1,0 +1,177 @@
+{
+    "settings": {
+        "numSupports": 6
+    },
+    "attacks": [
+        {
+            "name": "Default Attack",
+            "attackSpeed": 1,
+            "baseDamageMultiplier": 100,
+            "mods": [
+                {
+                    "id": "hitChance",
+                    "desc": "+#% TO HIT CHANCE",
+                    "stats": [
+                        {
+                            "name": "hitChance",
+                            "value": 100,
+                            "valueType": "base"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Special Attack",
+            "attackSpeed": 1,
+            "baseDamageMultiplier": 100,
+            "manaCost": 5,
+            "mods": [
+                {
+                    "id": "hitChance",
+                    "desc": "+#% TO HIT CHANCE",
+                    "stats": [
+                        {
+                            "name": "hitChance",
+                            "value": 80,
+                            "valueType": "base"
+                        }
+                    ]
+                },
+                {
+                    "id": "critChance",
+                    "desc": "+#% TO CRITICAL STRIKE CHANCE",
+                    "stats": [
+                        {
+                            "name": "critChance",
+                            "value": 10,
+                            "valueType": "base"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "supports": [
+        {
+            "name": "Damage",
+            "manaMultiplier": 120,
+            "mods": [
+                {
+                    "id": "moreDamage",
+                    "desc": "#% MORE DAMAGE",
+                    "stats": [
+                        {
+                            "name": "damage",
+                            "value": 100,
+                            "valueType": "more"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Attack Speed",
+            "manaMultiplier": 130,
+            "mods": [
+                {
+                    "id": "moreAttackSpeed",
+                    "desc": "#% MORE ATTACK SPEED",
+                    "stats": [
+                        {
+                            "name": "attackSpeed",
+                            "value": 10,
+                            "valueType": "more"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Hit Chance",
+            "manaMultiplier": 110,
+            "mods": [
+                {
+                    "id": "hitChance",
+                    "desc": "+#% TO HIT CHANCE",
+                    "stats": [
+                        {
+                            "name": "hitChance",
+                            "value": 10,
+                            "valueType": "base"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Crit Chance",
+            "manaMultiplier": 150,
+            "mods": [
+                {
+                    "id": "critChance",
+                    "desc": "+#% TO CRITICAL STRIKE CHANCE",
+                    "stats": [
+                        {
+                            "name": "critChance",
+                            "value": 30,
+                            "valueType": "base"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Crit Multiplier",
+            "manaMultiplier": 200,
+            "mods": [
+                {
+                    "id": "critMulti",
+                    "desc": "+#% TO CRITICAL STRIKE MULTIPLIER",
+                    "stats": [
+                        {
+                            "name": "critMulti",
+                            "value": 200,
+                            "valueType": "base"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Chance to Bleed",
+            "manaMultiplier": 200,
+            "mods": [
+                {
+                    "id": "bleedChance",
+                    "desc": "+#% TO BLEED CHANCE",
+                    "stats": [
+                        {
+                            "name": "bleedChance",
+                            "value": 50,
+                            "valueType": "base"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Bleed Damage",
+            "manaMultiplier": 200,
+            "mods": [
+                {
+                    "id": "moreBleedDamage",
+                    "desc": "#% MORE BLEED DAMAGE",
+                    "stats": [
+                        {
+                            "name": "damage",
+                            "value": 50,
+                            "valueType": "more",
+                            "flags": ["Bleed"]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
