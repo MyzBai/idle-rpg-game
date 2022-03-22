@@ -16,7 +16,7 @@ export async function init(data) {
     }
     console.log('init enemy');
 
-    healthList = data.enemies.flatmap(x => x.health);
+    healthList = data.enemies.map(x => x.health);
     maxHealth = healthList[0];
     curHealth = maxHealth;
     console.log(`Enemy initialized with %c${maxHealth}%c max health`, 'color: red', 'color: default');
