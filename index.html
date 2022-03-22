@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.10.0/ajv7.min.js"></script>
+</head>
+<body>
+    <div class="p-home p active" data-tab-content>
+        <div class="btn-go-to-game-page g-button" data-tab-target="body > .p-game">Game</div>
+        <div class="title">Load Module</div>
+        <div class="s-wrapper">
+            <div class="s-buttons">
+                <div class="g-vertical-button g-button" data-tab-target=".s-modules">Modules</div>
+                <div class="g-vertical-button g-button" data-tab-target=".s-upload">Upload</div>
+                <div class="g-vertical-button g-button" data-tab-target=".s-load">Load</div>
+            </div>
+            <div class="wrapper">
+                <div class="s-modules" data-tab-content>
+                    <div class="s-module-container">
+                        <template>
+                            <div class="module-button">
+                                <div class="title"></div>
+                                <div class="content"> <div></div>
+                                    <div class="start-button g-button">Start</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div class="s-upload" data-tab-content>
+                    <div class="s-drop-area empty">
+                        <input type="file" name="file" accept=".json" multiple>
+                    </div>
+                    <label class="warning">Warning: </span><span>Progress will not be saved. Provide a name property in a config.json file</label>
+                    <div class="start-button g-button" disabled >Start</div>
+                </div>
+                <div class="s-load" data-tab-content>
+                    No saved games...
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="p-game p" data-tab-content>
+        <div>
+            <div>
+                <button class="save-btn">Save</button>
+                <button class="load-btn">Load</button>
+            </div>
+            <div style="text-align: center;">
+                <label class="s-level">Level <span>1</span></label>
+                <label class="s-essence" style="display: block;">Essence <span>1</span></label>
+            </div>
+            <div>
+                <button class="btn-go-to-home-page" data-tab-target="body > .p-home">Load Module</button>
+                <button class="start-game">START</button>
+                <button class="stop-game">STOP</button>
+                <button class="reset-game">RESET</button>
+                <button class="kill-enemy">KILL</button>
+                <label class="status-game">Status: <span>stopped</span></label>
+            </div>
+        </div>
+        <div class="main">
+            <!--Menu-->
+            <div class="s-menu">
+                <fieldset>
+                    <legend>Main Menu</legend>
+                    <div class="g-menu-container">
+                        <div data-tab-target=".p-combat">Combat</div>
+                        <div data-tab-target=".p-skills">Skills</div>
+                        <div data-tab-target=".p-items">Items</div>
+                        <div data-tab-target=".p-mod-tree">Mod Tree</div>
+                    </div>
+                </fieldset>
+            </div>
+
+
+            <!--Main-->
+            <div class="p-main">
+                <div class="p-combat active" data-tab-content>
+                    <fieldset class="s-enemy">
+                        <legend>Combat</legend>
+                        <div class="g-progress-bar-background s-health-bar-background">
+                            <div class="g-progress-bar-foreground health-bar"></div>
+                        </div>
+                        <div>
+                            <div class="ailment bleed">Bleed: <span></span>s</div>
+                        </div>
+                        <div class="g-progress-bar-background s-mana-bar-background">
+                            <div class="g-progress-bar-foreground mana-bar"></div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="p-skills" data-tab-content>
+                    <fieldset class="s-skills">
+                        <legend>Skills</legend>
+                        <div class="s-buttons">
+                            <fieldset>
+                                <legend>Attack</legend>
+                                <div class="s-attack-skill-container g-menu-container"></div>
+                            </fieldset>
+                            <fieldset>
+                                <legend>Supports</legend>
+                                <div class="s-support-skill-container g-menu-container"></div>
+                            </fieldset>
+                        </div>
+            
+                        <div class="s-skill-view">
+                            <div class="name"></div>
+                            <div class="g-separator"></div>
+                            <div class="s-stats"></div>
+                            <div class="g-separator"></div>
+                            <div class="s-mods"></div>
+                            <button>Enable</button>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="p-items" data-tab-content>
+                    <fieldset class="s-items">
+                        <legend>Items</legend>
+                        <!-- <div class="s-menu"></div> -->
+                        <div class="s-content">
+                            <div class="s-item-list g-menu-container"></div>
+                            <div class="s-item"></div>
+                            <div class="s-item-options">
+                                <div class="s-basic">
+                                    <div class="s-roll-mods s-craft-action">
+                                        <div class="title">Roll Modifiers</div>
+                                        <select class="tier"></select>
+                                        <div class="cost">Cost <span>0</span></div>
+                                        <button>Craft</button>
+                                    </div>
+                                    <div class="s-add-mod s-craft-action">
+                                        <div class="title">Add Modifier</div>
+                                        <select class="tier"></select>
+                                        <div class="cost">Cost <span>0</span></div>
+                                        <button>Craft</button>
+                                    </div>
+                                    <div class="s-roll-values s-craft-action">
+                                        <div class="title">Roll Values</div>
+                                        <div class="cost">Cost <span>0</span></div>
+                                        <button>Craft</button>
+                                    </div>
+                                    <div class="s-remove s-craft-action">
+                                        <div class="title">Remove Random Modifier</div>
+                                        <div class="cost">Cost <span>0</span></div>
+                                        <button>Craft</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="p-mod-tree" data-tab-content>
+                    <fieldset class="s-mod-tree">
+                        <legend>Mod Tree</legend>
+                        <label class="remaining-points">Points Remaining: <span>0</span></label>
+                        <label class="spent-points">Points Spent: <span>0</span></label>
+                        <div class="s-wrapper">
+                            <div class="s-group-container">
+                                <template id="nodeTemplate">
+                                    <div class="s-node">
+                                        <div class="name"></div>
+                                        <div class="points"></div>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="s-tooltip">
+                                <div class="name"></div>
+                                <div class="content"></div>
+                                <button class="assign">Assign</button>
+                                <button class="unassign">Unassign</button>
+                            </div>
+                        </div>
+         
+                    </fieldset>
+                </div>
+            </div>
+            <!--Stats-->
+            <div class="s-stats">
+                <fieldset class="s-stats">
+                    <legend>Stats</legend>
+                    <div class="s-stats-container">
+                        <template>
+                            <div class="s-stats-field">
+                                <div></div>
+                                <div></div>
+                            </div>
+                        </template>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+
+    <!-- <script>
+        const pages = document.querySelectorAll('body > .p');
+        function goToPage(className){
+            pages.forEach(x => x.style.display = 'none');
+            [...pages].find(x => x.classList.contains(className)).style.display = 'block';
+        }
+    </script> -->
+</body>
+</html>

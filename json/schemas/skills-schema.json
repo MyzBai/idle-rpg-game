@@ -1,0 +1,88 @@
+{
+    "$id": "module/skills-schema.json",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "data"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "data": {
+            "type": "object",
+            "required": [
+                "attacks"
+            ],
+            "properties": {
+                "config": {
+                    "type": "object",
+                    "properties": {
+                        "numSupports": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "attacks": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "attackSpeed",
+                            "baseDamageMultiplier",
+                            "mods"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "attackSpeed": {
+                                "type": "number"
+                            },
+                            "baseDamageMultiplier": {
+                                "type": "number"
+                            },
+                            "manaCost": {
+                                "type": "number"
+                            },
+                            "mods": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "mods-schema.json#/definitions/mod"
+                                }
+                            }
+                        }
+                    }
+                },
+                "supports": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": [
+                            "name",
+                            "manaMultiplier",
+                            "mods"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "manaMultiplier": {
+                                "type": "number"
+                            },
+                            "mods": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "mods-schema.json#/definitions/mod"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

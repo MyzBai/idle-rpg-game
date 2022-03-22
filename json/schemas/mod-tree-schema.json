@@ -1,0 +1,55 @@
+{
+    "$id": "module/mod-tree-schema.json",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {"type":"string"},
+        "data": {
+            "type": "object",
+            "required": ["groups"],
+            "properties": {
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["nodes"],
+                        "properties": {
+                            "config": {
+                                "type": "object",
+                                "properties": {
+                                    "reqPoints": {
+                                        "type": "number"
+                                    }
+                                }
+                            },
+                            "nodes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "required": ["config","mods"],
+                                    "properties": {
+                                        "config": {
+                                            "type": "object",
+                                            "required": ["name"],
+                                            "properties": {
+                                                "name": {"type":"string"}
+                                            }
+                                        },
+                                        "mods": {
+                                            "type": "array",
+                                            "items":{
+                                                "$ref": "mods-schema.json#/definitions/mod"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

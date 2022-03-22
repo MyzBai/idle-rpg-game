@@ -1,0 +1,634 @@
+{
+    "$schema": "../../schemas/items-schema.json",
+    "data": {
+        "config": { 
+            "maxMods": 6
+        },
+        "items": [
+            {
+                "name": "Item 1",
+                "levelReq": 1
+            },
+            {
+                "name": "Item 2",
+                "levelReq": 3
+            },
+            {
+                "name": "Item 3",
+                "levelReq": 5
+            },
+            {
+                "name": "Item 4",
+                "levelReq": 8
+            },
+            {
+                "name": "Item 5",
+                "levelReq": 10
+            }
+        ],
+        "crafting": {
+            "basic": {
+                "config": {
+                    
+                },
+                "actions": {
+                    "rollMods": {
+                        "weights": [5, 10, 20, 30, 15, 5],
+                        "tierTargets": {
+                            "random": {
+                                "cost": 10
+                            },
+                            "lucky": {
+                                "cost": 100
+                            },
+                            "max": {
+                                "cost": 1000
+                            }
+                        }
+                    },
+                    "addMod": {
+                        "tierTargets": {
+                            "random": {
+                                "cost": 100
+                            },
+                            "lucky": {
+                                "cost": 1000
+                            },
+                            "max": {
+                                "cost": 10000
+                            }
+                        }
+                    },
+                    "rollValues": {
+                        "cost": 1000
+                    },
+                    "remove": {
+                        "cost": 500
+                    }
+                }
+            }
+        },
+        "mods": [
+            {
+                "id": "basePhysicalDamage",
+                "desc": "Adds # To # Physical Damage",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 100,
+                        "stats": [
+                            {
+                                "min": 3,
+                                "max": 4
+                            },
+                            {
+                                "min": 5,
+                                "max": 7
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 5,
+                        "weight": 90,
+                        "stats": [
+                            {
+                                "min": 4,
+                                "max": 6
+                            },
+                            {
+                                "min": 6,
+                                "max": 9
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 90,
+                        "stats": [
+                            {
+                                "min": 8,
+                                "max": 10
+                            },
+                            {
+                                "min": 11,
+                                "max": 14
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 15,
+                        "weight": 85,
+                        "stats": [
+                            {
+                                "min": 10,
+                                "max": 14
+                            },
+                            {
+                                "min": 16,
+                                "max": 20
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "incPhysicalDamage",
+                "desc": "#% Increased Physical Damage",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 80,
+                        "stats": [
+                            {
+                                "min": 20,
+                                "max": 30
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 5,
+                        "weight": 80,
+                        "stats": [
+                            {
+                                "min": 30,
+                                "max": 40
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 80,
+                        "stats": [
+                            {
+                                "min": 40,
+                                "max": 50
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "hitChance",
+                "desc": "+#% To Hit Chance",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 100,
+                        "stats": [
+                            {
+                                "min": 5,
+                                "max": 10
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 5,
+                        "weight": 100,
+                        "stats": [
+                            {
+                                "min": 10,
+                                "max": 15
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 100,
+                        "stats": [
+                            {
+                                "min": 15,
+                                "max": 20
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "incAttackSpeed",
+                "desc": "#% Increased Attack Speed",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 80,
+                        "stats": [
+                            {
+                                "min": 20,
+                                "max": 30
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 5,
+                        "weight": 80,
+                        "stats": [
+                            {
+                                "min": 30,
+                                "max": 40
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 80,
+                        "stats": [
+                            {
+                                "min": 40,
+                                "max": 50
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "critChance",
+                "desc": "+#% To Critical Strike Chance",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 5,
+                                "max": 9
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 10,
+                                "max": 15
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 16,
+                                "max": 20
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "critMulti",
+                "desc": "+#% To Critical Strike Multiplier",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 24,
+                                "max": 29
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 30,
+                                "max": 44
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 45,
+                                "max": 60
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "bleedChance",
+                "desc": "+#% To Bleed Chance",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 70,
+                        "stats": [
+                            {
+                                "min": 3,
+                                "max": 6
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 7,
+                                "max": 11
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 12,
+                                "max": 15
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "incBleedDamage",
+                "desc": "#% Increased Bleed Damage",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 70,
+                        "stats": [
+                            {
+                                "min": 16,
+                                "max": 22
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 23,
+                                "max": 31
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 32,
+                                "max": 38
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "incManaRegen",
+                "desc": "#% Increased Mana Regeneration",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 70,
+                        "stats": [
+                            {
+                                "min": 20,
+                                "max": 30
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 31,
+                                "max": 40
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 41,
+                                "max": 50
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "incMana",
+                "desc": "#% Increased Maximum Mana",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 70,
+                        "stats": [
+                            {
+                                "min": 20,
+                                "max": 30
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 31,
+                                "max": 40
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 41,
+                                "max": 50
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "baseMana",
+                "desc": "+#% To Maximum Mana",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 70,
+                        "stats": [
+                            {
+                                "min": 20,
+                                "max": 30
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 31,
+                                "max": 40
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 41,
+                                "max": 50
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "baseStrength",
+                "desc": "+# To Strength",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 70,
+                        "stats": [
+                            {
+                                "min": 5,
+                                "max": 10
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 11,
+                                "max": 15
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 15,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 16,
+                                "max": 20
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 21,
+                                "max": 25
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "baseDexterity",
+                "desc": "+# To Dexterity",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 70,
+                        "stats": [
+                            {
+                                "min": 5,
+                                "max": 10
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 11,
+                                "max": 15
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 15,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 16,
+                                "max": 20
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 21,
+                                "max": 25
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "id": "baseIntelligence",
+                "desc": "+# To Intelligence",
+                "table": [
+                    {
+                        "levelReq": 1,
+                        "weight": 70,
+                        "stats": [
+                            {
+                                "min": 5,
+                                "max": 10
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 10,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 11,
+                                "max": 15
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 15,
+                        "weight": 60,
+                        "stats": [
+                            {
+                                "min": 16,
+                                "max": 20
+                            }
+                        ]
+                    },
+                    {
+                        "levelReq": 20,
+                        "weight": 50,
+                        "stats": [
+                            {
+                                "min": 21,
+                                "max": 25
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

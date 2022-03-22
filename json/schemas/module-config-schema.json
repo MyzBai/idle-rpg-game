@@ -1,0 +1,16 @@
+{
+    "$id": "module/module-config-schema.json",
+    "type": "object",
+    "required": ["name", "include", "desc"],
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "include": {
+            "type" : "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    }
+}

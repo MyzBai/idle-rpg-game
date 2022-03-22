@@ -1,0 +1,158 @@
+{
+    "$schema": "../../schemas/mod-tree-schema.json",
+    "data": {
+        "groups": [
+            {
+                "config": {
+                    "reqPoints": 0
+                },
+                "nodes": [
+                    {
+                        "config": {
+                            "name": "Strength",
+                            "max": 10
+                        },
+                        "mods":[
+                            {
+                                "id": "baseStrength",
+                                "stats": [
+                                    {"value": 10}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "config": {
+                            "name": "Dexterity",
+                            "max": 10
+                        },
+                        "mods": [
+                            {
+                                "id": "baseDexterity",
+                                "stats": [
+                                    {"value": 10}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "config": {
+                            "name": "Intelligence",
+                            "max": 10
+                        },
+                        "mods": [
+                            {
+                                "id": "baseIntelligence",
+                                "stats": [
+                                    {"value": 10}
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "config": {
+                    "reqPoints": 5
+                },
+                "nodes": [
+                    {
+                        "config": {
+                            "name": "Physical Damage",
+                            "max": 5
+                        },
+                        "mods": [
+                            {
+                                "id": "incPhysicalDamage",
+                                "stats": [
+                                    {"value": 10}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "config": {
+                            "name": "Elemental Damage",
+                            "max": 5
+                        },
+                        "mods": [{
+                            "id": "incElementalDamage",
+                            "stats": [
+                                {"value": 10}
+                            ]
+                        }]
+                    },
+                    {
+                        "config": {
+                            "name": "Chaos Damage",
+                            "max": 5
+                        },
+                        "mods": [{
+                            "id": "incChaosDamage",
+                            "stats": [
+                                {"value": 10}
+                            ]
+                        }]
+                    }
+                ]
+            },
+            {
+                "config": {
+                    "reqPoints": 10
+                },
+                "nodes": [
+                    {
+                        "config": {
+                            "name": "Attack Speed",
+                            "max": 5
+                        },
+                        "mods": [
+                            {
+                                "id": "incAttackSpeed",
+                                "stats": [
+                                    {"value": 5}
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "config": {
+                            "name": "Hit Chance",
+                            "max": 5
+                        },
+                        "mods": [{
+                            "id": "hitChance",
+                            "stats": [
+                                {"value": 3}
+                            ]
+                        }]
+                    },
+                    {
+                        "config": {
+                            "name": "Critical Strike Chance",
+                            "max": 5
+                        },
+                        "mods": [{
+                            "id": "critChance",
+                            "stats": [
+                                {"value": 5}
+                            ]
+                        }]
+                    },
+                    {
+                        "config": {
+                            "name": "Critical Strike Multiplier",
+                            "max": 5
+                        },
+                        "mods": [{
+                            "id": "critMulti",
+                            "stats": [
+                                {"value": 20}
+                            ]
+                        }]
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "../../schemas/enemy-schema.json",
+    "data": {
+        "enemies": [
+            {
+                "health": 200
+            },
+            {
+                "health": 200
+            },
+            {
+                "health": 300
+            },
+            {
+                "health": 400
+            },
+            {
+                "health": 500
+            },
+            {
+                "health": 600
+            },
+            {
+                "health": 700
+            },
+            {
+                "health": 800
+            },
+            {
+                "health": 900
+            },
+            {
+                "health": 1000
+            }
+        ]
+    }
+}

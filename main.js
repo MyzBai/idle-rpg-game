@@ -1,0 +1,91 @@
+import Global from "./global.js";
+import { init as subModulesInit } from "./init-game.js";
+import * as gameLoop from "./gameLoop.js";
+import * as loadModule from "./loadModule.js";
+import { isLocalNetwork } from "./helperFunctions.js";
+import * as save from "./save.js";
+import { registerTabs } from "./helperFunctions.js";
+
+const tabs = [
+    document.querySelector(".btn-go-to-home-page"),
+    document.querySelector(".btn-go-to-game-page"),
+];
+registerTabs(tabs);
+tabs[0].click();
+
+const startButton = document.querySelector(".start-game");
+const stopButton = document.querySelector(".stop-game");
+const resetButton = document.querySelector(".reset-game");
+const statusSpan = document.querySelector(".status-game span");
+
+document.querySelector(".p-game .save-btn").addEventListener("click", (e) => {
+    save.save();
+});
+document.querySelector(".p-game .load-btn").addEventListener("click", (e) => {
+    save.load();
+});
+
+init();
+async function init() {
+    await loadEnvironment();
+
+    startButton.addEventListener("click", startGame);
+    stopButton.addEventListener("click", stopGame);
+    resetButton.addEventListener("click", resetGame);
+
+    await loadModule.init();
+    var moduleData = undefined;
+    do {
+        moduleData = await loadModule.load();
+        if (!moduleData) {
+            break;
+        }
+        Global.env.SAVE_PATH = moduleData.config.path;
+
+        if (moduleData.config.overrideSave && save.hasSave()) {
+            const ok = confirm(
+                "A save was found for this module. It will be overwritten. Continue anyways?"
+            );
+            if (!ok) {
+                moduleData = undefined;
+            } else {
+                save.reset();
+            }
+        }
+    } while (!moduleData);
+
+    subModulesInit(moduleData.data);
+    save.load();
+
+    tabs[1].click();
+}
+
+function startGame() {
+    startButton.classList.add("active");
+    stopButton.classList.remove("active");
+    statusSpan.style.color = "green";
+    statusSpan.textContent = "running";
+    gameLoop.start();
+}
+
+function stopGame() {
+    stopButton.classList.add("active");
+    startButton.classList.remove("active");
+    statusSpan.style.color = "red";
+    statusSpan.textContent = "stopped";
+    gameLoop.stop();
+}
+
+function resetGame() {
+    save.reset();
+    location.reload();
+}
+
+async function loadEnvironment() {
+    const isLocal = isLocalNetwork(window.location.hostname);
+    const envFilePath = `./env/${
+        isLocal ? "development" : "production"
+    }.env.js`;
+    const env = await import(envFilePath);
+    Global.env = env.default;
+}
