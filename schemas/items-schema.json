@@ -1,5 +1,6 @@
 {
-    "$id": "module/items-schema.json",
+    "$schema": "https://myzbai.github.io/idle-rpg-demo/schemas/items-schema.json#",
+    "$id": "https://myzbai.github.io/idle-rpg-demo/schemas/items-schema.json#",
     "type": "object",
     "required": [
         "data"
