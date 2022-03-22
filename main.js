@@ -30,8 +30,6 @@ async function init() {
 	stopButton.addEventListener("click", stopGame);
 	resetButton.addEventListener("click", resetGame);
 
-	console.log([...Object.entries(groups)]);
-
 	await loadModule.init();
 	const moduleData = await loadModule.load();
 	console.log('save path', Global.env.SAVE_PATH);
