@@ -1,6 +1,4 @@
 {
-    "$schema": "https://myzbai.github.io/idle-rpg-demo/schemas/items-schema.json#",
-    "title": "Strict JSON Schema to validate other JSON Schema",
     "$id": "https://myzbai.github.io/idle-rpg-demo/schemas/items-schema.json#",
     "type": "object",
     "required": [
