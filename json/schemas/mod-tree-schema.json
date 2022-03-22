@@ -1,63 +1,47 @@
 {
-    "$id": "module/mod-tree-schema.json",
-    "type": "object",
-    "required": ["data"],
-    "properties": {
-        "$schema": {"type":"string"},
-        "data": {
-            "type": "object",
-            "required": ["groups"],
-            "properties": {
-                "groups": {
+	"$id": "module/mod-tree-schema.json",
+	"type": "object",
+	"required": ["data"],
+	"properties": {
+		"$schema": { "type": "string" },
+		"data": {
+			"type": "object",
+            "required":["nodes"],
+			"properties": {
+                "nodes": {
                     "type": "array",
-                    "minItems": 1,
                     "items": {
-                        "type": "object",
-                        "required": ["nodes"],
-                        "properties": {
-                            "config": {
-                                "type": "object",
-                                "properties": {
-                                    "reqPoints": {
-                                        "type": "number"
-                                    }
-                                }
-                            },
-                            "nodes": {
-                                "type": "array",
-                                "minItems": 1,
-                                "items": {
-                                    "type": "object",
-                                    "required": ["config","mods"],
-                                    "properties": {
-                                        "config": {
-                                            "type": "object",
-                                            "required": ["name"],
-                                            "properties": {
-                                                "name": {
-                                                    "type":"string",
-                                                    "minLength": 3,
-                                                    "maxLength": 32,
-                                                    "pattern": "^[a-zA-Z ]+$"
-                                                },
-                                                "max": {
-                                                    "type": "number"
-                                                }
-                                            }
-                                        },
-                                        "mods": {
-                                            "type": "array",
-                                            "items":{
-                                                "$ref": "mods-schema.json#/definitions/mod"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        "$ref": "#/definitions/node"
                     }
                 }
-            }
-        }
-    }
+			}
+		}
+	},
+	"definitions": {
+		"node": {
+			"type": "object",
+            "required": ["name", "maxPoints", "mods"],
+			"properties": {
+				"name": {
+					"type": "string",
+					"minLength": 3,
+					"maxLength": 32,
+					"pattern": "^[a-zA-Z ]+$"
+				},
+				"maxPoints": {
+					"type": "integer",
+                    "minimum": 1
+				},
+                "reqPointsSpent": {
+                    "type": "integer"
+                },
+				"mods": {
+					"type": "array",
+					"items": {
+						"$ref": "mods-schema.json#/definitions/mod"
+					}
+				}
+			}
+		}
+	}
 }

@@ -6,10 +6,7 @@ import { isLocalNetwork } from "./helperFunctions.js";
 import * as save from "./save.js";
 import { registerTabs } from "./helperFunctions.js";
 
-const tabs = [
-    document.querySelector(".btn-go-to-home-page"),
-    document.querySelector(".btn-go-to-game-page"),
-];
+const tabs = [document.querySelector(".btn-go-to-home-page"), document.querySelector(".btn-go-to-game-page")];
 registerTabs(tabs);
 tabs[0].click();
 
@@ -19,55 +16,55 @@ const resetButton = document.querySelector(".reset-game");
 const statusSpan = document.querySelector(".status-game span");
 
 document.querySelector(".p-game .save-btn").addEventListener("click", (e) => {
-    save.save();
+	save.save();
 });
 document.querySelector(".p-game .load-btn").addEventListener("click", (e) => {
-    save.load();
+	save.load();
 });
 
 init();
 async function init() {
-    await loadEnvironment();
+	await loadEnvironment();
 
-    startButton.addEventListener("click", startGame);
-    stopButton.addEventListener("click", stopGame);
-    resetButton.addEventListener("click", resetGame);
+	startButton.addEventListener("click", startGame);
+	stopButton.addEventListener("click", stopGame);
+	resetButton.addEventListener("click", resetGame);
 
-    await loadModule.init();
-    const moduleData = await loadModule.load();
-    console.log('save path', Global.env.SAVE_PATH);
-    subModulesInit(moduleData);
-    save.load();
+	console.log([...Object.entries(groups)]);
 
-    tabs[1].click();
+	await loadModule.init();
+	const moduleData = await loadModule.load();
+	console.log('save path', Global.env.SAVE_PATH);
+	subModulesInit(moduleData);
+	save.load();
+
+	tabs[1].click();
 }
 
 function startGame() {
-    startButton.classList.add("active");
-    stopButton.classList.remove("active");
-    statusSpan.style.color = "green";
-    statusSpan.textContent = "running";
-    gameLoop.start();
+	startButton.classList.add("active");
+	stopButton.classList.remove("active");
+	statusSpan.style.color = "green";
+	statusSpan.textContent = "running";
+	gameLoop.start();
 }
 
 function stopGame() {
-    stopButton.classList.add("active");
-    startButton.classList.remove("active");
-    statusSpan.style.color = "red";
-    statusSpan.textContent = "stopped";
-    gameLoop.stop();
+	stopButton.classList.add("active");
+	startButton.classList.remove("active");
+	statusSpan.style.color = "red";
+	statusSpan.textContent = "stopped";
+	gameLoop.stop();
 }
 
 function resetGame() {
-    save.reset();
-    location.reload();
+	save.reset();
+	location.reload();
 }
 
 async function loadEnvironment() {
-    const isLocal = isLocalNetwork(window.location.hostname);
-    const envFilePath = `./env/${
-        isLocal ? "development" : "production"
-    }.env.js`;
-    const env = await import(envFilePath);
-    Global.env = env.default;
+	const isLocal = isLocalNetwork(window.location.hostname);
+	const envFilePath = `./env/${isLocal ? "development" : "production"}.env.js`;
+	const env = await import(envFilePath);
+	Global.env = env.default;
 }

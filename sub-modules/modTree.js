@@ -31,7 +31,7 @@ import { registerSave, registerLoad } from '../save.js';
 
 /**
  * @typedef TreeGroup
- * @property {GroupConfig} config
+ * @property {number} reqPoints
  * @property {GroupNode[]} nodes
  * @property {HTMLElement} [element]
  */
@@ -48,6 +48,7 @@ var unassignClickEvent = undefined;
 
 /**@type {TreeGroup[]} */
 const treeGroups = [];
+
 var selectedNode = undefined;
 
 
@@ -55,8 +56,13 @@ export async function init(data) {
 
     console.log('init mod-tree');
 
+    // const groups = data.groups;
+    
     /**@type {TreeGroup[]} */
-    const groups = data.groups;
+    const groups = Object.values(data.nodes.reduce((a, c) => {
+        c.reqPoints = c.reqPoints || 0;
+        a[c.reqPoints] = [...(a[c.reqPoints] || []), c];
+    }, {}));
 
     for (const group of groups) {
         createGroupElement(group);

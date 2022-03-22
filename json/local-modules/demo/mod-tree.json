@@ -1,17 +1,127 @@
 {
     "$schema": "../../schemas/mod-tree-schema.json",
     "data": {
+        "nodes": [
+            {
+                "name": "Strength",
+                "maxPoints": 10,
+                "mods":[
+                    {
+                        "id": "baseStrength",
+                        "stats": [
+                            {"value": 10}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Dexterity",
+                "maxPoints": 10,
+                "mods": [
+                    {
+                        "id": "baseDexterity",
+                        "stats": [
+                            {"value": 10}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Intelligence",
+                "maxPoints": 10,
+                "mods": [
+                    {
+                        "id": "baseIntelligence",
+                        "stats": [
+                            {"value": 10}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Physical Damage",
+                "maxPoints": 5,
+                "reqPointsSpent": 5,
+                "mods": [
+                    {
+                        "id": "incPhysicalDamage",
+                        "stats": [
+                            {"value": 10}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Elemental Damage",
+                "maxPoints": 5,
+                "reqPointsSpent": 5,
+                "mods": [{
+                    "id": "incElementalDamage",
+                    "stats": [
+                        {"value": 10}
+                    ]
+                }]
+            },
+            {
+                "name": "Chaos Damage",
+                "maxPoints": 5,
+                "reqPointsSpent": 5,
+                "mods": [{
+                    "id": "incChaosDamage",
+                    "stats": [
+                        {"value": 10}
+                    ]
+                }]
+            },
+            {
+                "name": "Attack Speed",
+                "maxPoints": 10,
+                "mods": [
+                    {
+                        "id": "incAttackSpeed",
+                        "stats": [
+                            {"value": 5}
+                        ]
+                    }
+                ]
+            },
+            {
+                "name": "Hit Chance",
+                "maxPoints": 10,
+                "mods": [{
+                    "id": "hitChance",
+                    "stats": [
+                        {"value": 3}
+                    ]
+                }]
+            },
+            {
+                "name": "Critical Strike Chance",
+                "maxPoints": 10,
+                "mods": [{
+                    "id": "critChance",
+                    "stats": [
+                        {"value": 5}
+                    ]
+                }]
+            },
+            {
+                "name": "Critical Strike Multiplier",
+                "maxPoints": 10,
+                "mods": [{
+                    "id": "critMulti",
+                    "stats": [
+                        {"value": 20}
+                    ]
+                }]
+            }
+        ],
         "groups": [
             {
-                "config": {
-                    "reqPoints": 0
-                },
                 "nodes": [
                     {
-                        "config": {
-                            "name": "Strength",
-                            "max": 10
-                        },
+                        "name": "Strength",
+                        "maxPoints": 10,
                         "mods":[
                             {
                                 "id": "baseStrength",
@@ -22,10 +132,8 @@
                         ]
                     },
                     {
-                        "config": {
-                            "name": "Dexterity",
-                            "max": 10
-                        },
+                        "name": "Dexterity",
+                        "maxPoints": 10,
                         "mods": [
                             {
                                 "id": "baseDexterity",
@@ -36,10 +144,8 @@
                         ]
                     },
                     {
-                        "config": {
-                            "name": "Intelligence",
-                            "max": 10
-                        },
+                        "name": "Intelligence",
+                        "maxPoints": 10,
                         "mods": [
                             {
                                 "id": "baseIntelligence",
@@ -57,10 +163,8 @@
                 },
                 "nodes": [
                     {
-                        "config": {
-                            "name": "Physical Damage",
-                            "max": 5
-                        },
+                        "name": "Physical Damage",
+                        "maxPoints": 5,
                         "mods": [
                             {
                                 "id": "incPhysicalDamage",
@@ -71,10 +175,8 @@
                         ]
                     },
                     {
-                        "config": {
-                            "name": "Elemental Damage",
-                            "max": 5
-                        },
+                        "name": "Elemental Damage",
+                        "maxPoints": 5,
                         "mods": [{
                             "id": "incElementalDamage",
                             "stats": [
@@ -83,10 +185,8 @@
                         }]
                     },
                     {
-                        "config": {
-                            "name": "Chaos Damage",
-                            "max": 5
-                        },
+                        "name": "Chaos Damage",
+                        "maxPoints": 5,
                         "mods": [{
                             "id": "incChaosDamage",
                             "stats": [
@@ -102,10 +202,8 @@
                 },
                 "nodes": [
                     {
-                        "config": {
-                            "name": "Attack Speed",
-                            "max": 5
-                        },
+                        "name": "Attack Speed",
+                        "maxPoints": 5,
                         "mods": [
                             {
                                 "id": "incAttackSpeed",
@@ -116,10 +214,8 @@
                         ]
                     },
                     {
-                        "config": {
-                            "name": "Hit Chance",
-                            "max": 5
-                        },
+                        "name": "Hit Chance",
+                        "maxPoints": 5,
                         "mods": [{
                             "id": "hitChance",
                             "stats": [
@@ -128,10 +224,8 @@
                         }]
                     },
                     {
-                        "config": {
-                            "name": "Critical Strike Chance",
-                            "max": 5
-                        },
+                        "name": "Critical Strike Chance",
+                        "maxPoints": 5,
                         "mods": [{
                             "id": "critChance",
                             "stats": [
@@ -140,10 +234,8 @@
                         }]
                     },
                     {
-                        "config": {
-                            "name": "Critical Strike Multiplier",
-                            "max": 5
-                        },
+                        "name": "Critical Strike Multiplier",
+                        "maxPoints": 5,
                         "mods": [{
                             "id": "critMulti",
                             "stats": [
