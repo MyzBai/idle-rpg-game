@@ -34,7 +34,15 @@
                                             "type": "object",
                                             "required": ["name"],
                                             "properties": {
-                                                "name": {"type":"string"}
+                                                "name": {
+                                                    "type":"string",
+                                                    "minLength": 3,
+                                                    "maxLength": 32,
+                                                    "pattern": "^[a-zA-Z ]+$"
+                                                },
+                                                "max": {
+                                                    "type": "number"
+                                                }
                                             }
                                         },
                                         "mods": {

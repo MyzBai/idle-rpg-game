@@ -142,7 +142,7 @@ function selectNode(node) {
 function updateGroups(){
     const pointsSpent = getSpentPoints();
     for (const group of treeGroups) {
-        group.element.classList.toggle("active", group.config.reqPoints <= pointsSpent);
+        group.element.classList.toggle("active", group?.config?.reqPoints || 0 <= pointsSpent);
     }
 }
 
