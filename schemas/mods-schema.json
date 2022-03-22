@@ -1,5 +1,5 @@
 {
-    "$id": "module/mods-schema.json",
+    "$id": "https://myzbai.github.io/idle-rpg-demo/schemas/mods-schema.json",
     "definitions": {
         "mod": {
             "type": "object",
