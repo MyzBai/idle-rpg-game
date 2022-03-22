@@ -1,5 +1,4 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
     "$id": "module/mod-tree-schema.json",
     "type": "object",
     "required": ["data"],
