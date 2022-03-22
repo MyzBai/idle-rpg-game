@@ -1,5 +1,5 @@
 import * as player from './player.js'
-import * as enemy from './enemy.js'
+import * as enemy from './sub-modules/enemy.js'
 import * as gameLoop from './gameLoop.js'
 
 /**

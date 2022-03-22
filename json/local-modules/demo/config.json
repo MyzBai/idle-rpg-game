@@ -1,0 +1,6 @@
+{
+    "$schema": "../../schemas/config-schema.json",
+    "data": {
+        "name": "Demo"
+    }
+}

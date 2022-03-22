@@ -1,9 +1,11 @@
 import { randomRange, parseModDescription, weightedRandom, deepFreeze } from "../helperFunctions.js";
-import { getModifierTemplate, getModTemplateList } from '../modTemplates.js';
+import { getStatModifierTemplate, getModTemplateList } from '../modTemplates.js';
 import * as player from '../player.js';
 import { convertStatMods } from "../modDB.js";
 import { registerSave, registerLoad } from '../save.js';
 import * as eventListener from '../eventListener.js';
+
+/**@typedef {import('../type-definitions.js').RawStatMod} RawStatModifier */
 
 /**
  * @typedef ConfigItems
@@ -31,18 +33,7 @@ import * as eventListener from '../eventListener.js';
  * @property {number} weight
  * @property {number} tableIndex
  * @property {number} tableSize
- * @property {Stat[]} stats
- */
-
-/**
- * @typedef Stat
- * @property {string} name
- * @property {string} valueType
- * @property {number} min
- * @property {number} max
- * @property {number} [value]
- * @property {string[]} [flags]
- * @property {string[]} [conditions]
+ * @property {RawStatModifier[]} stats
  */
 
 
@@ -61,7 +52,6 @@ var modCollection = [];
 
 var maxMods = 6;
 
-/**@param {ItemsJson} data */
 export async function init(data) {
     if (!data) {
         return;
@@ -79,7 +69,7 @@ export async function init(data) {
         for (const mod of table) {
             let { levelReq, weight, stats } = mod;
             levelReq = levelReq || 1;
-            let modTemplate = getModifierTemplate(id);
+            let modTemplate = getStatModifierTemplate(id);
             for (let i = 0; i < stats.length; i++) {
                 let statTemplate = modTemplate.stats[i];
                 stats[i].name = statTemplate.name;
@@ -432,6 +422,7 @@ function generateModifiers(level, amount, tierTarget, existingMods = []) {
     return out;
 }
 
+/**@param {Item} item */
 function applyItemModifiers(item){
     player.removeModifiersBySource(item);
     const rawStatMods = item.getMods().flatMap(x => x.stats);
@@ -444,6 +435,7 @@ class Item {
     constructor(name) {
         /**@type {Modifier} */
         const mods = [];
+
         this.name = name;
 
         /**@returns {Modifier[]} */

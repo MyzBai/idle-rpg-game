@@ -1,7 +1,7 @@
 import * as player from '../player.js';
 import * as eventListener from '../eventListener.js';
 import { parseModDescription } from '../helperFunctions.js';
-import { getModifierTemplate } from '../modTemplates.js';
+import { getStatModifierTemplate } from '../modTemplates.js';
 import { convertStatMods } from '../modDB.js';
 import { registerSave, registerLoad } from '../save.js';
 
@@ -151,7 +151,7 @@ function setTooltip(node) {
     var modsText = '';
     node.mods.forEach(x => {
         var values = x.stats.map(x => x.value);
-        var desc = getModifierTemplate(x.id).desc;
+        var desc = getStatModifierTemplate(x.id).desc;
         desc = parseModDescription(desc, values);
         modsText += `${desc}\n`;
     });
@@ -255,7 +255,7 @@ function updateStatMods(node){
     
     const tempStatMods = [];
     for (const mod of node.mods) {
-        const modTemplate = getModifierTemplate(mod.id);
+        const modTemplate = getStatModifierTemplate(mod.id);
         if(mod.stats.length !== modTemplate.stats.length){
             console.error("@modTree - node stats array length does not match mod template stats array length", "id:", mod.id);
             continue;

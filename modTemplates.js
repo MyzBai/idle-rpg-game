@@ -1,22 +1,13 @@
 
-/**
- * @typedef StatsTemplate
- * @property {string} name
- * @property {string} valueType
- * @property {string[]} [flags]
- * @property {string[]} [conditions]
- * @property {import('./modDB.js').StatKeyword} [statKeyword]
- */
+/**@typedef {import('./type-definitions.js').RawStatMod} RawStatModifier */
+
+
 
 /**
- * @typedef StatModTemplate
- * @property {number} id
- * @property {string} desc
- * @property {StatsTemplate[]} stats
+ * @param {string} id
+ * @returns {RawStatModifier} 
  */
-
-/**@returns {StatModTemplate} */
-export function getModifierTemplate(id) {
+export function getStatModifierTemplate(id) {
     const template = templates.find(x => x.id === id);
     if (!template) {
         console.error(`mod with id: ${id} does not exists`);

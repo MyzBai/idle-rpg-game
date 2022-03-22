@@ -1,7 +1,9 @@
 import { avg, randomRange } from './helperFunctions.js'
 
 
-/**@typedef {import('./modDB.js').StatModifier} StatModifier */
+/**@typedef {import('./type-definitions.js').StatMod} StatMod */
+/**@typedef {import('./sub-modules/skills.js').AttackSkill} AttackSkill */
+/**@typedef {import('./player.js').ModCache} ModCache */
 
 
 /**
@@ -22,8 +24,8 @@ import { avg, randomRange } from './helperFunctions.js'
 
 /**
  * @typedef Player
- * @property {StatModifier[]} modList
- * @property {import('./sub-modules/skills.js').AttackSkill} attackSkill
+ * @property {StatMod[]} modList
+ * @property {AttackSkill} attackSkill
  * @property {ConversionTable} conversionTable
  * @property {Attributes} attributes
  */
@@ -35,7 +37,7 @@ import { avg, randomRange } from './helperFunctions.js'
  * @property {function} calcMinMax
  * @property {number} [flags]
  * @property {number} [conditions]
- * @property {import('./player.js').ModCache} modCache
+ * @property {ModCache} modCache
  */
 
 /**
@@ -239,7 +241,7 @@ export function calcStats(player) {
 }
 
 /**
- * @param {StatModifier[]} modList 
+ * @param {StatMod[]} modList 
  * @param {ConversionTable} conversionTable 
  * @param {DamageCalcConfiguration} config
  * @returns {BaseDamageOutput} output
@@ -280,7 +282,7 @@ function calcAttributes(player) {
 }
 
 /**
- * @param {StatModifier[]} modList 
+ * @param {StatMod[]} modList 
  * @param {ConversionTable} conversionTable 
  * @param {string} damageType which damage type to calculate damage for
  * @param {DamageCalcConfiguration} config
@@ -352,7 +354,7 @@ export function calcBleedDamage(player) {
 }
 
 /**
- * @param {StatModifier[]} modList
+ * @param {StatMod[]} modList
  * @returns {ConversionTable}
  */
 export function createConversionTable(modList) {
@@ -406,7 +408,7 @@ export function createConversionTable(modList) {
 }
 
 /**
- * @param {StatModifier[]} modList 
+ * @param {StatMod[]} modList 
  * @param {string | string[]} modNames
  * @param {DamageCalcConfiguration} [config] 
  */
@@ -417,7 +419,7 @@ export function calcModTotal(modList, modNames, config) {
 }
 
 /**
- * @param {StatModifier[]} modList 
+ * @param {StatMod[]} modList 
  * @param {string | string[]} modNames 
  * @param {number} baseValue 
  * @param {DamageCalcConfiguration} config 
@@ -431,7 +433,7 @@ export function calcModIncMore(modList, modNames, baseValue, config) {
 }
 
 /**
- * @param {StatModifier[]} modList 
+ * @param {StatMod[]} modList 
  * @param {string} valueType 
  * @param {string | string[]} modNames
  * @param {DamageCalcConfiguration} [config] 
@@ -480,7 +482,7 @@ export function calcModSum(modList, valueType, modNames, config) {
 }
 
 /**
- * @param {StatModifier} mod
+ * @param {StatMod} mod
  * @param {DamageCalcConfiguration} [config]
  */
 function handleModKeywords(mod, config) {

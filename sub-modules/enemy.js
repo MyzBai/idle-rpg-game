@@ -1,20 +1,5 @@
-import { getLevel as getPlayerLevel } from './player.js';
-import { registerSave, registerLoad } from './save.js';
-
-/**
- * @typedef {import('./ailments.js').Ailments} Ailments
- */
-
-/**
- * @typedef Enemy
- * @property {number} level;
- * @property {number} maxHealth;
- * @property {number} curHealth;
- * @property {Ailments} ailments;
- * @property {function} takeDamage;
- */
-
-
+import { getLevel as getPlayerLevel } from '../player.js';
+import { registerSave, registerLoad } from '../save.js';
 
 /**@type {HTMLElement} */
 var healthbar = document.querySelector('.g-progress-bar-foreground.health-bar');
@@ -25,16 +10,13 @@ var healthList = undefined;
 var curHealth = 0;
 var maxHealth = 0;
 
-// /**@type {Ailments} */
-// export var ailments = { bleed };
-
 export async function init(data) {
     if (!data) {
         return;
     }
     console.log('init enemy');
 
-    healthList = data.map(x => x.health);
+    healthList = data.enemies.flatmap(x => x.health);
     maxHealth = healthList[0];
     curHealth = maxHealth;
     console.log(`Enemy initialized with %c${maxHealth}%c max health`, 'color: red', 'color: default');

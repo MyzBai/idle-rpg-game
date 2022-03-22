@@ -1,15 +1,14 @@
 import * as player from './player.js';
-import * as combat from './sub-modules/combat.js';
+import * as enemy from './sub-modules/enemy.js';
 import * as skills from './sub-modules/skills.js';
 import * as items from './sub-modules/items.js';
 import * as modTree from './sub-modules/modTree.js';
-
+import * as combat from './combat.js';
 import * as save from './save.js';
 
 initMenu();
 
 /**
- * 
  * @param {import('./loadModule.js').ModuleData} data 
  */
 export async function init(data) {
@@ -21,10 +20,12 @@ export async function init(data) {
     //player must be initialized first because it has no dependencies
     await player.init({ defaultStatMods: data.defaultStatMods });
 
-    await combat.init(data.enemy);
+    await enemy.init(data.enemy);
     await skills.init(data.skills);
     await items.init(data.items);
     await modTree.init(data.modTree);
+
+    await combat.init();
     save.registerSave(savedObj => { savedObj.config = data.config });
 }
 

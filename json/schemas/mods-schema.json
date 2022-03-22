@@ -3,7 +3,6 @@
     "definitions": {
         "mod": {
             "type": "object",
-            "additionalProperties": false,
             "required": ["id", "stats"],
             "properties": {
                 "id": {
@@ -28,10 +27,8 @@
         },
         "stat": {
             "type": "object",
-            "additionalProperties": false,
             "anyOf": [
                 {"required": ["value"]},
-                {"required": ["name", "value", "valueType"]},
                 {"required": ["min", "max"]}
             ],
             "properties": {
@@ -92,7 +89,6 @@
                     "type": "array",
                     "items": {
                         "type": "object",
-                        "additionalProperties": false,
                         "properties":{
                             "name": {
                                 "type": "string"

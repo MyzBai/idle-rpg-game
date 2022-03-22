@@ -60,7 +60,6 @@
                     "type": "array",
                     "items": {
                         "type": "object",
-                        "additionalProperties": false,
                         "required": [
                             "name",
                             "manaMultiplier",

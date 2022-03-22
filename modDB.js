@@ -1,32 +1,8 @@
 import { ModFlags } from "./damageCalc.js";
 
 /**
- * @typedef StatKeyword
- * @property {string} name
- * @property {string} type
- */
-
-/**
- * Raw stat modifier with flags/conditions as string arrays
- * @typedef RawStatMod
- * @property {string} name
- * @property {number} [value]
- * @property {string} valueType
- * @property {string[]} [flags]
- * @property {string[]} [conditions]
- * @property {StatKeyword[]} [keywords]
- */
-
-/**
- * Final stat modifier with flags/conditions as a number
- * @typedef StatMod
- * @property {number} value
- * @property {string} valueType
- * @property {string} name
- * @property {number} flags
- * @property {number} conditions
- * @property {StatKeyword[]} [keywords]
- * @property {object} [source]
+ * @typedef {import('./type-definitions.js').StatMod} StatMod
+ * @typedef {import('./type-definitions.js').RawStatMod} RawStatMod
  */
 
 /**
@@ -62,24 +38,11 @@ export function convertStatMods(rawStatMods, source = undefined) {
     return statMods;
 }
 
-
-/**
- * @typedef StatModifier
- * @property {string} name
- * @property {number} value
- * @property {string} valueType
- * @property {number} [flags]
- * @property {number} [conditions]
- * @property {object} [source]
- * @property {object[]} [keywords]
- */
-
-
 export class ModDB {
     constructor() {
         let modList = [];
 
-        /**@param {StatModifier | StatModifier[]} statModifiers */
+        /**@param {StatMod | StatMod[]} statModifiers */
         this.add = function (statModifiers) {
             modList.push(...statModifiers);
         };

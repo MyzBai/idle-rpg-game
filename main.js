@@ -34,27 +34,9 @@ async function init() {
     resetButton.addEventListener("click", resetGame);
 
     await loadModule.init();
-    var moduleData = undefined;
-    do {
-        moduleData = await loadModule.load();
-        if (!moduleData) {
-            break;
-        }
-        Global.env.SAVE_PATH = moduleData.config.path;
-
-        if (moduleData.config.overrideSave && save.hasSave()) {
-            const ok = confirm(
-                "A save was found for this module. It will be overwritten. Continue anyways?"
-            );
-            if (!ok) {
-                moduleData = undefined;
-            } else {
-                save.reset();
-            }
-        }
-    } while (!moduleData);
-
-    subModulesInit(moduleData.data);
+    const moduleData = await loadModule.load();
+    console.log('save path', Global.env.SAVE_PATH);
+    subModulesInit(moduleData);
     save.load();
 
     tabs[1].click();

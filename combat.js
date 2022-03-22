@@ -1,10 +1,15 @@
-import * as player from '../player.js';
-import * as mana from '../mana.js';
-import * as enemy from '../enemy.js';
-import { calcAttack } from '../damageCalc.js';
-import * as ailments from '../ailments.js';
-import * as gameLoop from '../gameLoop.js';
-import * as eventListener from '../eventListener.js';
+import * as player from './player.js';
+import * as mana from './mana.js';
+import * as enemy from './sub-modules/enemy.js';
+import { calcAttack } from './damageCalc.js';
+import * as ailments from './ailments.js';
+import * as gameLoop from './gameLoop.js';
+import * as eventListener from './eventListener.js';
+
+/**
+ * @typedef EnemyData
+ * @property {{health: number}[]} enemies
+ */
 
 var attackLoopId = undefined;
 
@@ -13,15 +18,8 @@ document.querySelector('.kill-enemy').addEventListener('click', e => {
     enemy.die();
 });
 
-export async function init(enemyData) {
-    if(!enemyData){
-        console.error("enemy data is mandatory. This should never be called");
-        return;
-    }
+export async function init() {
     console.log("init combat");
-
-    await enemy.init(enemyData.enemies);
-
     autoAttackLoop();
 }
 
