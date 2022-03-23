@@ -1,9 +1,7 @@
 {
     "$schema": "../../schemas/items-schema.json",
     "data": {
-        "config": { 
-            "maxMods": 6
-        },
+        "maxMods": 6,
         "items": [
             {
                 "name": "Item 1",
@@ -28,9 +26,6 @@
         ],
         "crafting": {
             "basic": {
-                "config": {
-                    
-                },
                 "actions": {
                     "rollMods": {
                         "weights": [5, 10, 20, 30, 15, 5],

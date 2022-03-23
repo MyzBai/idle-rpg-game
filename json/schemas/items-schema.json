@@ -8,14 +8,10 @@
 		},
 		"data": {
 			"type": "object",
-			"required": ["config", "items", "crafting", "mods"],
+			"required": ["items", "crafting", "mods"],
 			"properties": {
-				"config": {
-					"type": "object",
-					"required": ["maxMods"],
-					"properties": {
-						"maxMods": { "type": "number" }
-					}
+                "maxMods": {
+                    "type": "integer"
 				},
 				"items": {
 					"type": "array",
@@ -40,9 +36,6 @@
 							"type": "object",
 							"required": ["actions"],
 							"properties": {
-								"config": {
-									"type": "object"
-								},
 								"actions": {
 									"type": "object",
 									"minProperties": 1,
