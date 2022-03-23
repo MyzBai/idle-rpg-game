@@ -30,7 +30,7 @@
 				},
 				"crafting": {
 					"type": "object",
-					"anyOf": [{ "required": "basic" }],
+					"anyOf": [{ "required": ["basic"] }],
 					"properties": {
 						"basic": {
 							"type": "object",
