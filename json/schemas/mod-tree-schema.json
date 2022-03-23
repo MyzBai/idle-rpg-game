@@ -6,21 +6,21 @@
 		"$schema": { "type": "string" },
 		"data": {
 			"type": "object",
-            "required":["nodes"],
+			"required": ["nodes"],
 			"properties": {
-                "nodes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/node"
-                    }
-                }
+				"nodes": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/node"
+					}
+				}
 			}
 		}
 	},
 	"definitions": {
 		"node": {
 			"type": "object",
-            "required": ["name", "maxPoints", "mods"],
+			"required": ["name", "maxPoints", "mods"],
 			"properties": {
 				"name": {
 					"type": "string",
@@ -30,11 +30,11 @@
 				},
 				"maxPoints": {
 					"type": "integer",
-                    "minimum": 1
+					"minimum": 1
 				},
-                "reqPoints": {
-                    "type": "integer"
-                },
+				"reqPoints": {
+					"type": "integer"
+				},
 				"mods": {
 					"type": "array",
 					"items": {

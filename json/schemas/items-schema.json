@@ -10,8 +10,8 @@
 			"type": "object",
 			"required": ["items", "crafting", "mods"],
 			"properties": {
-                "maxMods": {
-                    "type": "integer"
+				"maxMods": {
+					"type": "integer"
 				},
 				"items": {
 					"type": "array",
