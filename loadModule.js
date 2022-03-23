@@ -1,6 +1,6 @@
 import global from "./global.js";
 import { registerTabs } from "./helperFunctions.js";
-import { getSaveItem } from "./save.js";
+import { getSaveItem, removeSaveItem } from "./save.js";
 import { loadConfigs } from "./json/local-modules/module-exporter.js";
 //#region Definitions
 
@@ -23,7 +23,7 @@ import { loadConfigs } from "./json/local-modules/module-exporter.js";
  */
 
 /**
- * @typedef SubModules
+ * @typedef Module
  * @property {ModuleConfig} config
  * @property {object} defaultStatMods
  * @property {object} enemy
@@ -86,7 +86,7 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 		return;
 	}
 
-	/**@type {SubModules} */
+	/**@type {Module} */
 	const moduleData = {};
 	for (const uploadFile of uploadFileContents) {
 		const propertyName = stringToCamelCase(uploadFile.filename);
@@ -103,7 +103,7 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 		}
 	}
 
-	selectModuleDefer(moduleData);
+	loadModuleDefer(moduleData);
 });
 //#endregion
 
@@ -117,8 +117,8 @@ var loadModuleName = undefined;
 const moduleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", "items.json", "skills.json", "mod-tree.json"];
 const ajv = new ajv7();
 //call this to resolve load module for main.js to continue
-/**@type {(param: SubModules) => {}} */
-var selectModuleDefer = undefined;
+/**@type {(param: Module) => {}} */
+var loadModuleDefer = undefined;
 
 var localConfigs = undefined;
 
@@ -140,7 +140,18 @@ export async function init() {
 			}
 			const { name, desc } = config;
 			const btn = getModuleButtonWithContent(name, desc, () => {
-				startModule(name, "local", config);
+				const module = getModule(name, "local", config);
+                if(module){
+                    const saveKey = `game-${name.toLowerCase()}`;
+                    if(getSaveItem(saveKey)){
+                        const overrideSave = confirm('You have a save with this module name\nSave file will be overwritten.\nContinue?')
+                        if(!overrideSave){
+                            return;
+                        }
+                        removeSaveItem(saveKey);
+                    }
+                    loadModuleDefer(module);
+                }
 			});
 			moduleButtonsContainer.appendChild(btn);
 		}
@@ -177,7 +188,10 @@ export async function init() {
 		startButton.addEventListener("click", (e) => {
 			if (!loadModuleName) return;
 			console.log("start", loadModuleName, "module");
-			startModule(loadModuleName, "load");
+			const module = getModule(loadModuleName, "load");
+            if(module){
+                loadModuleDefer(module);
+            }
 		});
 	}
 
@@ -186,10 +200,10 @@ export async function init() {
 	}
 }
 
-/**@returns {Promise<SubModules>} */
+/**@returns {Promise<Module>} */
 export async function load() {
 	const selectModulePromise = new Promise(async (resolve) => {
-		selectModuleDefer = resolve;
+		loadModuleDefer = resolve;
 	});
 	return await selectModulePromise;
 }
@@ -319,35 +333,33 @@ async function loadSchemas() {
  * @param {string} moduleName
  * @param {string} sourceTarget - local | load | github
  * @param {object} config
+ * @returns {Module}
  */
-async function startModule(moduleName, sourceTarget, config) {
+async function getModule(moduleName, sourceTarget, config) {
 	//if config exists, we already have all the necessary info
 	//else, load config, based on name and type
 
-	/**@type {SubModules} */
+	/**@type {Module} */
 	var moduleData = undefined;
     var src = undefined;
 	if (sourceTarget === "local") {
-        if(!config){
-            config = localConfigs.find(x => x.name === moduleName);
-            if(!config){
-                console.error('no local config with name', moduleName, 'was found');
-                return;
-            }
-        }
+        
 		const filenames = config.include || moduleFileNames.filter((x) => x !== "config.json");
 		const moduleExporter = await import("./json/local-modules/module-exporter.js");
 		const files = await moduleExporter.loadModule(moduleName, filenames);
 
 		moduleData = await getModuleDataFromFiles(files);
-		src = "local";
+        src = 'local';
 	} else if (sourceTarget === "load") {
         const saveKey = `game-${moduleName}`;
         const saveData = getSaveItem(saveKey);
-		const src = saveData.config.src;
+		src = saveData.config.src;
 		switch (src) {
 			case "local":
-                return startModule(moduleName, 'local');
+                const config = localConfigs.find(x => x.name === moduleName);
+                if(config){
+                    return getModule(moduleName, 'local', config);
+                }
 			case "github":
                 const {user, repo, name} = parseGithubPath(config.path);
                     // loadGithubModule(user, repo, name);
@@ -369,7 +381,7 @@ async function startModule(moduleName, sourceTarget, config) {
 		return;
 	}
 
-	if (!moduleData.config) {
+	if (!config) {
 		console.error("config.json is missing");
 		return;
 	}
@@ -385,16 +397,16 @@ async function startModule(moduleName, sourceTarget, config) {
 		console.error("skills.json is missing");
 		return;
 	}
-    
+
     moduleData.config = config;
     moduleData.config.src = src;
 	setGlobalSavePath(moduleData.config.name);
-	selectModuleDefer(moduleData);
+	return moduleData;
 }
 
 /**
  * @param {ModuleFile} files
- * @returns {Promise<SubModules>}
+ * @returns {Promise<Module>}
  */
 async function getModuleDataFromFiles(files) {
 	const moduleData = {};
