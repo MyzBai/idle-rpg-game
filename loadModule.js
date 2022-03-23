@@ -96,7 +96,7 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 	}
 
 	if (moduleData.config?.name) {
-		setGlobalSavePath("upload", moduleData.config.name);
+		setGlobalSavePath(moduleData.config.name);
 		if (localStorage.getItem(moduleData.config.name)) {
 			const confirm = confirm("This will overwrite a previous save\nChange the name property in config.json if this is not desired");
 			if (!confirm) {
