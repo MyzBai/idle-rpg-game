@@ -1,23 +1,23 @@
 {
-	"$id": "module/config.json",
-	"type": "object",
-	"required": ["data"],
-	"properties": {
-		"$schema": { "type": "string" },
-		"data": {
-			"type": "object",
-			"properties": {
-				"name": {
-					"type": "string",
-					"minLength": 3,
-					"maxLength": 24
-				},
-				"description": {
-					"type": "string",
-					"maxLength": 320,
-					"pattern": "^[a-zA-Z0-9 ,.\\-!\"#%&/()?@]*$"
-				}
-			}
-		}
-	}
+    "$id": "module/config.json",
+    "type": "object",
+    "required": ["data"],
+    "properties": {
+        "$schema": { "type": "string" },
+        "data": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 24
+                },
+                "description": {
+                    "type": "string",
+                    "maxLength": 320,
+                    "pattern": "^[a-zA-Z0-9 ,.\\-!\"#%&/()?@]*$"
+                }
+            }
+        }
+    }
 }

@@ -1,47 +1,47 @@
 {
-	"$id": "module/mod-tree-schema.json",
-	"type": "object",
-	"required": ["data"],
-	"properties": {
-		"$schema": { "type": "string" },
-		"data": {
-			"type": "object",
-			"required": ["nodes"],
-			"properties": {
-				"nodes": {
-					"type": "array",
-					"items": {
-						"$ref": "#/definitions/node"
-					}
-				}
-			}
-		}
-	},
-	"definitions": {
-		"node": {
-			"type": "object",
-			"required": ["name", "maxPoints", "mods"],
-			"properties": {
-				"name": {
-					"type": "string",
-					"minLength": 3,
-					"maxLength": 32,
-					"pattern": "^[a-zA-Z ]+$"
-				},
-				"maxPoints": {
-					"type": "integer",
-					"minimum": 1
-				},
-				"reqPoints": {
-					"type": "integer"
-				},
-				"mods": {
-					"type": "array",
-					"items": {
-						"$ref": "mods-schema.json#/definitions/mod"
-					}
-				}
-			}
-		}
-	}
+    "$id": "module/mod-tree-schema.json",
+    "type": "object",
+    "required": ["data"],
+    "properties": {
+        "$schema": { "type": "string" },
+        "data": {
+            "type": "object",
+            "required": ["nodes"],
+            "properties": {
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/node"
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "node": {
+            "type": "object",
+            "required": ["name", "maxPoints", "mods"],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 32,
+                    "pattern": "^[a-zA-Z ]+$"
+                },
+                "maxPoints": {
+                    "type": "integer",
+                    "minimum": 1
+                },
+                "reqPoints": {
+                    "type": "integer"
+                },
+                "mods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "mods-schema.json#/definitions/mod"
+                    }
+                }
+            }
+        }
+    }
 }

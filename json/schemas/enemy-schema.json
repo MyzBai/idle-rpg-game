@@ -1,29 +1,29 @@
 {
-	"type": "object",
-	"additionalProperties": false,
-	"required": ["data"],
-	"properties": {
-		"$schema": {
-			"type": "string"
-		},
-		"data": {
-			"type": "object",
-			"additionalProperties": false,
-			"required": ["enemies"],
-			"properties": {
-				"enemies": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"required": ["health"],
-						"properties": {
-							"health": {
-								"type": "number"
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["data"],
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "data": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["enemies"],
+            "properties": {
+                "enemies": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["health"],
+                        "properties": {
+                            "health": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1,18 +1,18 @@
 {
-	"$schema": "../../schemas/default-stat-mods-schema.json",
-	"data": [
-		{ "name": "minPhysicalDamage", "value": 5, "valueType": "base" },
-		{ "name": "maxPhysicalDamage", "value": 10, "valueType": "base" },
-		{ "name": "critMulti", "value": 150, "valueType": "base" },
-		{ "name": "duration", "value": 6, "valueType": "base", "flags": ["bleed"] },
-		{ "name": "mana", "value": 100, "valueType": "base" },
-		{ "name": "manaRegen", "value": 1, "valueType": "base" },
-		{ "name": "strength", "value": 100, "valueType": "base" },
-		{ "name": "strength", "value": 100, "valueType": "inc" },
-		{ "name": "dexterity", "value": 100, "valueType": "base" },
-		{ "name": "intelligence", "value": 100, "valueType": "base" },
-		{ "name": "damage", "value": 0.1, "valueType": "more", "keywords": [{ "type": "perStat", "name": "strength" }] },
-		{ "name": "hitChance", "value": 0.1, "valueType": "base", "keywords": [{ "type": "perStat", "name": "dexterity" }] },
-		{ "name": "mana", "value": 1, "valueType": "base", "keywords": [{ "type": "perStat", "name": "intelligence" }] }
-	]
+    "$schema": "../../schemas/default-stat-mods-schema.json",
+    "data": [
+        { "name": "minPhysicalDamage", "value": 5, "valueType": "base" },
+        { "name": "maxPhysicalDamage", "value": 10, "valueType": "base" },
+        { "name": "critMulti", "value": 150, "valueType": "base" },
+        { "name": "duration", "value": 6, "valueType": "base", "flags": ["bleed"] },
+        { "name": "mana", "value": 100, "valueType": "base" },
+        { "name": "manaRegen", "value": 1, "valueType": "base" },
+        { "name": "strength", "value": 100, "valueType": "base" },
+        { "name": "strength", "value": 100, "valueType": "inc" },
+        { "name": "dexterity", "value": 100, "valueType": "base" },
+        { "name": "intelligence", "value": 100, "valueType": "base" },
+        { "name": "damage", "value": 0.1, "valueType": "more", "keywords": [{ "type": "perStat", "name": "strength" }] },
+        { "name": "hitChance", "value": 0.1, "valueType": "base", "keywords": [{ "type": "perStat", "name": "dexterity" }] },
+        { "name": "mana", "value": 1, "valueType": "base", "keywords": [{ "type": "perStat", "name": "intelligence" }] }
+    ]
 }

@@ -1,69 +1,69 @@
 {
-	"$id": "module/skills-schema.json",
-	"type": "object",
-	"additionalProperties": false,
-	"required": ["data"],
-	"properties": {
-		"$schema": {
-			"type": "string"
-		},
-		"data": {
-			"type": "object",
-			"required": ["attacks"],
-			"properties": {
-				"numSupports": {
-					"type": "integer"
-				},
-				"attacks": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"additionalProperties": false,
-						"required": ["name", "attackSpeed", "baseDamageMultiplier", "mods"],
-						"properties": {
-							"name": {
-								"type": "string"
-							},
-							"attackSpeed": {
-								"type": "number"
-							},
-							"baseDamageMultiplier": {
-								"type": "number"
-							},
-							"manaCost": {
-								"type": "number"
-							},
-							"mods": {
-								"type": "array",
-								"items": {
-									"$ref": "mods-schema.json#/definitions/mod"
-								}
-							}
-						}
-					}
-				},
-				"supports": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"required": ["name", "manaMultiplier", "mods"],
-						"properties": {
-							"name": {
-								"type": "string"
-							},
-							"manaMultiplier": {
-								"type": "number"
-							},
-							"mods": {
-								"type": "array",
-								"items": {
-									"$ref": "mods-schema.json#/definitions/mod"
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+    "$id": "module/skills-schema.json",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["data"],
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "data": {
+            "type": "object",
+            "required": ["attacks"],
+            "properties": {
+                "numSupports": {
+                    "type": "integer"
+                },
+                "attacks": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["name", "attackSpeed", "baseDamageMultiplier", "mods"],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "attackSpeed": {
+                                "type": "number"
+                            },
+                            "baseDamageMultiplier": {
+                                "type": "number"
+                            },
+                            "manaCost": {
+                                "type": "number"
+                            },
+                            "mods": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "mods-schema.json#/definitions/mod"
+                                }
+                            }
+                        }
+                    }
+                },
+                "supports": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["name", "manaMultiplier", "mods"],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "manaMultiplier": {
+                                "type": "number"
+                            },
+                            "mods": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "mods-schema.json#/definitions/mod"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

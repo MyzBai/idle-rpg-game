@@ -1,17 +1,17 @@
 {
-	"$id": "module/default-stat-mods.json",
-	"type": "object",
-	"additionalProperties": false,
-	"required": ["data"],
-	"properties": {
-		"$schema": { "type": "string" },
-		"data": {
-			"type": "array",
-			"items": {
-				"$ref": "mods-schema.json#/definitions/stat",
-				"type": "object",
-				"required": ["name", "value", "valueType"]
-			}
-		}
-	}
+    "$id": "module/default-stat-mods.json",
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["data"],
+    "properties": {
+        "$schema": { "type": "string" },
+        "data": {
+            "type": "array",
+            "items": {
+                "$ref": "mods-schema.json#/definitions/stat",
+                "type": "object",
+                "required": ["name", "value", "valueType"]
+            }
+        }
+    }
 }
