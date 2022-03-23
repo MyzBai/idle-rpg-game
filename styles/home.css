@@ -73,7 +73,7 @@
 }
 
 .p-home .s-modules .s-container .module-button .content.active{
-    background-color: rgb(148, 148, 148);
+    background-color: rgb(131, 131, 131);
     box-shadow: inset 0px 0px 3px;
     display: block;
     cursor: auto;
@@ -101,7 +101,7 @@
 
 }
 .p-home .s-upload .s-drop-area{
-    background-color: var(--primary-color-button);
+    background-color: rgb(131, 131, 131);
     min-height: 100px;
     min-width: 100px;
     box-shadow: inset 0px 0px 3px black;
@@ -126,9 +126,10 @@
     display: none;
 }
 .p-home .s-upload .warning.active{
-    color: rgb(255, 0, 0);
+    color: rgb(228 132 132);
     display: block;
     font-size: 0.8em;
+    white-space: pre-wrap;
 }
 
 /*Load tab*/

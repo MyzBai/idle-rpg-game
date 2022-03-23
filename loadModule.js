@@ -95,6 +95,8 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 		moduleData[propertyName] = uploadFile.content.data || uploadFile.content;
 	}
 
+    moduleData.config.src = 'upload';
+
 	if (moduleData.config?.name) {
 		setGlobalSavePath(moduleData.config.name);
 		if (localStorage.getItem(moduleData.config.name)) {
@@ -115,7 +117,8 @@ const loadButtonTemplate = loadButtonsContainer.querySelector("template");
 var loadModuleName = undefined;
 //#endregion
 
-const moduleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", "items.json", "skills.json", "mod-tree.json"];
+const moduleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", "skills.json", "items.json", "mod-tree.json"];
+const requiredModuleFileNames = ['config.json', 'default-stat-mods.json', 'enemy.json', 'skills.json'];
 const ajv = new ajv7();
 //call this to resolve load module for main.js to continue
 /**@type {(param: Module) => {}} */
@@ -164,8 +167,12 @@ export async function init() {
 		loadButtonsContainer.replaceChildren([]);
 		for (const [key, value] of Object.entries(localStorage)) {
 			if (key.startsWith("game-")) {
-				hasSaves = true;
-				const name = JSON.parse(value).config.name;
+                const content = JSON.parse(value);
+                if(content.config.src === 'upload'){
+                    continue;
+                }
+                hasSaves = true;
+				const name = content.config.name;
 				const btn = loadButtonTemplate.content.cloneNode("true").firstElementChild;
 				btn.textContent = name;
 				btn.addEventListener("click", (e) => {
@@ -179,6 +186,7 @@ export async function init() {
 				loadButtonsContainer.appendChild(btn);
 			}
 		}
+        
 		if (!hasSaves) {
 			loadButtonsContainer.textContent = "You have no saved games";
 		} else {
@@ -293,10 +301,27 @@ async function uploadFiles(files) {
 		uploadDropArea.appendChild(element);
 	}
 
-	// const name = uploadFileContents.find((x) => x.filename === "config.json")?.content.data.name;
-	// uploadContainer.querySelector(".warning").classList.toggle("active", name === undefined);
-
-	var valid = uploadFileContents !== undefined;
+    var valid = true;
+    if(!uploadFileContents){
+        valid = false;
+    } else{
+        const missingRequiredFiles = requiredModuleFileNames.reduce((a, c) => {
+            if(!uploadFileContents.find(x => x.filename === c)){
+                a.push(c);
+            }
+            return a;
+        }, []);
+        let errorText = '';
+        for (const missingFile of missingRequiredFiles) {
+            errorText += "Missing: " + missingFile + '\n';
+        }
+        const warningElement = uploadContainer.querySelector('.warning');
+        const hasMissingFiles = errorText.length > 0;
+        warningElement.classList.toggle('active', hasMissingFiles);
+        if(hasMissingFiles){
+            warningElement.textContent = errorText;
+        }
+    }
 	const startButton = uploadContainer.querySelector(".start-button");
 	startButton.toggleAttribute("disabled", !valid);
 }
