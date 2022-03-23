@@ -1,5 +1,5 @@
 {
-	"$id": "module/items-schema.json",
+    "$id": "module/items-schema.json",
 	"type": "object",
 	"required": ["data"],
 	"properties": {
@@ -29,7 +29,7 @@
 					}
 				},
 				"crafting": {
-					"type": "object",
+				    "type": "object",
 					"required": ["basic"],
 					"properties": {
 						"basic": {
