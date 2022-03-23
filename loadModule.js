@@ -89,8 +89,10 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 	/**@type {Module} */
 	const moduleData = {};
 	for (const uploadFile of uploadFileContents) {
-		const propertyName = stringToCamelCase(uploadFile.filename);
-		moduleData[propertyName] = uploadFile.content.data;
+		const propertyName = filenameToCamelCase(uploadFile.filename);
+        const prop = uploadFile.content;
+        delete prop.$schema;
+		moduleData[propertyName] = uploadFile.content.data || uploadFile.content;
 	}
 
 	if (moduleData.config?.name) {
@@ -102,7 +104,6 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 			}
 		}
 	}
-
 	loadModuleDefer(moduleData);
 });
 //#endregion
@@ -306,7 +307,7 @@ async function uploadFiles(files) {
  * @param {string} string
  * @returns {string}
  */
-function stringToCamelCase(string) {
+function filenameToCamelCase(string) {
 	const propertyName = string
 		.substring(0, string.length - 5)
 		.split("-")
@@ -418,7 +419,7 @@ async function getModuleDataFromFiles(files) {
 				console.error(error);
 			}
 		} else {
-			const propertyName = stringToCamelCase(filename);
+			const propertyName = filenameToCamelCase(filename);
 			moduleData[propertyName] = fileData.data;
 		}
 	}
