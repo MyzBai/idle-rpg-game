@@ -6,8 +6,13 @@ const saveInstances = [];
 const loadInstances = [];
 
 export function hasSave(){
-    const item = localStorage.getItem(Global.env.SAVE_PATH);
-    return item && item.length !== 0;
+    try {
+        const item = localStorage.getItem(Global.env.SAVE_PATH);
+        return item && item.length !== 0;
+    } catch (e) {
+        console.error(e);
+    }
+    return false;
 }
 
 export function save() {
@@ -19,8 +24,11 @@ export function save() {
         instance.callback(savedObj);
     }
 
-    localStorage.setItem(Global.env.SAVE_PATH, JSON.stringify(savedObj));
-    console.log('saved game');
+    try {
+        localStorage.setItem(Global.env.SAVE_PATH, JSON.stringify(savedObj));
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 /**
@@ -37,7 +45,11 @@ export async function load() {
 }
 
 export function reset(){
-    localStorage.removeItem(Global.env.SAVE_PATH);
+    try {
+        localStorage.removeItem(Global.env.SAVE_PATH);
+    } catch (e) {
+        console.error(e);
+    }
 }
 
 /**
@@ -65,9 +77,13 @@ export function registerLoad(callback) {
 }
 
 export function getSavedObj(){
-    const data = localStorage.getItem(Global.env.SAVE_PATH);
-    if(data){
-        return JSON.parse(data);
+    try {
+        const data = localStorage.getItem(Global.env.SAVE_PATH);
+        if(data){
+            return JSON.parse(data);
+        }
+    } catch (e) {
+        console.error(e);        
     }
 }
 
