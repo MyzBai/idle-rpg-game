@@ -11,6 +11,9 @@ export function hasSave(){
 }
 
 export function save() {
+    if(Global.env.SAVE_PATH === undefined){
+        return;
+    }
     const savedObj = {};
     for (const instance of saveInstances) {
         instance.callback(savedObj);
@@ -61,13 +64,21 @@ export function registerLoad(callback) {
     return id;
 }
 
-// export function saveProperty(name, prop){
-//     savedObj[name] = prop;
-// }
-
 export function getSavedObj(){
     const data = localStorage.getItem(Global.env.SAVE_PATH);
     if(data){
         return JSON.parse(data);
+    }
+}
+
+/**@param {string} key */
+export function getSaveItem(key){
+    try {
+        const data = localStorage.getItem(key.toLowerCase());
+        if(data){
+            return JSON.parse(data);
+        }
+    } catch (e) {
+        console.error(e);
     }
 }
