@@ -58,8 +58,8 @@ export async function init(data) {
     }
 
     console.log('init items');
-    var config = data.config;
-    maxMods = config.maxMods || maxMods;
+    
+    maxMods = data.maxMods;
 
     modCollection = [];
     modCollection.push(...data.mods.reduce((a, c) => {

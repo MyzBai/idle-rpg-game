@@ -1,6 +1,6 @@
 {
     "$schema": "../../schemas/config-schema.json",
-    "data": {
-        "name": "Demo"
-    }
+    "name": "Demo",
+    "desc": "This is a Demo\nMax level is 30. \nEnjoy!",
+    "include": ["default-stat-mods.json", "enemy.json", "skills.json", "items.json", "mod-tree.json"]
 }

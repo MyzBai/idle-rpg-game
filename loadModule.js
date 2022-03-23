@@ -133,7 +133,7 @@ export async function init() {
 	for (const config of localConfigs) {
 		const { name, desc } = config;
 		createModuleButton(name, desc, () => {
-			selectModule('local');
+			selectModule(config, 'local');
 		});
 	}
 
@@ -294,19 +294,23 @@ async function loadSchemas() {
 }
 
 /**@param {string} type */
-async function selectModule(type) {
+async function selectModule(config, type) {
 
 	/**@type {SubModules} */
-	const moduleData = {};
+	const moduleData = {
+        config
+    };
 
 	if (type === "local") {
-		
-        moduleData.config.source = "local";
-        const files = await (await import("./json/local-modules/module-exporter.js")).loadModule(config);
+        const files = await (await import("./json/local-modules/module-exporter.js")).loadModule(config.name, config.include || moduleFileNames.filter(x => x !== 'config.json'));
         for (const file of files) {
             const { name: filename, data: fileData } = file;
-            const valid = await validateFile(filename, fileData);
-            if (valid) {
+            const errors = await validateFile(filename, fileData);
+            if (errors) {
+                for (const error of errors) {
+                    console.error(error);
+                }
+            }else{
                 const propertyName = filenameToPropertyName(filename);
                 moduleData[propertyName] = fileData.data;
             }
