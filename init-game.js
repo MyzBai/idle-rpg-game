@@ -27,7 +27,13 @@ export async function init(data) {
     await modTree.init(data.modTree);
 
     await combat.init();
-    save.registerSave(savedObj => { savedObj.config = data.config });
+    save.registerSave(savedObj => {
+        savedObj.config = {
+            name: data.config.name,
+            src: data.config.src,
+            path: data.config.path
+        }
+     });
 }
 
 
