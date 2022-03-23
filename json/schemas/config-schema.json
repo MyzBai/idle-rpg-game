@@ -1,7 +1,7 @@
 {
     "$id": "module/config-schema.json",
     "type": "object",
-    "required": ["name", "include", "desc"],
+    "required": ["name"],
     "properties": {
         "$schema": {
             "type": "string"
