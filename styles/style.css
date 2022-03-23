@@ -71,7 +71,8 @@ body{
     cursor: default;
     background-color: var(--primary-color-button-hover);
 }
-.g-button:active{
+.g-button:active,
+.g-button.active{
     background-color: var(--primary-color-button-active);
 }
 .g-button[disabled]{
@@ -118,142 +119,6 @@ body{
     position: absolute;
 }
 
-/*Home Page*/
-.p{
-    display: none;
-}
-
-.p.active{
-    display: block;
-}
-
-/*top*/
-
-/*back button*/
-.p-home .btn-go-to-game-page{
-    display: inline-block;
-}
-
-.p-home .btn-go-to-game-page.active{
-    padding: 0px 24px;
-}
-
-/*title*/
-.p-home > .title{
-    text-align: center;
-    font-size: 1.5em;
-    font-weight: 1000;
-}
-
-.p-home .s-wrapper{
-    background-color: var(--secondary-background-color);
-    padding: 3px;
-}
-
-/*Buttons*/
-.p-home .s-buttons{
-    display: flex;
-    font-size: 1.2em;
-    margin: 3px;
-}
-.p-home .s-buttons > div{
-    display: inline-block;
-    padding: 6px;
-}
-
-/*module container*/
-.p-home .s-module-container{
-    margin: 6px;
-    padding: 6px;
-    min-height: 300px;
-}
-
-.p-home .s-module-container .module-button{
-    padding: 3px;
-    background-color: var(--primary-color-button);
- 
-}
-.p-home .s-module-container .module-button .title{
-    user-select: none;
-    padding: 3px;
-    margin: 3px;
-}
-.p-home .s-module-container .module-button .title:hover{
-    cursor: default;
-    /* background-color: rgb(116, 116, 116); */
-    background-color: var(--primary-color-button-hover);
-}
-.p-home .s-module-container .module-button .title:active{
-    background-color: var(--primary-color-button-active);
-}
-.p-home .s-module-container .module-button .content{
-    display: none;
-    box-shadow: inset 0px 0px 3px;
-}
-.p-home .s-module-container .module-button .content.active{
-    background-color: rgb(148, 148, 148);
-    display: block;
-    cursor: auto;
-    font-size: 0.8em;
-    text-align: center;
-    overflow: hidden;
-    padding: 6px;
-    white-space:pre-line;
-}
-.p-home .s-module-container .module-button .content.active > div{
-    padding: 6px;
-}
-
-.p-home .s-module-container .module-button .content.active .start-button{
-    padding: 3px 12px;
-    width: 150px;
-    margin: auto;
-}
-
-/*Upload module files*/
-.p-home .s-upload{
-    padding: 6px;
-    margin: 6px;
-
-}
-.p-home .s-upload .s-drop-area{
-    background-color: var(--primary-color-button);
-    min-height: 100px;
-    min-width: 100px;
-    box-shadow: inset 0px 0px 3px black;
-    margin: 3px;
-    padding: 3px;
-}
-.p-home .s-upload .s-drop-area > div.error{
-    color: rgb(255, 0, 0);
-    font-weight: bold;
-}
-.p-home .s-upload .s-drop-area.empty::before{
-    content: "Drag files or folder here";
-}
-.p-home .s-upload .s-drop-area.drag-over{
-    box-shadow: inset 0px 0px 3px rgb(255, 0, 0);
-}
-.p-home .s-upload .s-drop-area input[type=file]{
-    display:none;
-}
-
-.p-home .s-upload .g-button{
-    display: inline-block;
-    width: 60px;
-    text-align: center;
-    margin: 3px;
-}
-.p-home .s-upload .warning{
-    display: none;
-}
-.p-home .s-upload .warning.active{
-    color: rgb(255, 0, 0);
-    display: block;
-    font-size: 0.8em;
-}
-
-/*Load saved games*/
 
 /*Game*/
 .p-game{

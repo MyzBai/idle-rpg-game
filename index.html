@@ -5,7 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./styles/home.css">
+    <link rel="stylesheet" href="./styles/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.10.0/ajv7.min.js"></script>
 </head>
 <body>
@@ -18,33 +19,38 @@
                 <div class="g-vertical-button g-button" data-tab-target=".s-upload">Upload</div>
                 <div class="g-vertical-button g-button" data-tab-target=".s-load">Load</div>
             </div>
-            <div class="wrapper">
-                <div class="s-modules" data-tab-content>
-                    <div class="s-module-container">
-                        <template>
-                            <div class="module-button">
-                                <div class="title"></div>
-                                <div class="content"> <div></div>
-                                    <div class="start-button g-button">Start</div>
-                                </div>
+            <div class="s-modules" data-tab-content>
+            <!--TODO:: Add search bar-->
+                <div class="s-container">
+                    <template>
+                        <div class="module-button">
+                            <div class="title g-button" ></div>
+                            <div class="content"> 
+                                <div class="desc"></div>
+                                <div class="start-button g-button">Start</div>
                             </div>
-                        </template>
-                    </div>
+                        </div>
+                    </template>
                 </div>
-                <div class="s-upload" data-tab-content>
-                    <div class="s-drop-area empty">
-                        <input type="file" name="file" accept=".json" multiple>
-                    </div>
-                    <!-- <label class="warning">Warning: </span><span>Progress will not be saved. Provide a name property in a config.json file</label> -->
-                    <div class="start-button g-button" disabled >Start</div>
+            </div>
+
+            <div class="s-upload" data-tab-content>
+                <div class="s-drop-area empty">
+                    <input type="file" name="file" accept=".json" multiple>
                 </div>
-                <div class="s-load" data-tab-content>
-                    No saved games...
+                <div class="start-button g-button" disabled >Start</div>
+            </div>
+            <div class="s-load" data-tab-content>
+                <div class="s-container">
+                    <template>
+                        <div class="module-button g-button"></div>
+                    </template>
+                    <div class="empty-label">You have no saved games</div>
                 </div>
+                <div class="start-button g-button">Start</div>
             </div>
         </div>
     </div>
-
 
     <div class="p-game p" data-tab-content>
         <div>
