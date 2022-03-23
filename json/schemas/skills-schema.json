@@ -15,13 +15,8 @@
                 "attacks"
             ],
             "properties": {
-                "config": {
-                    "type": "object",
-                    "properties": {
-                        "numSupports": {
-                            "type": "number"
-                        }
-                    }
+                "numSupports": {
+                    "type": "integer"
                 },
                 "attacks": {
                     "type": "array",

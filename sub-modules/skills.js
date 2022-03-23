@@ -5,10 +5,6 @@ import { registerSave, registerLoad } from "../save.js";
 import { getStatModifierTemplate } from "../modTemplates.js";
 
 /**
- * @typedef SkillsConfig
- * @property {boolean} maxSupports
- */
-/**
  * @typedef SkillMod
  * @property {string} id
  * @property {string} [desc]
@@ -32,7 +28,7 @@ import { getStatModifierTemplate } from "../modTemplates.js";
 
 /**
  * @typedef Skills
- * @property {SkillsConfig} config
+ * @property {number} maxSupports
  * @property {SkillsAttack} attacks
  * @property {SkillsSupport} supports
  */
@@ -63,8 +59,7 @@ const supportSkillContainer = document.querySelector(".s-skills .s-support-skill
 
 var skillViewButtonCallback = undefined;
 
-/**@type {SkillsConfig} */
-var skillsConfig = undefined;
+var maxSupports = undefined;
 
 /**@type {SkillsAttack[]} */
 export var attackSkillsCollection = [];
@@ -73,26 +68,24 @@ export var attackSkillsCollection = [];
 export var supportsCollection = [];
 
 /**@param {Skills} data */
-export async function init(data) {
-	if (!data) {
-		console.error("skills data is mandatory. This should never be called");
-		return;
-	}
+export async function init(data = {}) {
 	console.log("init skills");
 
 	attackSkillContainer.replaceChildren();
 	supportSkillContainer.replaceChildren();
 
-	skillsConfig = data.config;
-	Object.freeze(skillsConfig);
-	attackSkillsCollection = [...data.attacks];
+	maxSupports = data.maxSupports || 0;
+
+	const attackSkills = data.attacks || [];
+	attackSkillsCollection = [...attackSkills];
 	attackSkillsCollection.unshift(defaultAttackSkill);
 	if (new Set(attackSkillsCollection.map((x) => x.name)).size !== attackSkillsCollection.length) {
 		console.error("duplicated skill names were found");
 		return;
 	}
 	Object.freeze(attackSkillsCollection);
-	supportsCollection = data.supports;
+	const supportSkills = data.supports || [];
+	supportsCollection = [...supportSkills];
 	Object.freeze(supportsCollection);
 
 	for (const data of attackSkillsCollection) {
@@ -261,7 +254,7 @@ export class AttackSkill {
 	/**@param {SkillsAttack} skillJson */
 	constructor(skillJson) {
 		const { name, mods, manaCost, attackSpeed, baseDamageMultiplier } = skillJson;
-		const supports = Array.from({ length: skillsConfig ? skillsConfig.numSupports : 0 });
+		const supports = Array.from({ length: maxSupports });
 		Object.seal(supports);
 
 		var modList = [];

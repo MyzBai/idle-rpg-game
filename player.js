@@ -53,7 +53,8 @@ export async function init(data) {
     modCache = {};
     modDB = new ModDB();
     const source = this;
-    modDB.add(convertStatMods(data.defaultStatMods, source));
+    const defaultStatMods = !Array.isArray(data.defaultStatMods) ? [] : data.defaultStatMods;
+    modDB.add(convertStatMods(defaultStatMods, source));
     Object.freeze(modDB);
 
     updateModList();

@@ -1,9 +1,7 @@
 {
     "$schema": "../../schemas/skills-schema.json",
     "data": {
-        "config": {
-            "numSupports": 6
-        },
+        "numSupports": 6,
         "attacks": [
             {
                 "name": "Physical Attack",

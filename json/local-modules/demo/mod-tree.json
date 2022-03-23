@@ -5,6 +5,7 @@
             {
                 "name": "Strength",
                 "maxPoints": 10,
+                "reqPoints": 0,
                 "mods":[
                     {
                         "id": "baseStrength",
@@ -17,6 +18,7 @@
             {
                 "name": "Dexterity",
                 "maxPoints": 10,
+                "reqPoints": 0,
                 "mods": [
                     {
                         "id": "baseDexterity",
@@ -29,6 +31,7 @@
             {
                 "name": "Intelligence",
                 "maxPoints": 10,
+                "reqPoints": 0,
                 "mods": [
                     {
                         "id": "baseIntelligence",
@@ -41,7 +44,7 @@
             {
                 "name": "Physical Damage",
                 "maxPoints": 5,
-                "reqPointsSpent": 5,
+                "reqPoints": 0,
                 "mods": [
                     {
                         "id": "incPhysicalDamage",
@@ -54,7 +57,7 @@
             {
                 "name": "Elemental Damage",
                 "maxPoints": 5,
-                "reqPointsSpent": 5,
+                "reqPoints": 0,
                 "mods": [{
                     "id": "incElementalDamage",
                     "stats": [
@@ -65,7 +68,7 @@
             {
                 "name": "Chaos Damage",
                 "maxPoints": 5,
-                "reqPointsSpent": 5,
+                "reqPoints": 0,
                 "mods": [{
                     "id": "incChaosDamage",
                     "stats": [
@@ -76,6 +79,7 @@
             {
                 "name": "Attack Speed",
                 "maxPoints": 10,
+                "reqPoints": 5,
                 "mods": [
                     {
                         "id": "incAttackSpeed",
@@ -88,6 +92,7 @@
             {
                 "name": "Hit Chance",
                 "maxPoints": 10,
+                "reqPoints": 5,
                 "mods": [{
                     "id": "hitChance",
                     "stats": [
@@ -98,6 +103,7 @@
             {
                 "name": "Critical Strike Chance",
                 "maxPoints": 10,
+                "reqPoints": 10,
                 "mods": [{
                     "id": "critChance",
                     "stats": [
@@ -108,142 +114,13 @@
             {
                 "name": "Critical Strike Multiplier",
                 "maxPoints": 10,
+                "reqPoints": 10,
                 "mods": [{
                     "id": "critMulti",
                     "stats": [
                         {"value": 20}
                     ]
                 }]
-            }
-        ],
-        "groups": [
-            {
-                "nodes": [
-                    {
-                        "name": "Strength",
-                        "maxPoints": 10,
-                        "mods":[
-                            {
-                                "id": "baseStrength",
-                                "stats": [
-                                    {"value": 10}
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "name": "Dexterity",
-                        "maxPoints": 10,
-                        "mods": [
-                            {
-                                "id": "baseDexterity",
-                                "stats": [
-                                    {"value": 10}
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "name": "Intelligence",
-                        "maxPoints": 10,
-                        "mods": [
-                            {
-                                "id": "baseIntelligence",
-                                "stats": [
-                                    {"value": 10}
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "config": {
-                    "reqPoints": 5
-                },
-                "nodes": [
-                    {
-                        "name": "Physical Damage",
-                        "maxPoints": 5,
-                        "mods": [
-                            {
-                                "id": "incPhysicalDamage",
-                                "stats": [
-                                    {"value": 10}
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "name": "Elemental Damage",
-                        "maxPoints": 5,
-                        "mods": [{
-                            "id": "incElementalDamage",
-                            "stats": [
-                                {"value": 10}
-                            ]
-                        }]
-                    },
-                    {
-                        "name": "Chaos Damage",
-                        "maxPoints": 5,
-                        "mods": [{
-                            "id": "incChaosDamage",
-                            "stats": [
-                                {"value": 10}
-                            ]
-                        }]
-                    }
-                ]
-            },
-            {
-                "config": {
-                    "reqPoints": 10
-                },
-                "nodes": [
-                    {
-                        "name": "Attack Speed",
-                        "maxPoints": 5,
-                        "mods": [
-                            {
-                                "id": "incAttackSpeed",
-                                "stats": [
-                                    {"value": 5}
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "name": "Hit Chance",
-                        "maxPoints": 5,
-                        "mods": [{
-                            "id": "hitChance",
-                            "stats": [
-                                {"value": 3}
-                            ]
-                        }]
-                    },
-                    {
-                        "name": "Critical Strike Chance",
-                        "maxPoints": 5,
-                        "mods": [{
-                            "id": "critChance",
-                            "stats": [
-                                {"value": 5}
-                            ]
-                        }]
-                    },
-                    {
-                        "name": "Critical Strike Multiplier",
-                        "maxPoints": 5,
-                        "mods": [{
-                            "id": "critMulti",
-                            "stats": [
-                                {"value": 20}
-                            ]
-                        }]
-                    }
-                ]
             }
         ]
     }

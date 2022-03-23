@@ -32,7 +32,7 @@
 					"type": "integer",
                     "minimum": 1
 				},
-                "reqPointsSpent": {
+                "reqPoints": {
                     "type": "integer"
                 },
 				"mods": {

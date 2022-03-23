@@ -18,6 +18,7 @@ export async function init(data) {
     data = JSON.parse(JSON.stringify(data));
 
     //player must be initialized first because it has no dependencies
+    //without default statmods, 
     await player.init({ defaultStatMods: data.defaultStatMods });
 
     await enemy.init(data.enemy);

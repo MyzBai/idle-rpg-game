@@ -93,8 +93,7 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 		moduleData[propertyName] = uploadFile.content.data;
 	}
 
-	const name = moduleData.config.name;
-	if(moduleData.config.name){
+	if(moduleData.config?.name){
 		setGlobalSavePath('upload', moduleData.config.name);
 		if (localStorage.getItem(moduleData.config.name)) {
 			const confirm = confirm(
@@ -260,8 +259,7 @@ async function uploadFiles(files) {
 	// const name = uploadFileContents.find((x) => x.filename === "config.json")?.content.data.name;
 	// uploadContainer.querySelector(".warning").classList.toggle("active", name === undefined);
 
-	const name = uploadFileContents.find(x => x.filename === 'config.json')?.content.data.name;
-	var valid = uploadFileContents !== undefined && name !== undefined;
+	var valid = uploadFileContents !== undefined;
 	const startButton = uploadContainer.querySelector(".start-button");
 	startButton.toggleAttribute("disabled", !valid);
 }
