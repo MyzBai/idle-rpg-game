@@ -98,3 +98,11 @@ export function getSaveItem(key){
         console.error(e);
     }
 }
+
+export function removeSaveItem(key){
+    try {
+        localStorage.removeItem(key.toLowerCase());
+    } catch (e) {
+        console.error(e);
+    }
+}
