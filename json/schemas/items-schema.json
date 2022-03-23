@@ -1,172 +1,172 @@
 {
     "$id": "module/items-schema.json",
-	"type": "object",
-	"required": ["data"],
-	"properties": {
-		"$schema": {
-			"type": "string"
-		},
-		"data": {
-			"type": "object",
-			"required": ["items", "crafting", "mods"],
-			"properties": {
-				"maxMods": {
-					"type": "integer"
-				},
-				"items": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"required": ["name"],
-						"properties": {
-							"name": {
-								"type": "string"
-							},
-							"levelReq": {
-								"type": "number"
-							}
-						}
-					}
-				},
-				"crafting": {
-				    "type": "object",
-					"required": ["basic"],
-					"properties": {
-						"basic": {
-							"type": "object",
-							"required": ["actions"],
-							"properties": {
-								"actions": {
-									"type": "object",
-									"minProperties": 1,
-									"properties": {
-										"rollMods": {
-											"type": "object",
-											"required": ["weights", "tierTargets"],
-											"properties": {
-												"weights": {
-													"type": "array",
-													"items": {
-														"type": "number"
-													}
-												},
-												"tierTargets": {
-													"$ref": "#/definitions/tierTargets"
-												}
-											}
-										},
-										"addMod": {
-											"type": "object",
-											"required": ["tierTargets"],
-											"properties": {
-												"tierTargets": {
-													"$ref": "#/definitions/tierTargets"
-												}
-											}
-										},
-										"rollValues": {
-											"type": "object",
-											"required": ["cost"],
-											"properties": {
-												"cost": {
-													"type": "number"
-												}
-											}
-										},
-										"remove": {
-											"type": "object",
-											"required": ["cost"],
-											"properties": {
-												"cost": {
-													"type": "number"
-												}
-											}
-										}
-									}
-								}
-							}
-						},
-						"basic2": {
-							"type": "object"
-						}
-					}
-				},
-				"mods": {
-					"type": "array",
-					"items": {
-						"type": "object",
-						"additionalProperties": false,
-						"required": ["id", "table"],
-						"properties": {
-							"id": {
-								"type": "string"
-							},
-							"desc": {
-								"type": "string"
-							},
-							"table": {
-								"type": "array",
-								"items": {
-									"type": "object",
-									"additionalProperties": false,
-									"properties": {
-										"levelReq": {
-											"type": "number"
-										},
-										"weight": {
-											"type": "number"
-										},
-										"stats": {
-											"type": "array",
-											"items": {
-												"$ref": "mods-schema.json#/definitions/stat",
-												"type": "object",
-												"required": ["min", "max"]
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"definitions": {
-		"tierTargets": {
-			"type": "object",
-			"additionalProperties": false,
-			"minProperties": 1,
-			"properties": {
-				"random": {
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"cost": {
-							"type": "number"
-						}
-					}
-				},
-				"lucky": {
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"cost": {
-							"type": "number"
-						}
-					}
-				},
-				"max": {
-					"type": "object",
-					"additionalProperties": false,
-					"properties": {
-						"cost": {
-							"type": "number"
-						}
-					}
-				}
-			}
-		}
-	}
+    "type": "object",
+    "required": ["data"],
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "data": {
+            "type": "object",
+            "required": ["items", "crafting", "mods"],
+            "properties": {
+                "maxMods": {
+                    "type": "integer"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": ["name"],
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "levelReq": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                },
+                "crafting": {
+                    "type": "object",
+                    "required": ["basic"],
+                    "properties": {
+                        "basic": {
+                            "type": "object",
+                            "required": ["actions"],
+                            "properties": {
+                                "actions": {
+                                    "type": "object",
+                                    "minProperties": 1,
+                                    "properties": {
+                                        "rollMods": {
+                                            "type": "object",
+                                            "required": ["weights", "tierTargets"],
+                                            "properties": {
+                                                "weights": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "tierTargets": {
+                                                    "$ref": "#/definitions/tierTargets"
+                                                }
+                                            }
+                                        },
+                                        "addMod": {
+                                            "type": "object",
+                                            "required": ["tierTargets"],
+                                            "properties": {
+                                                "tierTargets": {
+                                                    "$ref": "#/definitions/tierTargets"
+                                                }
+                                            }
+                                        },
+                                        "rollValues": {
+                                            "type": "object",
+                                            "required": ["cost"],
+                                            "properties": {
+                                                "cost": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        },
+                                        "remove": {
+                                            "type": "object",
+                                            "required": ["cost"],
+                                            "properties": {
+                                                "cost": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "basic2": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "mods": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "required": ["id", "table"],
+                        "properties": {
+                            "id": {
+                                "type": "string"
+                            },
+                            "desc": {
+                                "type": "string"
+                            },
+                            "table": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "levelReq": {
+                                            "type": "number"
+                                        },
+                                        "weight": {
+                                            "type": "number"
+                                        },
+                                        "stats": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "mods-schema.json#/definitions/stat",
+                                                "type": "object",
+                                                "required": ["min", "max"]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "tierTargets": {
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "properties": {
+                "random": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "cost": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "lucky": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "cost": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "max": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "cost": {
+                            "type": "number"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
