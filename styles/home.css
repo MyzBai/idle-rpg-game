@@ -98,7 +98,7 @@
 /*Modules tab*/
 .p-home .s-modules .s-search{
     min-width: 300px;
-    margin: 6px 0px 6px;
+    margin: 0px 0px 6px;
 }
 .p-home .s-modules .s-search input[type="url"]{
     outline: none;
@@ -127,6 +127,10 @@
     margin-top: 3px;
 }
 
+.p-home .s-load .s-container{
+    padding: 3px;
+}
+
 
 /*Upload tab*/
 .p-home .s-upload .start-button{
@@ -138,7 +142,6 @@
     min-height: 100px;
     min-width: 100px;
     box-shadow: inset 0px 0px 3px black;
-    margin: 3px;
     padding: 3px;
 }
 .p-home .s-upload .s-drop-area > div.error{
