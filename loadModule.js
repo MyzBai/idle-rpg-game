@@ -534,30 +534,6 @@ function setGlobalSavePath(name) {
 		}
 	}
 
-	/**
-	 * @returns {Promise<{}[]>}
-	 */
-	async function getModuleConfig(user, repo) {
-		const configs = [];
-		const repoFiles = await getFileContent(`https://api.github.com/repos/${user}/${repo}/contents`);
-		if (repoFiles.some((x) => x.type === "dir" && x.name === "modules")) {
-			const moduleFiles = await getFileContent(`https://api.github.com/repos/${user}/${repo}/contents/modules`);
-			if (Array.isArray(moduleFiles)) {
-				for (const file of moduleFiles) {
-					if (file.type === "file" && file.name === "config.json") {
-						const content = await getFileContent(file.download_url);
-						if (content.name) {
-							//the name and description can be completely gibberish,
-							//we might want to do some string validation here to ignore such nonsense
-							configs.push({ name: content.name, description: content.description });
-						}
-					}
-				}
-			}
-		}
-		return configs;
-	}
-
 	async function getFileContent(url) {
 		try {
 			const response = await fetch(url);
