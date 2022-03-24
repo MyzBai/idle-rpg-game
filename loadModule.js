@@ -157,7 +157,7 @@ export async function init() {
 				continue;
 			}
 			const { name, desc } = config;
-			const btn = getModuleButtonWithContent(name, desc, () => {
+			const btn = getModuleButtonWithContent(name, desc, async () => {
 				const module = await getLocalModule(name);
 				if (module) {
 					const saveKey = `game-${name.toLowerCase()}`;
