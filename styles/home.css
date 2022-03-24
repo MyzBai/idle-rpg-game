@@ -115,6 +115,10 @@
     min-height: 300px;
 }
 
+.p-home .s-modules .s-container .search-hidden{
+    display:none;
+}
+
 
 /*Load tab*/
 .p-home .s-load .load-button{
