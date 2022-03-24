@@ -33,6 +33,10 @@
 
 /*Buttons*/
 
+.p-home .go-to-game-button{
+    display: inline-block;
+    padding: 6px;
+}
 
 .p-home .start-button{
     width: 60px;
