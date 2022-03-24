@@ -312,12 +312,9 @@ async function uploadFiles(files) {
 	if (!uploadFileContents) {
 		valid = false;
 	} else {
-		const missingRequiredFiles = requiredModuleFileNames.reduce((a, c) => {
-			if (!uploadFileContents.find((x) => x.filename === c)) {
-				a.push(c);
-			}
-			return a;
-		}, []);
+        const missingRequiredFiles = getMissingRequiredFilenames(uploadFileContents.map(x => x.filename));
+
+
 		let errorText = "";
 		for (const missingFile of missingRequiredFiles) {
 			errorText += "Missing: " + missingFile + "\n";
@@ -417,6 +414,12 @@ async function getModule(moduleName, sourceTarget, config) {
  * @returns {Promise<Module>}
  */
 async function getModuleData(files) {
+
+    const missingRequiredFiles = getMissingRequiredFilenames(files.map(x => x.name));
+    if(missingRequiredFiles.length !== 0){
+        console.error('Missing files', missingRequiredFiles);
+        return;
+    }
 	const moduleData = {};
 	for (const file of files) {
 		const { name: filename, data: fileData } = file;
@@ -427,7 +430,7 @@ async function getModuleData(files) {
 			}
 		} else {
 			const propertyName = filenameToCamelCase(filename);
-			moduleData[propertyName] = fileData.data;
+			moduleData[propertyName] = fileData;
 		}
 	}
 
@@ -444,6 +447,16 @@ async function getModuleData(files) {
 		return;
 	}
 	return moduleData;
+}
+
+function getMissingRequiredFilenames(filenames){
+    const filesMissing = requiredModuleFileNames.reduce((a, c) => {
+        if (!filenames.some(x => x === c)) {
+            a.push(c);
+        }
+        return a;
+    }, []);
+    return filesMissing;
 }
 
 /**
@@ -536,7 +549,7 @@ async function getModuleByUrl(url) {
 		for (const file of githubFiles) {
 			if (file.type === "file") {
 				const { name } = file;
-				if (moduleFileNames.include(name)) {
+				if (moduleFileNames.includes(name)) {
 					const data = await getFileContent(file.download_url);
 					moduleFiles.push({ name: file.name, data });
 				}
