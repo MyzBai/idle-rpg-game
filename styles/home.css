@@ -33,6 +33,7 @@
 
 /*Buttons*/
 
+
 .p-home .start-button{
     width: 60px;
     text-align: center;
@@ -43,36 +44,46 @@
     font-size: 1.2em;
     margin: 3px;
 }
+.p-home .s-buttons .find-module-button{
+    margin-left: auto;
+}
+
+
 .p-home .s-buttons > div{
     display: inline-block;
     padding: 6px;
 }
 
-/*Modules tab*/
-.p-home .s-modules .s-container .start-button{
+.p-home [data-tab-content]{
+    padding: 6px;
+    margin: 6px;
+}
+
+
+.p-home .start-button{
     margin: auto;
 }
 
-.p-home .s-modules .s-container .module-button .title{
+.p-home .module-button .title{
     user-select: none;
 }
 
-.p-home .s-modules .s-container .module-button .title:hover{
+.p-home .module-button .title:hover{
     cursor: default;
     /* background-color: rgb(116, 116, 116); */
     background-color: var(--primary-color-button-hover);
 }
 
 
-.p-home .s-modules .s-container .module-button .title:active{
+.p-home .module-button .title:active{
     background-color: var(--primary-color-button-active);
 }
 
-.p-home .s-modules .s-container .module-button .content{
+.p-home .module-button .content{
     display: none;
 }
 
-.p-home .s-modules .s-container .module-button .content.active{
+.p-home .module-button .content.active{
     background-color: rgb(131, 131, 131);
     box-shadow: inset 0px 0px 3px;
     display: block;
@@ -84,22 +95,30 @@
     white-space:pre-line;
 }
 
-.p-home .s-modules .s-container .module-button .content.active > div{
-    padding: 6px;
-}
-
+/*Modules tab*/
 .p-home .s-modules .s-container{
-    margin: 6px;
-    padding: 6px;
+    /* padding: 6px; */
     min-height: 300px;
 }
 
-/*Upload tab*/
-.p-home .s-upload{
-    padding: 6px;
-    margin: 6px;
 
+/*Load tab*/
+.p-home .s-load .load-button{
+    display: inline-block;
+    width: 60px;
+    text-align: center;
 }
+
+.p-home .s-load .start-button{
+    margin-top: 3px;
+}
+
+
+/*Upload tab*/
+.p-home .s-upload .start-button{
+    margin-top: 3px;
+}
+
 .p-home .s-upload .s-drop-area{
     background-color: rgb(131, 131, 131);
     min-height: 100px;
@@ -132,16 +151,23 @@
     white-space: pre-wrap;
 }
 
-/*Load tab*/
-.p-home .s-load .s-container{
-    padding: 6px;
-    margin: 6px;
+
+/*Find Tab*/
+.p-home .s-find .s-search input[type="url"]{
+    min-width: 300px;
+
 }
-.p-home .s-load .load-button{
+.p-home .s-find .question-mark{
     display: inline-block;
-    width: 60px;
-    text-align: center;
-    margin: 3px;
 }
-
-
+.p-home .s-find .question-mark:hover{
+    transform: scale(1.3);
+    cursor: default;
+}
+.p-home .s-find .s-search-field{
+    padding: 3px;
+    min-width: 100px;
+}
+.p-home .s-find input{
+    outline: none;
+}

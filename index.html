@@ -15,12 +15,13 @@
         <div class="title">Load Module</div>
         <div class="s-wrapper">
             <div class="s-buttons">
-                <div class="g-vertical-button g-button" data-tab-target=".s-modules">Modules</div>
-                <div class="g-vertical-button g-button" data-tab-target=".s-upload">Upload</div>
-                <div class="g-vertical-button g-button" data-tab-target=".s-load">Load</div>
+                <div class="new-module-button g-vertical-button g-button" data-tab-target=".s-modules">Modules</div>
+                <div class="load-module-button g-vertical-button g-button" data-tab-target=".s-load">Load</div>
+                <div class="find-module-button g-vertical-button g-button" data-tab-target=".s-find">Find</div>
+                <div class="custom-module-button g-vertical-button g-button" data-tab-target=".s-upload">Custom</div>
             </div>
             <div class="s-modules" data-tab-content>
-            <!--TODO:: Add search bar-->
+                <!--TODO:: Add search bar-->
                 <div class="s-container">
                     <template>
                         <div class="module-button">
@@ -33,14 +34,6 @@
                     </template>
                 </div>
             </div>
-
-            <div class="s-upload" data-tab-content>
-                <div class="s-drop-area empty">
-                    <input type="file" name="file" accept=".json" multiple>
-                </div>
-                <div class="warning"></div>
-                <div class="start-button g-button" disabled >Start</div>
-            </div>
             <div class="s-load" data-tab-content>
                 <div class="s-container">
                     <template>
@@ -49,6 +42,22 @@
                     <div class="empty-label">You have no saved games</div>
                 </div>
                 <div class="start-button g-button">Start</div>
+            </div>
+            <div class="s-find" data-tab-content>
+                <div class="s-search">
+                    <div>Github Username</div>
+                    <input type="url" placeholder="">
+                    <div class="search-button g-button" style="display: inline-block">Search</div>
+                    <div class="s-container"></div>
+                </div>
+                
+            </div>
+            <div class="s-upload" data-tab-content>
+                <div class="s-drop-area empty">
+                    <input type="file" name="file" accept=".json" multiple>
+                </div>
+                <div class="warning"></div>
+                <div class="start-button g-button" disabled >Start</div>
             </div>
         </div>
     </div>
