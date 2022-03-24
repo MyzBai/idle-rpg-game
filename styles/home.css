@@ -44,7 +44,7 @@
     font-size: 1.2em;
     margin: 3px;
 }
-.p-home .s-buttons .find-module-button{
+.p-home .s-buttons .custom-module-button{
     margin-left: auto;
 }
 
@@ -96,6 +96,20 @@
 }
 
 /*Modules tab*/
+.p-home .s-modules .s-search{
+    min-width: 300px;
+    margin: 6px 0px 6px;
+}
+.p-home .s-modules .s-search input[type="url"]{
+    outline: none;
+    display: inline-block;
+    margin: auto;
+    font-size: 1em;
+}
+.p-home .s-modules .s-search-field{
+    min-width: 100px;
+}
+
 .p-home .s-modules .s-container{
     /* padding: 6px; */
     min-height: 300px;
@@ -149,25 +163,4 @@
     display: block;
     font-size: 0.8em;
     white-space: pre-wrap;
-}
-
-
-/*Find Tab*/
-.p-home .s-find .s-search input[type="url"]{
-    min-width: 300px;
-
-}
-.p-home .s-find .question-mark{
-    display: inline-block;
-}
-.p-home .s-find .question-mark:hover{
-    transform: scale(1.3);
-    cursor: default;
-}
-.p-home .s-find .s-search-field{
-    padding: 3px;
-    min-width: 100px;
-}
-.p-home .s-find input{
-    outline: none;
 }

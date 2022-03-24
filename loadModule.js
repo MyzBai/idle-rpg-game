@@ -48,15 +48,9 @@ const MODS_SCHEMA_PATH = `${SCHEMA_PATH}/mods-schema.json`;
 const homePage = document.querySelector(".p-home");
 const tabs = homePage.querySelectorAll(".s-buttons [data-tab-target]");
 registerTabs(tabs);
-tabs[2].click();
+tabs[0].click();
 
 homePage.querySelector(".btn-go-to-game-page");
-
-//#region Modules Tab
-const modulesContainer = homePage.querySelector(".s-modules");
-const moduleButtonsContainer = modulesContainer.querySelector(".s-container");
-const moduleButtonTemplate = moduleButtonsContainer.querySelector("template");
-//#endregion
 
 //#region Upload Tab
 /**@type {ModuleFile[]} */
@@ -126,6 +120,14 @@ var loadModuleDefer = undefined;
 
 var localConfigs = undefined;
 
+//#region Modules Tab
+
+const moduleSearchInput = homePage.querySelector(".s-modules .s-search input");
+const moduleButtonsContainer = homePage.querySelector(".s-modules .s-container");
+const moduleButtonTemplate = moduleButtonsContainer.querySelector("template");
+
+//#endregion
+
 export async function init() {
 	await loadSchemas();
 
@@ -159,6 +161,11 @@ export async function init() {
 			});
 			moduleButtonsContainer.appendChild(btn);
 		}
+	}
+
+	{
+		//github
+		await getReposBySearchAPI();
 	}
 
 	{
@@ -373,7 +380,7 @@ async function getModule(moduleName, sourceTarget, config) {
 		const moduleExporter = await import("./json/local-modules/module-exporter.js");
 		const files = await moduleExporter.loadModule(moduleName, filenames);
 
-		moduleData = await getModuleDataFromFiles(files);
+		moduleData = await getModuleData(files);
 		src = "local";
 	} else if (sourceTarget === "load") {
 		const saveKey = `game-${moduleName}`;
@@ -409,7 +416,7 @@ async function getModule(moduleName, sourceTarget, config) {
  * @param {ModuleFile} files
  * @returns {Promise<Module>}
  */
-async function getModuleDataFromFiles(files) {
+async function getModuleData(files) {
 	const moduleData = {};
 	for (const file of files) {
 		const { name: filename, data: fileData } = file;
@@ -462,87 +469,91 @@ function setGlobalSavePath(name) {
 	global.env.SAVE_PATH = `game-${name.toLowerCase()}`;
 }
 
-//#region Find Tab
-{
-	const searchInput = homePage.querySelector(".s-find .s-search input");
-	const searchButton = homePage.querySelector(".s-find .s-search .search-button");
-	const searchResultContainer = homePage.querySelector(".s-find .s-container");
-	var lastSearchValue = undefined;
-	searchButton.addEventListener("click", async (e) => {
-		const searchValue = searchInput.value;
-		if (searchValue === lastSearchValue || searchValue.length === 0) {
-			return;
-		}
-
-		const moduleInfos = await getGithubModuleInfos(searchValue);
-		searchResultContainer.replaceChildren([]);
-		for (const info of moduleInfos) {
-			const { name, description } = info;
-			const btn = getModuleButtonWithContent(name, description, () => {
-				const data = getModule(name, "github");
-				if (data) {
-					const saveKey = `game-${name.toLowerCase()}`;
-					if (getSaveItem(saveKey)) {
-						const overrideSave = confirm("You have a save with this module name\nSave file will be overwritten.\nContinue?");
-						if (!overrideSave) {
-							return;
+async function getReposBySearchAPI() {
+	const repoQueryString = "https://api.github.com/search/repositories?q=key:529d32e203fb53700710d725ad75c820+in:readme&sort=updated&order=desc";
+	const repos = await getFileContent(repoQueryString);
+	//1. look for a folder called modules
+	//2. for each folder in modules, find a file called config.json
+	const requests = repos.items.map((x) => getFileContent(`${x.url}/contents`));
+	const results = await Promise.all(requests);
+	for (const result of results) {
+		if (Array.isArray(result)) {
+			for (const file of result) {
+				if (file.type === "dir" && file.name === "modules") {
+					const moduleFiles = await getFileContent(file.url);
+					if (Array.isArray(moduleFiles)) {
+						for (const moduleFile of moduleFiles) {
+							if (moduleFile.type === "dir") {
+								const moduleContent = await getFileContent(moduleFile.url);
+								if (Array.isArray(moduleContent)) {
+									var config = moduleContent.find((x) => x.name === "config.json" && x.type === "file");
+									if (config) {
+										var configData = await getFileContent(config.download_url);
+										if (configData) {
+											configData = {
+												name: configData.name,
+												description: configData.description,
+												moduleUrl: moduleFile.url,
+											};
+											createModuleButton(configData);
+										}
+									}
+								}
+							}
 						}
-						removeSaveItem(saveKey);
 					}
-					loadModuleDefer(data);
 				}
-			});
-			searchResultContainer.appendChild(btn);
-		}
-		lastSearchValue = searchValue;
-	});
-
-	/**
-	 *
-	 * @param {string} username
-	 * @returns {Promise<{name: string, description?: string}[]>}
-	 */
-	async function getGithubModuleInfos(username) {
-		const repos = await getFileContent(`https://api.github.com/users/${username}/repos`);
-		if (Array.isArray(repos)) {
-            const configs = [];
-			for (const repo of repos) {
-                //check if repo contains a folder called modules
-                const contents = await getFileContent(`https://api.github.com/repos/${username}/${repo.name}/contents`);
-                if(Array.isArray(contents)){
-                    if(contents.find(x => x.type === 'dir' && x.name === 'modules')){
-
-                        const moduleFolders = await getFileContent(`https://api.github.com/repos/${username}/${repo.name}/contents/modules`);
-                        if(Array.isArray(moduleFolders)){
-                            for (const moduleFolder of moduleFolders) {
-                                if(moduleFolder.type === 'dir'){
-                                    const files = await getFileContent(`https://api.github.com/repos/${username}/${repo.name}/contents/modules/${moduleFolder.name}`);
-                                    if(Array.isArray(files)){
-                                        var config = files.find(x => x.name === 'config.json' && x.type === 'file');
-                                        if(config){
-                                            config = await getFileContent(config.download_url);
-                                            configs.push({name: config.name, description: config.description});
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
 			}
-            return configs;
-		}
-	}
-
-	async function getFileContent(url) {
-		try {
-			const response = await fetch(url);
-			const data = await response.json();
-			return data;
-		} catch (e) {
-			console.error(e);
 		}
 	}
 }
 
-//#endregion
+function createModuleButton(configData) {
+	const { name, description } = configData;
+
+	const callback = async () => {
+		const data = await getModuleByUrl(configData.moduleUrl);
+		if (data) {
+			const saveKey = `game-${name.toLowerCase()}`;
+			if (getSaveItem(saveKey)) {
+				const overrideSave = confirm("You have a save with this module name\nSave file will be overwritten.\nContinue?");
+				if (!overrideSave) {
+					return;
+				}
+				removeSaveItem(saveKey);
+			}
+			loadModuleDefer(data);
+		}
+	};
+	const btn = getModuleButtonWithContent(name, description, callback);
+    moduleButtonsContainer.appendChild(btn);
+}
+
+async function getModuleByUrl(url) {
+	const moduleFiles = [];
+	const githubFiles = await getFileContent(url);
+	if (Array.isArray(githubFiles)) {
+		for (const file of githubFiles) {
+			if (file.type === "file") {
+				const { name } = file;
+				if (moduleFileNames.include(name)) {
+					const data = await getFileContent(file.download_url);
+					moduleFiles.push({ name: file.name, data });
+				}
+			}
+		}
+	}
+
+	const moduleData = getModuleData(moduleFiles);
+	return moduleData;
+}
+
+async function getFileContent(url) {
+	try {
+		const response = await fetch(url);
+		const data = await response.json();
+		return data;
+	} catch (e) {
+		console.error(e);
+	}
+}

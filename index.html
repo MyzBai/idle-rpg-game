@@ -17,11 +17,13 @@
             <div class="s-buttons">
                 <div class="new-module-button g-vertical-button g-button" data-tab-target=".s-modules">Modules</div>
                 <div class="load-module-button g-vertical-button g-button" data-tab-target=".s-load">Load</div>
-                <div class="find-module-button g-vertical-button g-button" data-tab-target=".s-find">Find</div>
                 <div class="custom-module-button g-vertical-button g-button" data-tab-target=".s-upload">Custom</div>
             </div>
             <div class="s-modules" data-tab-content>
-                <!--TODO:: Add search bar-->
+                <div class="s-search">
+                    <input type="url" placeholder="Search...">
+                    <div class="search-button g-button" style="display: inline-block">Search</div>
+                </div>
                 <div class="s-container">
                     <template>
                         <div class="module-button">
@@ -42,15 +44,6 @@
                     <div class="empty-label">You have no saved games</div>
                 </div>
                 <div class="start-button g-button">Start</div>
-            </div>
-            <div class="s-find" data-tab-content>
-                <div class="s-search">
-                    <div>Github Username</div>
-                    <input type="url" placeholder="">
-                    <div class="search-button g-button" style="display: inline-block">Search</div>
-                    <div class="s-container"></div>
-                </div>
-                
             </div>
             <div class="s-upload" data-tab-content>
                 <div class="s-drop-area empty">
