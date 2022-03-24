@@ -6,7 +6,9 @@ import { isLocalNetwork } from "./helperFunctions.js";
 import * as save from "./save.js";
 import { registerTabs } from "./helperFunctions.js";
 
-const tabs = [document.querySelector(".btn-go-to-home-page"), document.querySelector(".btn-go-to-game-page")];
+const homeButton = document.querySelector(".go-to-home-button");
+const gameButton = document.querySelector(".go-to-game-button");
+const tabs = [homeButton, gameButton];
 registerTabs(tabs);
 tabs[0].click();
 
@@ -25,18 +27,18 @@ document.querySelector(".p-game .load-btn").addEventListener("click", (e) => {
 init();
 async function init() {
 	await loadEnvironment();
+	await loadModule.init();
 
 	startButton.addEventListener("click", startGame);
 	stopButton.addEventListener("click", stopGame);
 	resetButton.addEventListener("click", resetGame);
 
-	await loadModule.init();
-	const moduleData = await loadModule.load();
-	console.log('save path', Global.env.SAVE_PATH);
-	subModulesInit(moduleData);
-	save.load();
+	// const moduleData = await loadModule.load();
+	// console.log('save path', Global.env.SAVE_PATH);
+	// subModulesInit(moduleData);
+	// save.load();
 
-	tabs[1].click();
+	// tabs[1].click();
 }
 
 function startGame() {

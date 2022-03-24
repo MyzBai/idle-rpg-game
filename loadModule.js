@@ -2,6 +2,9 @@ import global from "./global.js";
 import { registerTabs } from "./helperFunctions.js";
 import { getSaveItem, removeSaveItem } from "./save.js";
 import { loadConfigs as loadLocalConfigs, loadModule as loadLocalModule } from "./modules/module-exporter.js";
+import { init as subModulesInit } from "./init-game.js";
+
+
 //#region Definitions
 
 /**
@@ -52,25 +55,22 @@ tabs[0].click();
 
 homePage.querySelector(".btn-go-to-game-page");
 
-
 //#region Modules Tab
 
 const moduleSearchInput = homePage.querySelector(".s-modules .s-search input");
 const moduleButtonsContainer = homePage.querySelector(".s-modules .s-container");
 const moduleButtonTemplate = moduleButtonsContainer.querySelector("template");
-moduleSearchInput.addEventListener('input', e => {
-    if(!moduleSearchInput.delayUpdate){
-        moduleSearchInput.delayUpdate = true;
-        setTimeout(() => {
-            const filter = e.target.value;
-            moduleSearchInput.delayUpdate = false;
-            performModuleFiltering(filter.toLowerCase());
-        }, 500);
-    }
-
+moduleSearchInput.addEventListener("input", (e) => {
+	if (!moduleSearchInput.delayUpdate) {
+		moduleSearchInput.delayUpdate = true;
+		setTimeout(() => {
+			const filter = e.target.value;
+			moduleSearchInput.delayUpdate = false;
+			performModuleFiltering(filter.toLowerCase());
+		}, 500);
+	}
 });
 //#endregion
-
 
 //#region Upload Tab
 /**@type {ModuleFile[]} */
@@ -120,7 +120,7 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 			}
 		}
 	}
-	loadModuleDefer(moduleData);
+    startModule(moduleData);
 });
 //#endregion
 
@@ -135,8 +135,8 @@ const moduleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", 
 const requiredModuleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", "skills.json"];
 const ajv = new ajv7();
 //call this to resolve load module for main.js to continue
-/**@type {(param: Module) => {}} */
-var loadModuleDefer = undefined;
+// /**@type {(param: Module) => {}} */
+// var loadModuleDefer = undefined;
 
 var localConfigs = undefined;
 
@@ -168,7 +168,7 @@ export async function init() {
 						}
 						removeSaveItem(saveKey);
 					}
-					loadModuleDefer(module);
+                    startModule(module);
 				}
 			});
 			moduleButtonsContainer.appendChild(btn);
@@ -215,24 +215,33 @@ export async function init() {
 			console.log("start", loadModuleName, "module");
 			const module = await getLocalModule(loadModuleName, "load");
 			if (module) {
-				loadModuleDefer(module);
+				startModule(module);
 			}
 		});
 	}
-    
+
 	{
 		//github
 		// await getReposBySearchAPI();
 	}
 }
 
-/**@returns {Promise<Module>} */
-export async function load() {
-	const selectModulePromise = new Promise(async (resolve) => {
-		loadModuleDefer = resolve;
-	});
-	return await selectModulePromise;
+/**@param {Module} */
+function startModule(module) {
+	subModulesInit(module);
+
+
+    document.querySelector('.p-home .go-to-game-button').click();
+	tabs[1].click();
 }
+
+// /**@returns {Promise<Module>} */
+// export async function load() {
+// 	const selectModulePromise = new Promise(async (resolve) => {
+// 		loadModuleDefer = resolve;
+// 	});
+// 	return await selectModulePromise;
+// }
 
 /**
  * @param {string} filename
@@ -372,14 +381,14 @@ async function getSavedModule(moduleName) {
 	const saveKey = `game-${name}`;
 	const saveData = getsaveItem(moduleName);
 	const { src, path } = saveData.config;
-    switch (src) {
-        case "local":
-            return await getLocalModule(moduleName);
-        case "github":
-            const { user, repo, name } = parseGithubPath(config.path);
-            // loadGithubModule(user, repo, name);
-            break;
-    }
+	switch (src) {
+		case "local":
+			return await getLocalModule(moduleName);
+		case "github":
+			const { user, repo, name } = parseGithubPath(config.path);
+			// loadGithubModule(user, repo, name);
+			break;
+	}
 }
 
 /**
@@ -391,14 +400,14 @@ async function getSavedModule(moduleName) {
 async function getLocalModule(moduleName) {
 	/**@type {Module} */
 	var moduleData = undefined;
-    
-    const config = localConfigs.find(x => x.name === moduleName);
-    config.src = 'local';
 
-    const filenames = config.include || moduleFileNames.filter((x) => x !== "config.json");
-    const files = await loadLocalModule(moduleName, filenames);
-    files.push({name: 'config.json', content: config});
-    moduleData = await getModuleData(files);
+	const config = localConfigs.find((x) => x.name === moduleName);
+	config.src = "local";
+
+	const filenames = config.include || moduleFileNames.filter((x) => x !== "config.json");
+	const files = await loadLocalModule(moduleName, filenames);
+	files.push({ name: "config.json", content: config });
+	moduleData = await getModuleData(files);
 
 	if (!moduleData) {
 		console.error(sourceTarget, "is an invalid source type");
@@ -524,8 +533,8 @@ function createModuleButton(configData) {
 	const { name, description } = configData;
 
 	const callback = async () => {
-		const data = await getModuleByUrl(configData.moduleUrl);
-		if (data) {
+		const module = await getModuleByUrl(configData.moduleUrl);
+		if (module) {
 			const saveKey = `game-${name.toLowerCase()}`;
 			if (getSaveItem(saveKey)) {
 				const overrideSave = confirm("You have a save with this module name\nSave file will be overwritten.\nContinue?");
@@ -534,7 +543,7 @@ function createModuleButton(configData) {
 				}
 				removeSaveItem(saveKey);
 			}
-			loadModuleDefer(data);
+            startModule(module);
 		}
 	};
 	const btn = getModuleButtonWithContent(name, description, callback);
@@ -570,11 +579,10 @@ async function getFileContent(url) {
 	}
 }
 
-
-function performModuleFiltering(filter){
-    moduleButtonsContainer.querySelectorAll('.module-button').forEach(x => {
-        const title = x.querySelector('.title');
-        const hide = (!title.innerHTML.toLowerCase().startsWith(filter)) && filter.length > 0;
-        x.classList.toggle('search-hidden', hide);
-    });
+function performModuleFiltering(filter) {
+	moduleButtonsContainer.querySelectorAll(".module-button").forEach((x) => {
+		const title = x.querySelector(".title");
+		const hide = !title.innerHTML.toLowerCase().startsWith(filter) && filter.length > 0;
+		x.classList.toggle("search-hidden", hide);
+	});
 }
