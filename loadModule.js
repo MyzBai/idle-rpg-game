@@ -52,6 +52,26 @@ tabs[0].click();
 
 homePage.querySelector(".btn-go-to-game-page");
 
+
+//#region Modules Tab
+
+const moduleSearchInput = homePage.querySelector(".s-modules .s-search input");
+const moduleButtonsContainer = homePage.querySelector(".s-modules .s-container");
+const moduleButtonTemplate = moduleButtonsContainer.querySelector("template");
+moduleSearchInput.addEventListener('input', e => {
+    if(!moduleSearchInput.delayUpdate){
+        moduleSearchInput.delayUpdate = true;
+        setTimeout(() => {
+            const filter = e.target.value;
+            moduleSearchInput.delayUpdate = false;
+            performModuleFiltering(filter.toLowerCase());
+        }, 500);
+    }
+
+});
+//#endregion
+
+
 //#region Upload Tab
 /**@type {ModuleFile[]} */
 var uploadFileContents = undefined;
@@ -120,14 +140,6 @@ var loadModuleDefer = undefined;
 
 var localConfigs = undefined;
 
-//#region Modules Tab
-
-const moduleSearchInput = homePage.querySelector(".s-modules .s-search input");
-const moduleButtonsContainer = homePage.querySelector(".s-modules .s-container");
-const moduleButtonTemplate = moduleButtonsContainer.querySelector("template");
-
-//#endregion
-
 export async function init() {
 	await loadSchemas();
 
@@ -146,7 +158,7 @@ export async function init() {
 			}
 			const { name, desc } = config;
 			const btn = getModuleButtonWithContent(name, desc, () => {
-				const module = getLocalModule(name);
+				const module = await getLocalModule(name);
 				if (module) {
 					const saveKey = `game-${name.toLowerCase()}`;
 					if (getSaveItem(saveKey)) {
@@ -210,7 +222,7 @@ export async function init() {
     
 	{
 		//github
-		await getReposBySearchAPI();
+		// await getReposBySearchAPI();
 	}
 }
 
@@ -556,4 +568,13 @@ async function getFileContent(url) {
 	} catch (e) {
 		console.error(e);
 	}
+}
+
+
+function performModuleFiltering(filter){
+    moduleButtonsContainer.querySelectorAll('.module-button').forEach(x => {
+        const title = x.querySelector('.title');
+        const hide = (!title.innerHTML.toLowerCase().startsWith(filter)) && filter.length > 0;
+        x.classList.toggle('search-hidden', hide);
+    });
 }
