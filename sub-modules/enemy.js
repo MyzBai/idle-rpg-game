@@ -74,6 +74,6 @@ function load(savedObj) {
         return;
     }
     maxHealth = healthList[getPlayerLevel() - 1];
-    curHealth = enemy.healthRatio * maxHealth;
+    curHealth = maxHealth * enemy.healthRatio;
     updateHealthbar();
 }
