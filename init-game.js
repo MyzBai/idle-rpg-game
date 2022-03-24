@@ -11,7 +11,7 @@ initMenu();
 /**
  * @param {import('./loadModule.js').ModuleData} data 
  */
-export async function init(data) {
+export function init(data) {
     console.log('init sub modules');
     
     //make sure we copy the data before distributing it to all the sub-modules
@@ -19,14 +19,14 @@ export async function init(data) {
 
     //player must be initialized first because it has no dependencies
     //without default statmods, 
-    await player.init({ defaultStatMods: data.defaultStatMods });
+    player.init({ defaultStatMods: data.defaultStatMods });
 
-    await enemy.init(data.enemy);
-    await skills.init(data.skills);
-    await items.init(data.items);
-    await modTree.init(data.modTree);
+    enemy.init(data.enemy);
+    skills.init(data.skills);
+    items.init(data.items);
+    modTree.init(data.modTree);
 
-    await combat.init();
+    combat.init();
     save.registerSave(savedObj => {
         savedObj.config = {
             name: data.config.name,
@@ -34,6 +34,8 @@ export async function init(data) {
             path: data.config.path
         }
      });
+
+     save.load();
 }
 
 

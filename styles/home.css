@@ -61,39 +61,10 @@
 
 
 .p-home .start-button{
-    margin: auto;
-}
-
-.p-home .module-button .title{
-    user-select: none;
-}
-
-.p-home .module-button .title:hover{
-    cursor: default;
-    /* background-color: rgb(116, 116, 116); */
-    background-color: var(--primary-color-button-hover);
+    margin: auto 0;
 }
 
 
-.p-home .module-button .title:active{
-    background-color: var(--primary-color-button-active);
-}
-
-.p-home .module-button .content{
-    display: none;
-}
-
-.p-home .module-button .content.active{
-    background-color: rgb(131, 131, 131);
-    box-shadow: inset 0px 0px 3px;
-    display: block;
-    cursor: auto;
-    font-size: 0.8em;
-    text-align: center;
-    overflow: hidden;
-    padding: 6px;
-    white-space:pre-line;
-}
 
 /*Modules tab*/
 .p-home .s-modules .s-search{
@@ -115,9 +86,45 @@
     min-height: 300px;
 }
 
-.p-home .s-modules .s-container .search-hidden{
+.p-home .s-modules .s-container .module-button.search-hidden{
     display:none;
 }
+
+
+.p-home .s-modules .s-container .module-button .title{
+    user-select: none;
+}
+
+.p-home .s-modules .s-container .module-button .title:hover{
+    cursor: default;
+    /* background-color: rgb(116, 116, 116); */
+    background-color: var(--primary-color-button-hover);
+}
+
+.p-home .s-modules .s-container .module-button .title:active{
+    background-color: var(--primary-color-button-active);
+}
+
+.p-home .s-modules .s-container .module-button .content{
+    display: none;
+}
+
+.p-home .s-modules .s-container .module-button .content.active{
+    background-color: rgb(131, 131, 131);
+    box-shadow: inset 0px 0px 3px;
+    display: block;
+    cursor: auto;
+    font-size: 0.8em;
+    text-align: center;
+    overflow: hidden;
+    padding: 6px;
+    white-space:pre-line;
+}
+
+.p-home .s-modules .s-container .module-button .content .start-button{
+    margin: auto;
+}
+
 
 
 /*Load tab*/
@@ -127,20 +134,12 @@
     text-align: center;
 }
 
-.p-home .s-load .start-button{
-    margin-top: 3px;
-}
-
 .p-home .s-load .s-container{
     padding: 3px;
 }
 
 
 /*Upload tab*/
-.p-home .s-upload .start-button{
-    margin-top: 3px;
-}
-
 .p-home .s-upload .s-drop-area{
     background-color: rgb(131, 131, 131);
     min-height: 100px;
