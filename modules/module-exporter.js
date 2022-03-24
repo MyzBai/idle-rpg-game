@@ -1,5 +1,8 @@
 
-/**@returns {Promise<import('../../type-definitions.js').ModuleConfig[]>} */
+/**@typedef {import('../type-definitions.js')} ModuleConfig */
+/**@typedef {import('../loadModule.js')} ModuleFile */
+
+/**@returns {Promise<ModuleConfig[]>} */
 export async function loadConfigs(){
     const configs = [];
     const demoConfig = await loadConfig('demo');
@@ -10,13 +13,13 @@ export async function loadConfigs(){
 /**
  * @param {string} foldername
  * @param {string[]} includes - files to include
- * @returns {Promise<{name: string, data: object}[]>} */
+ * @returns {Promise<ModuleFile>} */
 export async function loadModule(foldername, includes) {
     const files = [];
     for (const filename of includes) {
         try {
             const { default: data } = await import(`./${foldername.toLowerCase()}/${filename.toLowerCase()}`, { assert: { type: 'json' } });
-            files.push({ name: filename, data: data });
+            files.push({ name: filename, content: data });
         } catch (e) {
             console.error(e);
         }

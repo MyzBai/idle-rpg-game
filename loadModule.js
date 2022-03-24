@@ -1,7 +1,7 @@
 import global from "./global.js";
 import { registerTabs } from "./helperFunctions.js";
 import { getSaveItem, removeSaveItem } from "./save.js";
-import { loadConfigs } from "./json/local-modules/module-exporter.js";
+import { loadConfigs as loadLocalConfigs, loadModule as loadLocalModule } from "./modules/module-exporter.js";
 //#region Definitions
 
 /**
@@ -134,7 +134,7 @@ export async function init() {
 	{
 		//Local
 		// const localConfigs = await (await import("./json/local-modules/module-exporter.js")).loadConfigs();
-		localConfigs = await loadConfigs();
+		localConfigs = await loadLocalConfigs();
 
 		for (const config of localConfigs) {
 			const errors = await validateFile("config.json", config);
@@ -146,7 +146,7 @@ export async function init() {
 			}
 			const { name, desc } = config;
 			const btn = getModuleButtonWithContent(name, desc, () => {
-				const module = getModule(name, "local", config);
+				const module = getLocalModule(name);
 				if (module) {
 					const saveKey = `game-${name.toLowerCase()}`;
 					if (getSaveItem(saveKey)) {
@@ -161,11 +161,6 @@ export async function init() {
 			});
 			moduleButtonsContainer.appendChild(btn);
 		}
-	}
-
-	{
-		//github
-		await getReposBySearchAPI();
 	}
 
 	{
@@ -201,18 +196,21 @@ export async function init() {
 		}
 		const startButton = loadContainer.querySelector(".start-button");
 		startButton.toggleAttribute("disabled", !hasSaves);
-		startButton.addEventListener("click", (e) => {
-			if (!loadModuleName) return;
+		startButton.addEventListener("click", async (e) => {
+			if (!loadModuleName) {
+				return;
+			}
 			console.log("start", loadModuleName, "module");
-			const module = getModule(loadModuleName, "load");
+			const module = await getLocalModule(loadModuleName, "load");
 			if (module) {
 				loadModuleDefer(module);
 			}
 		});
 	}
-
-	//only load external modules if in production
-	if (global.env.ENV_TYPE === "production") {
+    
+	{
+		//github
+		await getReposBySearchAPI();
 	}
 }
 
@@ -312,8 +310,7 @@ async function uploadFiles(files) {
 	if (!uploadFileContents) {
 		valid = false;
 	} else {
-        const missingRequiredFiles = getMissingRequiredFilenames(uploadFileContents.map(x => x.filename));
-
+		const missingRequiredFiles = getMissingRequiredFilenames(uploadFileContents.map((x) => x.filename));
 
 		let errorText = "";
 		for (const missingFile of missingRequiredFiles) {
@@ -359,52 +356,43 @@ async function loadSchemas() {
 	}
 }
 
+async function getSavedModule(moduleName) {
+	const saveKey = `game-${name}`;
+	const saveData = getsaveItem(moduleName);
+	const { src, path } = saveData.config;
+    switch (src) {
+        case "local":
+            return await getLocalModule(moduleName);
+        case "github":
+            const { user, repo, name } = parseGithubPath(config.path);
+            // loadGithubModule(user, repo, name);
+            break;
+    }
+}
+
 /**
  * @param {string} moduleName
  * @param {string} sourceTarget - local | load | github
  * @param {object} config
- * @returns {Module}
+ * @returns {Promise<Module>}
  */
-async function getModule(moduleName, sourceTarget, config) {
-	//if config exists, we already have all the necessary info
-	//else, load config, based on name and type
-
+async function getLocalModule(moduleName) {
 	/**@type {Module} */
 	var moduleData = undefined;
-	var src = undefined;
-	if (sourceTarget === "local") {
-		const filenames = config.include || moduleFileNames.filter((x) => x !== "config.json");
-		const moduleExporter = await import("./json/local-modules/module-exporter.js");
-		const files = await moduleExporter.loadModule(moduleName, filenames);
+    
+    const config = localConfigs.find(x => x.name === moduleName);
+    config.src = 'local';
 
-		moduleData = await getModuleData(files);
-		src = "local";
-	} else if (sourceTarget === "load") {
-		const saveKey = `game-${moduleName}`;
-		const saveData = getSaveItem(saveKey);
-		src = saveData.config.src;
-		switch (src) {
-			case "local":
-				const config = localConfigs.find((x) => x.name === moduleName);
-				if (config) {
-					return getModule(moduleName, "local", config);
-				}
-			case "github":
-				const { user, repo, name } = parseGithubPath(config.path);
-				// loadGithubModule(user, repo, name);
-				break;
-		}
-	} else if (sourceTarget === "github") {
-		console.warning("get github module data has not yet been implemented");
-	}
+    const filenames = config.include || moduleFileNames.filter((x) => x !== "config.json");
+    const files = await loadLocalModule(moduleName, filenames);
+    files.push({name: 'config.json', content: config});
+    moduleData = await getModuleData(files);
 
 	if (!moduleData) {
 		console.error(sourceTarget, "is an invalid source type");
 		return;
 	}
 
-	moduleData.config = config;
-	moduleData.config.src = src;
 	setGlobalSavePath(moduleData.config.name);
 	return moduleData;
 }
@@ -414,23 +402,22 @@ async function getModule(moduleName, sourceTarget, config) {
  * @returns {Promise<Module>}
  */
 async function getModuleData(files) {
-
-    const missingRequiredFiles = getMissingRequiredFilenames(files.map(x => x.name));
-    if(missingRequiredFiles.length !== 0){
-        console.error('Missing files', missingRequiredFiles);
-        return;
-    }
+	const missingRequiredFiles = getMissingRequiredFilenames(files.map((x) => x.name));
+	if (missingRequiredFiles.length !== 0) {
+		console.error("Missing files", missingRequiredFiles);
+		return;
+	}
 	const moduleData = {};
 	for (const file of files) {
-		const { name: filename, data: fileData } = file;
-		const errors = await validateFile(filename, fileData);
+		const { name: filename, content: fileContent } = file;
+		const errors = await validateFile(filename, fileContent);
 		if (errors) {
 			for (const error of errors) {
 				console.error(error);
 			}
 		} else {
 			const propertyName = filenameToCamelCase(filename);
-			moduleData[propertyName] = fileData;
+			moduleData[propertyName] = fileContent.data || fileContent;
 		}
 	}
 
@@ -449,14 +436,14 @@ async function getModuleData(files) {
 	return moduleData;
 }
 
-function getMissingRequiredFilenames(filenames){
-    const filesMissing = requiredModuleFileNames.reduce((a, c) => {
-        if (!filenames.some(x => x === c)) {
-            a.push(c);
-        }
-        return a;
-    }, []);
-    return filesMissing;
+function getMissingRequiredFilenames(filenames) {
+	const filesMissing = requiredModuleFileNames.reduce((a, c) => {
+		if (!filenames.some((x) => x === c)) {
+			a.push(c);
+		}
+		return a;
+	}, []);
+	return filesMissing;
 }
 
 /**
@@ -539,7 +526,7 @@ function createModuleButton(configData) {
 		}
 	};
 	const btn = getModuleButtonWithContent(name, description, callback);
-    moduleButtonsContainer.appendChild(btn);
+	moduleButtonsContainer.appendChild(btn);
 }
 
 async function getModuleByUrl(url) {
