@@ -58,20 +58,21 @@ document.querySelector(".p-game .go-to-home-button").addEventListener('click', e
 });
 
 //#region Modules Tab
-
-const moduleSearchInput = homePage.querySelector(".s-modules .s-search input");
+const moduleFilterInput = homePage.querySelector(".s-modules .s-filter input");
 const moduleButtonsContainer = homePage.querySelector(".s-modules .s-container");
-const moduleButtonTemplate = moduleButtonsContainer.querySelector("template");
-moduleSearchInput.addEventListener("input", (e) => {
-	if (!moduleSearchInput.delayUpdate) {
-		moduleSearchInput.delayUpdate = true;
+const moduleInfoContainer = homePage.querySelector('.s-modules .s-column-info');
+// const moduleButtonTemplate = moduleButtonsContainer.querySelector("template");
+moduleFilterInput.addEventListener("input", (e) => {
+	if (!moduleFilterInput.delayUpdate) {
+		moduleFilterInput.delayUpdate = true;
 		setTimeout(() => {
 			const filter = e.target.value;
-			moduleSearchInput.delayUpdate = false;
+			moduleFilterInput.delayUpdate = false;
 			performModuleFiltering(filter.toLowerCase());
 		}, 500);
 	}
 });
+var startModuleCallback = undefined;
 //#endregion
 
 //#region Upload Tab
@@ -136,9 +137,6 @@ var loadModuleName = undefined;
 const moduleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", "skills.json", "items.json", "mod-tree.json"];
 const requiredModuleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", "skills.json"];
 const ajv = new ajv7();
-//call this to resolve load module for main.js to continue
-// /**@type {(param: Module) => {}} */
-// var loadModuleDefer = undefined;
 
 var localConfigs = undefined;
 
@@ -158,8 +156,11 @@ export async function init() {
 				continue;
 			}
 			const { name, desc } = config;
-			const btn = getModuleButtonWithContent(name, desc, async () => {
-				const module = await getLocalModule(name);
+            const btn = document.createElement('div');
+            btn.classList.add('module-button', 'g-button');
+            btn.textContent = name;
+            const callback = async () => {
+                const module = await getLocalModule(name);
 				if (module) {
 					const saveKey = `game-${name.toLowerCase()}`;
 					if (save.getSaveItem(saveKey)) {
@@ -171,9 +172,16 @@ export async function init() {
 					}
                     startModule(module);
 				}
-			});
+            }
+            btn.addEventListener('click', e => {
+                showModuleInfo(name, desc, callback);
+                moduleButtonsContainer.querySelectorAll('.module-button').forEach(x => {
+                    x.classList.toggle('active', x === btn);
+                });
+            });
 			moduleButtonsContainer.appendChild(btn);
 		}
+        moduleButtonsContainer.querySelector('.module-button').click();
 	}
 
 	{ //saves
@@ -187,6 +195,14 @@ export async function init() {
 		
 		// await getReposBySearchAPI();
 	}
+}
+
+function showModuleInfo(name, desc, callback){
+    moduleInfoContainer.querySelector('.name').textContent = name;
+    moduleInfoContainer.querySelector('.description').textContent = desc;
+    moduleInfoContainer.querySelector('.start-button').removeEventListener('click', startModuleCallback);
+    startModuleCallback = callback;
+    moduleInfoContainer.querySelector('.start-button').addEventListener('click', startModuleCallback);
 }
 
 function updateSavedModulesContainer(){
@@ -548,9 +564,8 @@ function getMissingRequiredFilenames(filenames) {
 
 function performModuleFiltering(filter) {
 	moduleButtonsContainer.querySelectorAll(".module-button").forEach((x) => {
-		const title = x.querySelector(".title");
-		const hide = !title.innerHTML.toLowerCase().startsWith(filter) && filter.length > 0;
-		x.classList.toggle("search-hidden", hide);
+		const hide = !x.innerHTML.toLowerCase().startsWith(filter) && filter.length > 0 && !x.classList.contains('active');
+		x.classList.toggle("filter-hidden", hide);
 	});
 }
 

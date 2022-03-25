@@ -13,29 +13,37 @@
        <!--Home-->
     <div class="p-home p active" data-tab-content>
         <div class="go-to-game-button g-button" data-tab-target="body > .p-game">Game</div>
-        <div class="title">Load Module</div>
         <div class="s-buttons">
             <div class="new-module-button g-button" data-tab-target=".s-modules">New</div>
             <div class="load-module-button g-button" data-tab-target=".s-load">Load</div>
             <div class="custom-module-button g-button" data-tab-target=".s-upload">Custom</div>
         </div>
         <div class="s-modules" data-tab-content>
-            <div class="s-search">
-                <input type="url" placeholder="Search...">
-                <div class="search-button g-button" style="display: inline-block">Search</div>
-            </div>
-            <div class="s-container">
-                <template>
-                    <div class="module-button">
-                        <div class="title g-button" ></div>
-                        <div class="content"> 
-                            <p class="desc"></p>
-                            <div class="start-button g-button">Start</div>
-                        </div>
+            <div class="wrapper">
+                <div class="s-column-list">
+                    <div class="s-filter">
+                        <input type="url">
                     </div>
-                </template>
+                    <div class="s-container">
+                        <template>
+                            <div class="module-button">
+                                <div class="title g-button" ></div>
+                                <div class="content"> 
+                                    <p class="desc"></p>
+                                    <div class="start-button g-button">Start</div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+                <div class="s-column-info">
+                    <p class="name"></p>
+                    <p class="description"></p>
+                    <div class="start-button g-button">Start</div>
+                </div>
             </div>
         </div>
+
         <div class="s-load" data-tab-content>
             <div class="s-container">
                 <template>
