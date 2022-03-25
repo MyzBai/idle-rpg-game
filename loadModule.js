@@ -1,6 +1,6 @@
 import global from "./global.js";
 import { registerTabs } from "./helperFunctions.js";
-import { getSaveItem, removeSaveItem } from "./save.js";
+import * as save from './save.js';
 import { loadConfigs as loadLocalConfigs, loadModule as loadLocalModule } from "./modules/module-exporter.js";
 import { init as subModulesInit } from "./init-game.js";
 
@@ -53,7 +53,9 @@ const tabs = homePage.querySelectorAll(".s-buttons [data-tab-target]");
 registerTabs(tabs);
 tabs[0].click();
 
-homePage.querySelector(".btn-go-to-game-page");
+document.querySelector(".p-game .go-to-home-button").addEventListener('click', e => {
+    updateSavedModulesContainer();
+});
 
 //#region Modules Tab
 
@@ -143,8 +145,7 @@ var localConfigs = undefined;
 export async function init() {
 	await loadSchemas();
 
-	{
-		//Local
+	{ //local
 		// const localConfigs = await (await import("./json/local-modules/module-exporter.js")).loadConfigs();
 		localConfigs = await loadLocalConfigs();
 
@@ -161,12 +162,12 @@ export async function init() {
 				const module = await getLocalModule(name);
 				if (module) {
 					const saveKey = `game-${name.toLowerCase()}`;
-					if (getSaveItem(saveKey)) {
+					if (save.getSaveItem(saveKey)) {
 						const overrideSave = confirm("You have a save with this module name\nSave file will be overwritten.\nContinue?");
 						if (!overrideSave) {
 							return;
 						}
-						removeSaveItem(saveKey);
+						save.removeSaveItem(saveKey);
 					}
                     startModule(module);
 				}
@@ -175,55 +176,62 @@ export async function init() {
 		}
 	}
 
-	{
-		//saves
-		var hasSaves = false;
-		loadButtonsContainer.replaceChildren([]);
-		for (const [key, value] of Object.entries(localStorage)) {
-			if (key.startsWith("game-")) {
-				const content = JSON.parse(value);
-				if (content.config.src === "upload") {
-					continue;
-				}
-				hasSaves = true;
-				const name = content.config.name;
-				const btn = loadButtonTemplate.content.cloneNode("true").firstElementChild;
-				btn.textContent = name;
-				btn.addEventListener("click", (e) => {
-					loadModuleName = name;
-					const btns = [...loadButtonsContainer.querySelectorAll(".module-button")];
-					btns.forEach((x) => {
-						x.classList.toggle("active", x === btn);
-					});
-					console.log("select", loadModuleName, "module");
-				});
-				loadButtonsContainer.appendChild(btn);
-			}
-		}
+	{ //saves
+		
+        //being called when refreshing the page
+        //updateSavedModulesContainer();
 
-		if (!hasSaves) {
-			loadButtonsContainer.textContent = "You have no saved games";
-		} else {
-			// loadButtonsContainer.firstElementChild.click();
-		}
-		const startButton = loadContainer.querySelector(".start-button");
-		startButton.toggleAttribute("disabled", !hasSaves);
-		startButton.addEventListener("click", async (e) => {
-			if (!loadModuleName) {
-				return;
-			}
-			console.log("start", loadModuleName, "module");
-			const module = await getLocalModule(loadModuleName, "load");
-			if (module) {
-				startModule(module);
-			}
-		});
 	}
 
-	{
-		//github
+	{//github
+		
 		// await getReposBySearchAPI();
 	}
+}
+
+function updateSavedModulesContainer(){
+    let hasSaves = false;
+    loadButtonsContainer.replaceChildren([]);
+    for (const [key, value] of Object.entries(localStorage)) {
+        if (key.startsWith("game-")) {
+            const content = JSON.parse(value);
+            if (content.config.src === "upload") {
+                continue;
+            }
+            hasSaves = true;
+            const name = content.config.name;
+            const btn = loadButtonTemplate.content.cloneNode("true").firstElementChild;
+            btn.textContent = name;
+            btn.addEventListener("click", (e) => {
+                loadModuleName = name;
+                const btns = [...loadButtonsContainer.querySelectorAll(".module-button")];
+                btns.forEach((x) => {
+                    x.classList.toggle("active", x === btn);
+                });
+                console.log("select", loadModuleName, "module");
+            });
+            loadButtonsContainer.appendChild(btn);
+        }
+    }
+
+    if (!hasSaves) {
+        loadButtonsContainer.textContent = "You have no saved games";
+    }
+    const startButton = loadContainer.querySelector(".start-button");
+    startButton.toggleAttribute("disabled", !hasSaves);
+    startButton.addEventListener("click", async (e) => {
+        if (!loadModuleName) {
+            return;
+        }
+        console.log("start", loadModuleName, "module");
+        const module = await getLocalModule(loadModuleName, "load");
+        if (module) {
+            startModule(module);
+        }
+    });
+    if(loadButtonsContainer.children.length > 0){
+        loadButtonsContainer.children[0].click();
+    }
 }
 
 /**@param {Module} */
@@ -235,28 +243,7 @@ function startModule(module) {
 	tabs[1].click();
 }
 
-// /**@returns {Promise<Module>} */
-// export async function load() {
-// 	const selectModulePromise = new Promise(async (resolve) => {
-// 		loadModuleDefer = resolve;
-// 	});
-// 	return await selectModulePromise;
-// }
 
-/**
- * @param {string} filename
- * @param {object} content
- * @returns {Promise<object[] | void>} */
-async function validateFile(filename, content) {
-	try {
-		const validator = ajv.getSchema(filename);
-		validator(content);
-		return validator.errors;
-	} catch (e) {
-		console.error(e);
-	}
-	return undefined;
-}
 
 /**
  * @param {string} title
@@ -348,20 +335,10 @@ async function uploadFiles(files) {
 	startButton.toggleAttribute("disabled", !valid);
 }
 
-//load saved games
+async function loadSavedModules(){
 
-/**
- * @param {string} string
- * @returns {string}
- */
-function filenameToCamelCase(string) {
-	const propertyName = string
-		.substring(0, string.length - 5)
-		.split("-")
-		.map((x, i) => (i > 0 ? x.charAt(0).toUpperCase() + x.slice(1) : x))
-		.join("");
-	return propertyName;
 }
+
 
 async function loadSchemas() {
 	const { default: modsSchema } = await import(`${MODS_SCHEMA_PATH}`, {
@@ -374,20 +351,6 @@ async function loadSchemas() {
 			assert: { type: "json" },
 		});
 		ajv.addSchema(schema, filename);
-	}
-}
-
-async function getSavedModule(moduleName) {
-	const saveKey = `game-${name}`;
-	const saveData = getsaveItem(moduleName);
-	const { src, path } = saveData.config;
-	switch (src) {
-		case "local":
-			return await getLocalModule(moduleName);
-		case "github":
-			const { user, repo, name } = parseGithubPath(config.path);
-			// loadGithubModule(user, repo, name);
-			break;
 	}
 }
 
@@ -457,38 +420,6 @@ async function getModuleData(files) {
 	return moduleData;
 }
 
-function getMissingRequiredFilenames(filenames) {
-	const filesMissing = requiredModuleFileNames.reduce((a, c) => {
-		if (!filenames.some((x) => x === c)) {
-			a.push(c);
-		}
-		return a;
-	}, []);
-	return filesMissing;
-}
-
-/**
- *
- * @param {string} path
- * @returns {{user: string, repo: string, name: string}}
- */
-function parseGithubPath(path) {
-	return path.split("/").reduce((a, c, i) => {
-		a[i] = c;
-	}, {});
-}
-
-/**
- * @param {string} name - module name
- */
-function setGlobalSavePath(name) {
-	if (!name) {
-		global.env.SAVE_PATH = undefined;
-		return;
-	}
-	name = name.split(" ").join("-");
-	global.env.SAVE_PATH = `game-${name.toLowerCase()}`;
-}
 
 async function getReposBySearchAPI() {
 	const repoQueryString = "https://api.github.com/search/repositories?q=key:529d32e203fb53700710d725ad75c820+in:readme&sort=updated&order=desc";
@@ -536,12 +467,12 @@ function createModuleButton(configData) {
 		const module = await getModuleByUrl(configData.moduleUrl);
 		if (module) {
 			const saveKey = `game-${name.toLowerCase()}`;
-			if (getSaveItem(saveKey)) {
+			if (save.getSaveItem(saveKey)) {
 				const overrideSave = confirm("You have a save with this module name\nSave file will be overwritten.\nContinue?");
 				if (!overrideSave) {
 					return;
 				}
-				removeSaveItem(saveKey);
+				save.removeSaveItem(saveKey);
 			}
             startModule(module);
 		}
@@ -565,10 +496,31 @@ async function getModuleByUrl(url) {
 		}
 	}
 
-	const moduleData = getModuleData(moduleFiles);
+	const moduleData = await getModuleData(moduleFiles);
 	return moduleData;
 }
 
+
+//#region utility
+
+/**
+ * @param {string} string
+ * @returns {string} e.g default-stat-mods > defaultStatMods
+ */
+ function filenameToCamelCase(string) {
+	const propertyName = string
+		.substring(0, string.length - 5)
+		.split("-")
+		.map((x, i) => (i > 0 ? x.charAt(0).toUpperCase() + x.slice(1) : x))
+		.join("");
+	return propertyName;
+}
+
+/**
+ * fetches json data
+ * @param {string} url 
+ * @returns 
+ */
 async function getFileContent(url) {
 	try {
 		const response = await fetch(url);
@@ -579,6 +531,21 @@ async function getFileContent(url) {
 	}
 }
 
+/**
+ * @param {string[]} filenames
+ * @returns {string[]}
+ */
+function getMissingRequiredFilenames(filenames) {
+	const filesMissing = requiredModuleFileNames.reduce((a, c) => {
+		if (!filenames.some((x) => x === c)) {
+			a.push(c);
+		}
+		return a;
+	}, []);
+	return filesMissing;
+}
+
+
 function performModuleFiltering(filter) {
 	moduleButtonsContainer.querySelectorAll(".module-button").forEach((x) => {
 		const title = x.querySelector(".title");
@@ -586,3 +553,32 @@ function performModuleFiltering(filter) {
 		x.classList.toggle("search-hidden", hide);
 	});
 }
+
+/**
+ * @param {string} name - module name
+ */
+ function setGlobalSavePath(name) {
+	if (!name) {
+		global.env.SAVE_PATH = undefined;
+		return;
+	}
+	name = name.split(" ").join("-");
+	global.env.SAVE_PATH = `game-${name.toLowerCase()}`;
+}
+
+/**
+ * @param {string} filename
+ * @param {object} content
+ * @returns {Promise<object[] | void>} */
+ async function validateFile(filename, content) {
+	try {
+		const validator = ajv.getSchema(filename);
+		validator(content);
+		return validator.errors;
+	} catch (e) {
+		console.error(e);
+	}
+	return undefined;
+}
+
+//#endregion
