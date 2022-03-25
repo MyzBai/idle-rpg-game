@@ -172,7 +172,7 @@ function setupBasicCrafting(basicCraftings) {
                 craftButton.disabled = true;
             }
         });
-        const craftButton = element.querySelector('button');
+        const craftButton = element.querySelector('.craft-button');
         craftButton.addEventListener('click', e => {
             rollModifiers(selectedItem, weights, tierTarget);
             showItem(selectedItem);
@@ -212,7 +212,7 @@ function setupBasicCrafting(basicCraftings) {
             }
         });
 
-        const craftButton = element.querySelector('button');
+        const craftButton = element.querySelector('.craft-button');
 
         craftButton.addEventListener('click', e => {
             addModifier(selectedItem, tierTarget);
@@ -242,7 +242,7 @@ function setupBasicCrafting(basicCraftings) {
         let cost = actions.rollValues.cost;
         costSpan.textContent = cost;
 
-        const craftButton = element.querySelector('button');
+        const craftButton = element.querySelector('.craft-button');
 
         craftButton.addEventListener('click', e => {
             rollValues(selectedItem);
@@ -269,7 +269,7 @@ function setupBasicCrafting(basicCraftings) {
         let cost = actions.rollValues.cost;
         costSpan.textContent = cost;
 
-        const craftButton = element.querySelector('button');
+        const craftButton = element.querySelector('.craft-button');
 
         craftButton.addEventListener('click', e => {
             removeRandom(selectedItem);

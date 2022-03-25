@@ -33,40 +33,14 @@
 
 /*Buttons*/
 
-.p-home .go-to-game-button{
-    display: inline-block;
-    padding: 6px;
-}
-
-.p-home .start-button{
-    width: 60px;
-    text-align: center;
-}
-
 .p-home .s-buttons{
     display: flex;
-    font-size: 1.2em;
-    margin: 3px;
-}
-.p-home .s-buttons .custom-module-button{
-    margin-left: auto;
-}
-
-
-.p-home .s-buttons .g-button{
-    display: inline-block;
-    padding: 6px 12px;
-    
+    margin: auto 0;
 }
 
 .p-home [data-tab-content]{
     padding: 6px;
     margin: 6px;
-}
-
-
-.p-home .start-button{
-    margin: auto 0;
 }
 
 
@@ -87,14 +61,15 @@
 }
 
 .p-home .s-modules .s-container{
-    /* padding: 6px; */
     min-height: 300px;
 }
 
 .p-home .s-modules .s-container .module-button.search-hidden{
     display:none;
 }
-
+.p-home .s-modules .s-container .module-button .title{
+    display: flex;
+}
 
 .p-home .s-modules .s-container .module-button .title{
     user-select: none;
@@ -119,15 +94,17 @@
     box-shadow: inset 0px 0px 3px;
     display: block;
     cursor: auto;
-    font-size: 0.8em;
-    text-align: center;
-    overflow: hidden;
     padding: 6px;
+}
+.p-home .s-modules .s-container .module-button .content.active p{
+    cursor: auto;
+    text-align: center;
     white-space:pre-line;
 }
-
 .p-home .s-modules .s-container .module-button .content .start-button{
     margin: auto;
+    align-self: center;
+    display: inline-block;
 }
 
 

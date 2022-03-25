@@ -148,7 +148,7 @@ function toggleSupport(name) {
 function createSkillButton(name, type) {
 	var btn = document.createElement("div");
 	btn.textContent = name;
-	btn.classList.add(`${type}-skill`, "skill-button");
+	btn.classList.add(`${type}-skill`, 'skill-button', 'g-button');
 	btn.addEventListener("click", (e) => {
 		viewSkill(name, type);
 	});
@@ -194,7 +194,7 @@ function viewSkill(name, type) {
 	skillView.querySelector(".s-mods").textContent = modsText;
 
 	//button
-	let button = skillView.querySelector("button");
+	let button = skillView.querySelector(".g-button");
 	let isActive = false;
 	if (type === "attack") {
 		isActive = isAttackSkillActive(name);

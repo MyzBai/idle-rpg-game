@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.10.0/ajv7.min.js"></script>
 </head>
 <body>
+       <!--Home-->
     <div class="p-home p active" data-tab-content>
         <div class="go-to-game-button g-button" data-tab-target="body > .p-game">Game</div>
         <div class="title">Load Module</div>
@@ -30,7 +31,7 @@
                         <div class="module-button">
                             <div class="title g-button" ></div>
                             <div class="content"> 
-                                <div class="desc"></div>
+                                <p class="desc"></p>
                                 <div class="start-button g-button">Start</div>
                             </div>
                         </div>
@@ -56,35 +57,37 @@
         </div>
     </div>
 
+    <!--Game-->
     <div class="p-game p" data-tab-content>
         <div>
-            <div>
-                <button class="save-btn">Save</button>
-                <button class="load-btn">Load</button>
-            </div>
+            <div class="go-to-home-button g-button" data-tab-target="body > .p-home">Home</div>
             <div style="text-align: center;">
                 <label class="s-level">Level <span>1</span></label>
                 <label class="s-essence" style="display: block;">Essence <span>1</span></label>
             </div>
-            <div>
-                <button class="go-to-home-button" data-tab-target="body > .p-home">Load Module</button>
-                <button class="start-game">START</button>
-                <button class="stop-game">STOP</button>
-                <button class="reset-game">RESET</button>
-                <button class="kill-enemy">KILL</button>
+            <fieldset>
+                <legend>Test</legend>
                 <label class="status-game">Status: <span>stopped</span></label>
-            </div>
+                <div style="display: flex;">
+                    <div class="save-btn g-button">Save</div>
+                    <div class="load-btn g-button">Load</div>
+                    <div class="start-game g-button">Start</div>
+                    <div class="stop-game g-button">Stop</div>
+                    <div class="reset-game g-button">Reset</div>
+                    <div class="kill-enemy g-button">Instant Kill</div>
+                </div>
+            </fieldset>
         </div>
         <div class="main">
             <!--Menu-->
             <div class="s-menu">
                 <fieldset>
                     <legend>Main Menu</legend>
-                    <div class="g-menu-container">
-                        <div data-tab-target=".p-combat">Combat</div>
-                        <div data-tab-target=".p-skills">Skills</div>
-                        <div data-tab-target=".p-items">Items</div>
-                        <div data-tab-target=".p-mod-tree">Mod Tree</div>
+                    <div class="g-vertical-menu-container .u-separator">
+                        <div class="g-button" data-tab-target=".p-combat">Combat</div>
+                        <div class="g-button" data-tab-target=".p-skills">Skills</div>
+                        <div class="g-button" data-tab-target=".p-items">Items</div>
+                        <div class="g-button" data-tab-target=".p-mod-tree">Mod Tree</div>
                     </div>
                 </fieldset>
             </div>
@@ -112,11 +115,13 @@
                         <div class="s-buttons">
                             <fieldset>
                                 <legend>Attack</legend>
-                                <div class="s-attack-skill-container g-menu-container"></div>
+                                <div class="s-attack-skill-container g-vertical-menu-container">
+
+                                </div>
                             </fieldset>
                             <fieldset>
                                 <legend>Supports</legend>
-                                <div class="s-support-skill-container g-menu-container"></div>
+                                <div class="s-support-skill-container g-vertical-menu-container"></div>
                             </fieldset>
                         </div>
             
@@ -126,7 +131,7 @@
                             <div class="s-stats"></div>
                             <div class="g-separator"></div>
                             <div class="s-mods"></div>
-                            <button>Enable</button>
+                            <div class="g-button" style="margin-bottom: 3px">Enable</div>
                         </div>
                     </fieldset>
                 </div>
@@ -143,23 +148,23 @@
                                         <div class="title">Roll Modifiers</div>
                                         <select class="tier"></select>
                                         <div class="cost">Cost <span>0</span></div>
-                                        <button>Craft</button>
+                                        <div class="craft-button g-button">Craft</div>
                                     </div>
                                     <div class="s-add-mod s-craft-action">
                                         <div class="title">Add Modifier</div>
                                         <select class="tier"></select>
                                         <div class="cost">Cost <span>0</span></div>
-                                        <button>Craft</button>
+                                        <div class="craft-button g-button">Craft</div>
                                     </div>
                                     <div class="s-roll-values s-craft-action">
                                         <div class="title">Roll Values</div>
                                         <div class="cost">Cost <span>0</span></div>
-                                        <button>Craft</button>
+                                        <div class="craft-button g-button">Craft</div>
                                     </div>
                                     <div class="s-remove s-craft-action">
                                         <div class="title">Remove Random Modifier</div>
                                         <div class="cost">Cost <span>0</span></div>
-                                        <button>Craft</button>
+                                        <div class="craft-button g-button">Craft</div>
                                     </div>
                                 </div>
                             </div>
