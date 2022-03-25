@@ -53,9 +53,10 @@
 }
 
 
-.p-home .s-buttons > div{
+.p-home .s-buttons .g-button{
     display: inline-block;
-    padding: 6px;
+    padding: 6px 12px;
+    
 }
 
 .p-home [data-tab-content]{
