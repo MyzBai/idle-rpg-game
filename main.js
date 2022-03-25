@@ -10,7 +10,7 @@ const homeButton = document.querySelector(".go-to-home-button");
 const gameButton = document.querySelector(".go-to-game-button");
 const tabs = [homeButton, gameButton];
 registerTabs(tabs);
-tabs[1].click();
+tabs[0].click();
 
 const startButton = document.querySelector(".start-game");
 const stopButton = document.querySelector(".stop-game");

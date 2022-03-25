@@ -5,9 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="./styles/style.css">
-    <link rel="stylesheet" href="./styles/home.css">
-    <link rel="stylesheet" href="./styles/game.css">
+    <!-- <link rel="stylesheet" href="./styles/style.css"> -->
+    <link rel="stylesheet" href="./style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.10.0/ajv7.min.js"></script>
 </head>
 <body>
@@ -15,45 +14,43 @@
     <div class="p-home p active" data-tab-content>
         <div class="go-to-game-button g-button" data-tab-target="body > .p-game">Game</div>
         <div class="title">Load Module</div>
-        <div class="s-wrapper">
-            <div class="s-buttons">
-                <div class="new-module-button g-button" data-tab-target=".s-modules">New</div>
-                <div class="load-module-button g-button" data-tab-target=".s-load">Load</div>
-                <div class="custom-module-button g-button" data-tab-target=".s-upload">Custom</div>
+        <div class="s-buttons">
+            <div class="new-module-button g-button" data-tab-target=".s-modules">New</div>
+            <div class="load-module-button g-button" data-tab-target=".s-load">Load</div>
+            <div class="custom-module-button g-button" data-tab-target=".s-upload">Custom</div>
+        </div>
+        <div class="s-modules" data-tab-content>
+            <div class="s-search">
+                <input type="url" placeholder="Search...">
+                <div class="search-button g-button" style="display: inline-block">Search</div>
             </div>
-            <div class="s-modules" data-tab-content>
-                <div class="s-search">
-                    <input type="url" placeholder="Search...">
-                    <div class="search-button g-button" style="display: inline-block">Search</div>
-                </div>
-                <div class="s-container">
-                    <template>
-                        <div class="module-button">
-                            <div class="title g-button" ></div>
-                            <div class="content"> 
-                                <p class="desc"></p>
-                                <div class="start-button g-button">Start</div>
-                            </div>
+            <div class="s-container">
+                <template>
+                    <div class="module-button">
+                        <div class="title g-button" ></div>
+                        <div class="content"> 
+                            <p class="desc"></p>
+                            <div class="start-button g-button">Start</div>
                         </div>
-                    </template>
-                </div>
+                    </div>
+                </template>
             </div>
-            <div class="s-load" data-tab-content>
-                <div class="s-container">
-                    <template>
-                        <div class="module-button g-button"></div>
-                    </template>
-                    <div class="empty-label">You have no saved games</div>
-                </div>
-                <div class="start-button g-button">Start</div>
+        </div>
+        <div class="s-load" data-tab-content>
+            <div class="s-container">
+                <template>
+                    <div class="module-button g-button"></div>
+                </template>
+                <div class="empty-label">You have no saved games</div>
             </div>
-            <div class="s-upload" data-tab-content>
-                <div class="s-drop-area empty">
-                    <input type="file" name="file" accept=".json" multiple>
-                </div>
-                <div class="warning"></div>
-                <div class="start-button g-button" disabled >Start</div>
+            <div class="start-button g-button">Start</div>
+        </div>
+        <div class="s-upload" data-tab-content>
+            <div class="s-drop-area empty">
+                <input type="file" name="file" accept=".json" multiple>
             </div>
+            <div class="warning"></div>
+            <div class="start-button g-button" disabled >Start</div>
         </div>
     </div>
 
