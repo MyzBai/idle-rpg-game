@@ -262,13 +262,9 @@ fieldset{
 }
 
 /*Combat*/
-
-.s-combat{
-    display: none;
-}
-
 .s-combat.active{
     display: block;
+    flex: 1;
 }
 
 .s-health-bar-background{
@@ -350,6 +346,7 @@ fieldset{
 /*Items*/
 .p-game .s-items.active{
     display: flex;
+    flex: 1;
 }
 
 .p-game .s-items .s-item-list{
@@ -400,6 +397,7 @@ fieldset{
     grid-template-rows: auto 1fr;
     grid-template-columns: 1fr 0.7fr;
     min-height: 0px;
+    flex: 1;
 }
 
 .p-game .s-mod-tree .s-top{
