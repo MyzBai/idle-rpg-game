@@ -1,11 +1,12 @@
 {
-    "$schema": "../../schemas/mod-tree-schema.json",
+    "$schema": "../../json/schemas/mod-tree-schema.json",
     "data": {
+        "numPointsPerLevel": 1,
         "nodes": [
             {
                 "name": "Strength",
                 "maxPoints": 10,
-                "reqPoints": 0,
+                "reqLevel": 0,
                 "mods":[
                     {
                         "id": "baseStrength",
@@ -18,7 +19,7 @@
             {
                 "name": "Dexterity",
                 "maxPoints": 10,
-                "reqPoints": 0,
+                "reqLevel": 0,
                 "mods": [
                     {
                         "id": "baseDexterity",
@@ -31,7 +32,7 @@
             {
                 "name": "Intelligence",
                 "maxPoints": 10,
-                "reqPoints": 0,
+                "reqLevel": 0,
                 "mods": [
                     {
                         "id": "baseIntelligence",
@@ -44,7 +45,7 @@
             {
                 "name": "Physical Damage",
                 "maxPoints": 5,
-                "reqPoints": 0,
+                "reqLevel": 0,
                 "mods": [
                     {
                         "id": "incPhysicalDamage",
@@ -57,7 +58,7 @@
             {
                 "name": "Elemental Damage",
                 "maxPoints": 5,
-                "reqPoints": 0,
+                "reqLevel": 0,
                 "mods": [{
                     "id": "incElementalDamage",
                     "stats": [
@@ -68,7 +69,7 @@
             {
                 "name": "Chaos Damage",
                 "maxPoints": 5,
-                "reqPoints": 0,
+                "reqLevel": 0,
                 "mods": [{
                     "id": "incChaosDamage",
                     "stats": [
@@ -79,7 +80,7 @@
             {
                 "name": "Attack Speed",
                 "maxPoints": 10,
-                "reqPoints": 5,
+                "reqLevel": 5,
                 "mods": [
                     {
                         "id": "incAttackSpeed",
@@ -92,7 +93,7 @@
             {
                 "name": "Hit Chance",
                 "maxPoints": 10,
-                "reqPoints": 5,
+                "reqLevel": 5,
                 "mods": [{
                     "id": "hitChance",
                     "stats": [
@@ -103,7 +104,7 @@
             {
                 "name": "Critical Strike Chance",
                 "maxPoints": 10,
-                "reqPoints": 10,
+                "reqLevel": 10,
                 "mods": [{
                     "id": "critChance",
                     "stats": [
@@ -114,7 +115,7 @@
             {
                 "name": "Critical Strike Multiplier",
                 "maxPoints": 10,
-                "reqPoints": 10,
+                "reqLevel": 10,
                 "mods": [{
                     "id": "critMulti",
                     "stats": [

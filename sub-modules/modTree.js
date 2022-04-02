@@ -12,7 +12,7 @@ import { registerSave, registerLoad } from "../save.js";
  */
 
 /**
- * @typedef GroupNode
+ * @typedef Node
  * @property {string} name
  * @property {number} curPoints
  * @property {number} maxPoints
@@ -20,105 +20,86 @@ import { registerSave, registerLoad } from "../save.js";
  * @property {HTMLElement} element
  */
 
-/**
- * @typedef TreeGroup
- * @property {number} reqPoints
- * @property {GroupNode[]} nodes
- * @property {HTMLElement} [element]
- */
+const modTreeElement = document.querySelector(".p-game .s-mod-tree");
+const pointsSpan = modTreeElement.querySelector(".points span");
+const nodeContainer = modTreeElement.querySelector(".s-list");
+const nodeTemplate = nodeContainer.querySelector("template");
+const nodeInfoContainer = modTreeElement.querySelector(".s-node-info");
 
-const pointsRemainingSpan = document.querySelector(".s-mod-tree .s-top .remaining-points span");
-const pointsSpentSpan = document.querySelector(".s-mod-tree .spent-points span");
-const groupContainer = document.querySelector(".s-mod-tree .s-list");
-const nodeTemplate = groupContainer.querySelector("template");
-const nodeInfoContainer = document.querySelector(".s-mod-tree .s-node-info");
-
-var assignClickEvent = undefined;
-var unassignClickEvent = undefined;
-
-/**@type {TreeGroup[]} */
-const treeGroups = [];
+/**@type {Node[]} */
+var nodes = [];
 
 var selectedNode = undefined;
+var numPointsPerLevel = 1;
+var assignClickEvent = undefined;
+var unassignClickEvent = undefined;
+var levelUpEvtId = undefined;
 
 export async function init(data) {
 	console.log("init mod-tree");
 
-	// const groups = data.groups;
-
-	/**@type {TreeGroup[]} */
-	const groups = Object.values(
-		data.nodes.reduce((a, c) => {
-			const reqPoints = c.reqPoints || 0;
-			const group = a[reqPoints] || { reqPoints, nodes: [] };
-			// a[c.reqPoints] = [...(a[c.reqPoints] || []), c];
-            group.nodes.push(c);
-            a[reqPoints] = group;
-            return a;
-		}, {})
-	);
-
-	for (const group of groups) {
-		createGroupElement(group);
-		if (!group.element) {
-			console.log("Error");
-			break;
-		}
-
-		groupContainer.append(group.element);
-
-		treeGroups.push(group);
+	nodes = [];
+	nodeContainer.replaceChildren([]);
+	for (const nodeData of data.nodes) {
+		const { name, maxPoints, reqLevel, mods } = nodeData;
+		const node = {
+			name,
+			maxPoints,
+			reqLevel: reqLevel || 0,
+			mods: mods.map((x) => {
+				return {
+					id: x.id,
+					stats: x.stats.map((y) => {
+						return { value: y.value };
+					}),
+				};
+			}),
+		};
+		createNodeElement(node);
+		nodes.push(node);
 	}
 
-	eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
-		console.log("player leveled up observed in modTree.js", level);
-		calcPoints();
-		updateGroups();
-		selectNode(selectedNode);
-	});
+	if (!levelUpEvtId) {
+		levelUpEvtId = eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
+			console.log("player leveled up observed in modTree.js", level);
+			updatePoints();
+			updateNodes();
+			selectNode(selectedNode);
+		});
+	}
 
-	selectNode(treeGroups[0].nodes[0]);
+	selectNode(nodes[0]);
 
-	updateGroups();
+	updateNodes();
 
 	registerSave(save);
 	registerLoad(load);
 }
 
-function calcPoints() {
-	var pointsRemaining = player.getLevel() - 1;
+function updatePoints() {
+	var points = (player.getLevel() - 1) * numPointsPerLevel;
 	var pointsSpent = getSpentPoints();
-	pointsRemaining -= pointsSpent;
-	if (pointsRemaining < 0) {
-		console.error("Too many points spent. This is not allowed");
-		return;
-	}
-	pointsRemainingSpan.textContent = pointsRemaining.toString();
-	pointsSpentSpan.textContent = pointsSpent.toString();
+	points -= pointsSpent;
+	pointsSpan.textContent = points.toString();
 }
 
-/**
- * @param {TreeGroup} group
- * @returns {HTMLElement} container
- */
-function createGroupElement(group) {
-	group.element = document.createElement("div");
-	if (group.reqPoints > 0) {
-		const pointsLabel = document.createElement("div");
-		pointsLabel.textContent = "Required Points Spent: " + group.reqPoints;
-		pointsLabel.classList.add("req-points-label");
-		group.element.appendChild(pointsLabel);
-	}
+/**@param {Node} node */
+function selectNode(node) {
+	if (!node) return;
 
-	group.element.classList.add("s-group", "g-menu-container");
-	for (const node of group.nodes) {
-		createNodeElement(node);
-		group.element.appendChild(node.element);
+	nodes.forEach((x) => x.element.classList.toggle("active", x.element === node.element));
+	setNodeIndo(node);
+	selectedNode = node;
+}
+
+function updateNodes() {
+	for (const node of nodes) {
+		setNodePoints(node);
 	}
 }
 
 /**
- * @param {GroupNode} node
+ * @param {Node} node
  * @returns {HTMLElement} container
  */
 function createNodeElement(node) {
@@ -129,22 +110,10 @@ function createNodeElement(node) {
 	node.element.addEventListener("click", (e) => {
 		selectNode(node);
 	});
+    nodeContainer.appendChild(node.element);
 }
 
-function selectNode(node) {
-	treeGroups.flatMap((x) => x.nodes).forEach((x) => x.element.classList.toggle("active", x.element === node.element));
-	setTooltip(node);
-	selectedNode = node;
-}
-
-function updateGroups() {
-	const pointsSpent = getSpentPoints();
-	for (const group of treeGroups) {
-		group.element.classList.toggle("active", group.reqPoints <= pointsSpent);
-	}
-}
-
-function setTooltip(node) {
+function setNodeIndo(node) {
 	nodeInfoContainer.querySelector(".name").textContent = node.name;
 	var modsText = "";
 	node.mods.forEach((x) => {
@@ -164,85 +133,68 @@ function setTooltip(node) {
 	unassignClickEvent = () => {
 		unallocate(node.name);
 	};
-	assignButton.disabled = !validateAssign(node);
-	unassignButton.disabled = !validateUnassign(node);
+	assignButton.toggleAttribute('disabled', !validateAssign(node));
+	unassignButton.toggleAttribute('disabled', !validateUnassign(node));
 	assignButton.addEventListener("click", assignClickEvent);
 	unassignButton.addEventListener("click", unassignClickEvent);
 }
 
 function getNodeByName(name) {
-	var node = treeGroups.flatMap((x) => x.nodes).find((x) => x.name === name);
-	return node;
-}
-
-function calcGroupPointsSpent(group) {
-	var pointsSpent = 0;
-	for (const node of group.nodes) {
-		pointsSpent += node.curPoints;
-	}
-	return pointsSpent;
+    var node = nodes.find(x => x.name === name);
+    return node;
 }
 
 function getSpentPoints() {
-	var spentPoints = 0;
-	for (const group of treeGroups) {
-		for (const node of group.nodes) {
-			spentPoints += node.curPoints;
-		}
-	}
-	return spentPoints;
+    return nodes.reduce((a, c) => a += c.curPoints, 0);
+}
+
+function getMaxPoints() {
+	return (player.getLevel() - 1) * numPointsPerLevel;
 }
 
 function getRemainingPoints() {
 	var spentPoints = getSpentPoints();
-	var pointsFromLevel = player.getLevel() - 1;
-	return pointsFromLevel - spentPoints;
+	return getMaxPoints() - spentPoints;
 }
 
 function validateAssign(node) {
-	if (getRemainingPoints() <= 0) return false;
-
-	return node.curPoints < node.maxPoints;
+    return node.curPoints < node.maxPoints && getRemainingPoints() > 0;
 }
 
 function validateUnassign(node) {
-	if (node.curPoints <= 0) return false;
-
-	const spentPoints = getSpentPoints() - 1;
-	for (const group of treeGroups) {
-		if (calcGroupPointsSpent(group) > 0) {
-			if (spentPoints < group.reqPoints) return false;
-		}
-	}
-	return true;
+	return node.curPoints > 0;
 }
 
 function allocate(name) {
 	var node = getNodeByName(name);
-	if (!validateAssign(node)) return;
+	if (!validateAssign(node)) {
+		return;
+	}
 
 	node.curPoints++;
 	setNodePoints(node);
-	calcPoints();
+	updatePoints();
 	selectNode(node);
-	updateGroups();
+	updateNodes();
 
 	updateStatMods(node);
 }
 
 function unallocate(name) {
 	var node = getNodeByName(name);
-	if (!validateUnassign(node)) return;
+	if (!validateUnassign(node)) {
+		return;
+	}
 
 	node.curPoints--;
 	setNodePoints(node);
-	calcPoints();
+	updatePoints();
 	selectNode(node);
 
 	updateStatMods(node);
 }
 
-/**@param {GroupNode} node */
+/**@param {Node} node */
 function updateStatMods(node) {
 	player.removeModifiersBySource(node);
 
@@ -250,11 +202,7 @@ function updateStatMods(node) {
 	for (const mod of node.mods) {
 		const modTemplate = getStatModifierTemplate(mod.id);
 		if (mod.stats.length !== modTemplate.stats.length) {
-			console.error(
-				"@modTree - node stats array length does not match mod template stats array length",
-				"id:",
-				mod.id
-			);
+			console.error("@modTree - node stats array length does not match mod template stats array length", "id:", mod.id);
 			continue;
 		}
 		for (let i = 0; i < mod.stats.length; i++) {
@@ -313,7 +261,7 @@ function load(savedObj) {
 			allocate(node.name);
 		}
 	}
-	calcPoints();
+	updatePoints();
 	//check if spentPoints is equal to saved nodes total points
 	//if not, then allocation failed and this should trigger a full respec
 }

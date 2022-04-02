@@ -38,7 +38,7 @@ fieldset{
 }
 
 [data-tab-content]{
-    display: none;
+    display: none; 
 }
 
 .active[data-tab-content]{
@@ -229,6 +229,11 @@ fieldset{
     flex: 1;
     display: flex;
     flex-direction: column;
+    min-height: 0px;
+}
+
+.p-game .container{
+    min-height: 0px;
 }
 
 .p-game .go-to-home-button{
@@ -244,6 +249,7 @@ fieldset{
 }
 
 .p-game .s-main {
+    display: flex;
     grid-column: 2 / 3;
 }
 
@@ -392,58 +398,51 @@ fieldset{
 .p-game .s-mod-tree.active{
     display: grid;
     grid-template-rows: auto 1fr;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr 0.7fr;
+    min-height: 0px;
 }
 
 .p-game .s-mod-tree .s-top{
     grid-column: 1 / 3;
 }
-.s-mod-tree > label{
+.p-game .s-mod-tree > label{
     display: block;
-}
-.s-mod-tree .s-wrapper{
-    display: flex;
-}
-.s-mod-tree .s-group-container{
-    background-color: rgb(199, 199, 199);
-    flex: 1;
-    min-width: 200px;
-}
-.s-mod-tree .s-group-container .s-group{
-    display: none;
-}
-.s-mod-tree .s-group-container .s-group.active{
-    display: block;
-    min-width: 150px;
-    word-wrap: break-word;
-    padding: 3px;
-}
-.s-mod-tree .s-group-container .s-group .req-points-label{
-    background-color: rgb(155, 155, 155);
-    padding: 3px;
-    white-space: nowrap;
-}
-.s-mod-tree .s-group-container .s-group .s-node{
-    display: flex;
-    cursor: default;
-}
-.s-mod-tree .s-group-container .s-group .s-node .name{
-    flex:1;
 }
 
-.s-mod-tree .s-group-container .s-group .s-node{
-    text-align: left;
+.p-game .s-mod-tree .s-list{
+    display: flex;
+    flex-direction: column;
 }
-.s-mod-tree .s-tooltip{
+
+.p-game .s-mod-tree .s-list .s-node{
+    cursor: default;
+    display: flex;
+}
+.p-game .s-mod-tree .s-list .s-node .name{
+    cursor: default;
+    text-align: left;
+    flex: 1;
+    white-space: nowrap;
+    margin-right: 6px;
+}
+
+.p-game .s-mod-tree .s-node-info{
     background-color: rgb(177, 177, 177);
     padding: 6px;
     text-align: center;
-    min-width: 350px;
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    min-height: 0px;
 }
-.s-mod-tree .s-tooltip .name{
+.p-game .s-mod-tree .s-node-info .name{
     font-weight: 600;
 }
-
+.p-game .s-mod-tree .s-node-info .content{
+    flex: 1;
+    white-space: pre-wrap;
+    overflow-y: auto;
+}
 
 /*Stats*/
 .p-game .s-stats{

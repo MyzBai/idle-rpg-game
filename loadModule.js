@@ -136,7 +136,7 @@ var loadModuleName = undefined;
 
 const moduleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", "skills.json", "items.json", "mod-tree.json"];
 const requiredModuleFileNames = ["config.json", "default-stat-mods.json", "enemy.json", "skills.json"];
-const ajv = new ajv7();
+const ajv = new ajv7({allowUnionTypes: true});
 
 var localConfigs = undefined;
 
