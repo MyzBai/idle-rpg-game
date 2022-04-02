@@ -26,6 +26,10 @@ export function remove(id){
     instances = instances.filter(x => x.id !== id);
 }
 
+export function clear(){
+    instances = [];
+}
+
 export function invoke(type, ...params) {
 	for (const instance of instances.filter((x) => x.type === type)) {
 		instance.callback(...params);
