@@ -244,8 +244,8 @@ div.hide,
 }
 
 .p-game .s-menu{
-    flex: 0.3;
     display: flex;
+    min-width: 150px;
 }
 
 .p-game .s-main {
@@ -461,9 +461,6 @@ div.hide,
 
 /*Stats*/
 .p-game .container > .s-stats{
-    /* min-width: 300px;
-    max-width: 450px; */
-    flex: 0.7;
     overflow-y: auto;
 }
 
@@ -476,6 +473,7 @@ div.hide,
 }
 .p-game .container .s-stats .s-stats-field div:first-child{
     flex: 1;
+    padding-right: 24px;
 }
 .p-game .container .s-stats .s-stats-field:nth-child(even){
     background-color: rgb(230, 230, 230);
