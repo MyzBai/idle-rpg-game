@@ -3,7 +3,7 @@ import * as eventListener from "../eventListener.js";
 import { parseModDescription } from "../helperFunctions.js";
 import { getStatModifierTemplate } from "../modTemplates.js";
 import { convertStatMods } from "../modDB.js";
-import { registerSave, registerLoad } from "../save.js";
+// import { registerSave, registerLoad } from "../save.js";
 
 /**
  * @typedef NodeMod
@@ -79,8 +79,8 @@ export async function init(data) {
 
 	updateNodes();
 
-	registerSave(save);
-	registerLoad(load);
+    eventListener.add(eventListener.EventType.SAVE_GAME, save);
+    eventListener.add(eventListener.EventType.LOAD_GAME, load);
 }
 
 function updatePoints() {
@@ -137,21 +137,17 @@ function setNodeInfo(node) {
 	assignButton.removeEventListener("click", assignClickEvent);
 	unassignButton.removeEventListener("click", unassignClickEvent);
 	assignClickEvent = () => {
-		allocate(node.name);
+		allocate(node);
 	};
 	unassignClickEvent = () => {
-		unallocate(node.name);
+		unallocate(node);
+        player.changeEssenceAmount(-unassignCost);
 	};
 	assignButton.toggleAttribute("disabled", !validateAssign(node));
 	unassignButton.toggleAttribute("disabled", !validateUnassign(node));
 	unassignButton.querySelector("span").innerText = unassignCost;
 	assignButton.addEventListener("click", assignClickEvent);
 	unassignButton.addEventListener("click", unassignClickEvent);
-}
-
-function getNodeByName(name) {
-	var node = nodes.find((x) => x.name === name);
-	return node;
 }
 
 function getSpentPoints() {
@@ -167,20 +163,18 @@ function getRemainingPoints() {
 	return getMaxPoints() - spentPoints;
 }
 
+/** @param {Node} node */
 function validateAssign(node) {
 	return node.curPoints < node.maxPoints && getRemainingPoints() > 0;
 }
 
+/** @param {Node} node */
 function validateUnassign(node) {
 	return node.curPoints > 0 && player.getEssenceAmount() >= unassignCost;
 }
 
-function allocate(name) {
-	var node = getNodeByName(name);
-	if (!validateAssign(node)) {
-		return;
-	}
-
+/** @param {Node} node */
+function allocate(node) {
 	node.curPoints++;
 	setNodePoints(node);
 	updatePoints();
@@ -190,12 +184,8 @@ function allocate(name) {
 	updateStatMods(node);
 }
 
-function unallocate(name) {
-	var node = getNodeByName(name);
-	if (!validateUnassign(node)) {
-		return;
-	}
-
+/** @param {Node} node */
+function unallocate(node) {
 	node.curPoints--;
 	setNodePoints(node);
 	updatePoints();
@@ -238,35 +228,26 @@ function save(savedObj) {
 	savedObj.modTree = {
 		nodes: [],
 	};
-	treeGroups
-		.flatMap((x) => x.nodes)
-		.forEach((x) => {
-			if (savedObj.modTree.hasOwnProperty(x.name)) {
-				console.error("savedObj.modTree already contains node name:", x.name);
-				return;
-			}
-			if (x.curPoints > 0) {
-				savedObj.modTree.nodes.push({ name: x.name, value: x.curPoints });
-			}
-		});
+    nodes.forEach(x => {
+        if(x.curPoints > 0){
+            savedObj.modTree.nodes.push({name: x.name, value: x.curPoints});
+        }
+    });
 }
 
 function load(savedObj) {
-	const { modTree } = savedObj;
-	if (!modTree) {
+	if (!savedObj.modTree) {
 		return;
 	}
 
-	treeGroups
-		.flatMap((x) => x.nodes)
-		.forEach((x) => {
-			player.removeModifiersBySource(x);
-			x.curPoints = 0;
-			setNodePoints(x);
-		});
+    //reset nodes
+    nodes.forEach(x => {
+        player.removeModifiersBySource(x);
+        x.curPoints = 0;
+    });
+    updateNodes();
 
-	var nodes = modTree.nodes;
-	for (const node of nodes) {
+	for (const node of savedObj.modTree.nodes) {
 		for (let i = 0; i < node.value; i++) {
 			allocate(node.name);
 		}

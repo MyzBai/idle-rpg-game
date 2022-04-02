@@ -1,8 +1,8 @@
 import * as player from "../player.js";
 import { convertStatMods } from "../modDB.js";
 import { parseModDescription, deepFreeze } from "../helperFunctions.js";
-import { registerSave, registerLoad } from "../save.js";
 import { getStatModifierTemplate } from "../modTemplates.js";
+import * as eventListener from '../eventListener.js';
 
 /**
  * @typedef SkillMod
@@ -103,8 +103,8 @@ export async function init(data = {}) {
 	viewSkill(defaultAttackSkill.name, "attack");
 	updateSkillButtons();
 
-	registerSave(save);
-	registerLoad(load);
+    eventListener.add(eventListener.EventType.SAVE_GAME, save);
+    eventListener.add(eventListener.EventType.LOAD_GAME, load);
 }
 
 /**@param {string} name skill name */

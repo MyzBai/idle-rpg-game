@@ -3,7 +3,7 @@ import { calcStats, calcModTotal, createConversionTable } from './damageCalc.js'
 import * as mana from './mana.js';
 import * as stats from './stats.js';
 import { deepFreeze } from './helperFunctions.js';
-import { registerSave, registerLoad } from './save.js';
+// import { registerSave, registerLoad } from './save.js';
 import * as eventListener from './eventListener.js';
 import * as gameLoop from './gameLoop.js';
 
@@ -65,15 +65,10 @@ export async function init(data) {
     });
     setLevel(level, false);
 
-    let t = 0;
     gameLoop.subscribe(dt => {
-        t += dt;
-        if(t > 1){
-            essence++;
-            eventListener.invoke(eventListener.EventType.ESSENCE_CHANGED, essence);
-            t = 0;
-        }
-    }, 1000);
+        essence++;
+        eventListener.invoke(eventListener.EventType.ESSENCE_CHANGED, essence);
+    }, {intervalMS: 1000});
 
     eventListener.add(eventListener.EventType.ESSENCE_CHANGED, () => {
         essenceSpan.textContent = essence;
@@ -82,6 +77,8 @@ export async function init(data) {
 
     registerSave(save);
     registerLoad(load);
+    eventListener.add(eventListener.EventType.SAVE_GAME, save);
+    eventListener.add(eventListener.EventType.LOAD_GAME, save);
 }
 
 export function getModCache() {

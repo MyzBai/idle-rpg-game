@@ -6,6 +6,8 @@ export const EventType = {
 	ENEMY_KILLED: 2,
 	ESSENCE_CHANGED: 3,
 	ITEM_CHANGED: 4,
+    SAVE_GAME: 5,
+    LOAD_GAME: 6
 };
 Object.freeze(EventType);
 

@@ -5,7 +5,7 @@ import * as items from "./sub-modules/items.js";
 import * as modTree from "./sub-modules/modTree.js";
 import * as combat from "./combat.js";
 import * as save from "./save.js";
-import { clear as clearEventListeners } from "./eventListener.js";
+import * as eventListener from "./eventListener.js";
 import Global from "./global.js";
 import * as gameLoop from "./gameLoop.js";
 
@@ -17,7 +17,9 @@ initMenu();
 export function init(data) {
 	console.log("init sub modules");
 
-	clearEventListeners();
+	eventListener.clear();
+	gameLoop.clear();
+	gameLoop.stop();
 	//make sure we copy the data before distributing it to all the sub-modules
 	data = JSON.parse(JSON.stringify(data));
 
@@ -31,21 +33,31 @@ export function init(data) {
 	modTree.init(data.modTree);
 
 	combat.init();
-	save.registerSave((savedObj) => {
-		savedObj.config = {
+    
+    eventListener.add(eventListener.EventType.SAVE_GAME, savedObj => {
+        savedObj.config = {
 			name: data.config.name,
 			src: data.config.src,
 			path: data.config.path,
 		};
-	});
+    });
 
 	save.load();
 
 	const isProduction = Global.env.ENV_TYPE === "production";
 	document.querySelector(".p-game .s-dev-tools").classList.toggle("hide", isProduction);
-    gameLoop.stop();
-	if (isProduction) {
+	gameLoop.stop();
+	if (isProduction || true) {
 		gameLoop.start();
+
+        //auto save
+		gameLoop.subscribe(
+			() => {
+				save.save();
+                console.log('auto saved');
+			},
+			{ intervalMS: 10 * 1000 }
+		);
 	}
 }
 

@@ -2,7 +2,7 @@ import { randomRange, parseModDescription, weightedRandom, deepFreeze } from "..
 import { getStatModifierTemplate, getModTemplateList } from '../modTemplates.js';
 import * as player from '../player.js';
 import { convertStatMods } from "../modDB.js";
-import { registerSave, registerLoad } from '../save.js';
+// import { registerSave, registerLoad } from '../save.js';
 import * as eventListener from '../eventListener.js';
 
 /**@typedef {import('../type-definitions.js').RawStatMod} RawStatModifier */
@@ -106,8 +106,8 @@ export async function init(data) {
         applyItemModifiers(item);
     });
 
-    registerSave(save);
-    registerLoad(load);
+    eventListener.add(eventListener.EventType.SAVE_GAME, save);
+    eventListener.add(eventListener.EventType.LOAD_GAME, load);
 }
 
 function createItems(itemsFromjson) {
