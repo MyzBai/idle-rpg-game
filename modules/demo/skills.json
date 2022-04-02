@@ -1,5 +1,5 @@
 {
-    "$schema": "../../schemas/skills-schema.json",
+    "$schema": "../../json/schemas/skills-schema.json",
     "data": {
         "maxSupports": 6,
         "attacks": [

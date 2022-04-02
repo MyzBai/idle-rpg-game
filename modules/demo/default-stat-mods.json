@@ -1,5 +1,5 @@
 {
-    "$schema": "../../schemas/default-stat-mods-schema.json",
+    "$schema": "../../json/schemas/default-stat-mods-schema.json",
     "data": [
         { "name": "minPhysicalDamage", "value": 5, "valueType": "base" },
         { "name": "maxPhysicalDamage", "value": 10, "valueType": "base" },

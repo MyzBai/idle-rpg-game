@@ -1,5 +1,5 @@
 {
-    "$schema": "../../schemas/items-schema.json",
+    "$schema": "../../json/schemas/items-schema.json",
     "data": {
         "maxMods": 6,
         "items": [
