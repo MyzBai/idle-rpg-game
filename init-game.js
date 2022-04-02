@@ -40,7 +40,7 @@ export function init(data) {
 
 
 function initMenu(){
-    const tabs = document.querySelectorAll('.p-game [data-tab-target]');
+    const tabs = document.querySelectorAll('body .p-game .s-menu [data-tab-target]');
     for (const tab of tabs) {
         tab.addEventListener('click', e => {
             for (const otherTab of tabs) {

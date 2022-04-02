@@ -6,21 +6,21 @@ import { isLocalNetwork } from "./helperFunctions.js";
 import * as save from "./save.js";
 import { registerTabs } from "./helperFunctions.js";
 
-const homeButton = document.querySelector(".go-to-home-button");
-const gameButton = document.querySelector(".go-to-game-button");
+const homeButton = document.querySelector("body .p-game .go-to-home-button");
+const gameButton = document.querySelector("body .p-home .go-to-game-button");
 const tabs = [homeButton, gameButton];
 registerTabs(tabs);
-tabs[0].click();
+tabs[1].click();
 
 const startButton = document.querySelector(".start-game");
 const stopButton = document.querySelector(".stop-game");
 const resetButton = document.querySelector(".reset-game");
 const statusSpan = document.querySelector(".status-game span");
 
-document.querySelector(".p-game .save-btn").addEventListener("click", (e) => {
+document.querySelector("body .p-game .save-btn").addEventListener("click", (e) => {
 	save.save();
 });
-document.querySelector(".p-game .load-btn").addEventListener("click", (e) => {
+document.querySelector("body .p-game .load-btn").addEventListener("click", (e) => {
 	save.load();
 });
 

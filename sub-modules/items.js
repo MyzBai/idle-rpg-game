@@ -123,6 +123,7 @@ function createItems(itemsFromjson) {
 /**@param {Item} item */
 function createItemButton(item) {
     const btn = document.createElement('div');
+    btn.classList.add('g-button');
     btn.textContent = item.name;
     btn.addEventListener('click', e => { showItem(item); })
     itemList.appendChild(btn);

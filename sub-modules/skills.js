@@ -53,9 +53,9 @@ const defaultAttackSkill = {
 	],
 };
 
-const skillView = document.querySelector(".s-skills .s-skill-view");
-const attackSkillContainer = document.querySelector(".s-skills .s-attack-skill-container");
-const supportSkillContainer = document.querySelector(".s-skills .s-support-skill-container");
+const skillView = document.querySelector(".s-skills .s-skill-info");
+const attackSkillContainer = document.querySelector(".s-skills .s-attack-skills");
+const supportSkillContainer = document.querySelector(".s-skills .s-supports");
 
 var skillViewButtonCallback = undefined;
 

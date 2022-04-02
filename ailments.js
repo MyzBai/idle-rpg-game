@@ -11,7 +11,7 @@ import * as gameLoop from './gameLoop.js'
  * @property {number} time
  */
 
-var bleedElement = document.querySelector('.s-enemy .ailment.bleed');
+var bleedElement = document.querySelector('.s-combat .ailment.bleed');
 var bleedSpan = bleedElement.querySelector('span');
 
 var tickId = -1;

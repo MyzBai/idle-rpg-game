@@ -1,7 +1,7 @@
 import * as damageCalc from './damageCalc.js';
 import * as player from './player.js';
 
-const statsContainer = document.querySelector('.p-game .s-stats .s-stats-container');
+const statsContainer = document.querySelector('body .p-game .s-stats .s-stats-container');
 const statFieldTemplate = statsContainer.querySelector('template');
 
 export function update() {

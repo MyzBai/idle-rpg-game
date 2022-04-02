@@ -27,11 +27,11 @@ import { registerSave, registerLoad } from "../save.js";
  * @property {HTMLElement} [element]
  */
 
-const pointsRemainingSpan = document.querySelector(".p-mod-tree .remaining-points span");
-const pointsSpentSpan = document.querySelector(".p-mod-tree .spent-points span");
-const groupContainer = document.querySelector(".p-mod-tree .s-group-container");
+const pointsRemainingSpan = document.querySelector(".s-mod-tree .s-top .remaining-points span");
+const pointsSpentSpan = document.querySelector(".s-mod-tree .spent-points span");
+const groupContainer = document.querySelector(".s-mod-tree .s-list");
 const nodeTemplate = groupContainer.querySelector("template");
-const tooltip = document.querySelector(".p-mod-tree .s-tooltip");
+const nodeInfoContainer = document.querySelector(".s-mod-tree .s-node-info");
 
 var assignClickEvent = undefined;
 var unassignClickEvent = undefined;
@@ -145,7 +145,7 @@ function updateGroups() {
 }
 
 function setTooltip(node) {
-	tooltip.querySelector(".name").textContent = node.name;
+	nodeInfoContainer.querySelector(".name").textContent = node.name;
 	var modsText = "";
 	node.mods.forEach((x) => {
 		var values = x.stats.map((x) => x.value);
@@ -153,9 +153,9 @@ function setTooltip(node) {
 		desc = parseModDescription(desc, values);
 		modsText += `${desc}\n`;
 	});
-	tooltip.querySelector(".content").textContent = modsText;
-	const assignButton = tooltip.querySelector(".assign");
-	const unassignButton = tooltip.querySelector(".unassign");
+	nodeInfoContainer.querySelector(".content").textContent = modsText;
+	const assignButton = nodeInfoContainer.querySelector(".assign");
+	const unassignButton = nodeInfoContainer.querySelector(".unassign");
 	assignButton.removeEventListener("click", assignClickEvent);
 	unassignButton.removeEventListener("click", unassignClickEvent);
 	assignClickEvent = () => {

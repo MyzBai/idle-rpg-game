@@ -48,12 +48,12 @@ const SCHEMA_PATH = "./json/schemas";
 const MODS_SCHEMA_PATH = `${SCHEMA_PATH}/mods-schema.json`;
 //#endregion
 
-const homePage = document.querySelector(".p-home");
+const homePage = document.querySelector("body .p-home");
 const tabs = homePage.querySelectorAll(".s-buttons [data-tab-target]");
 registerTabs(tabs);
 tabs[0].click();
 
-document.querySelector(".p-game .go-to-home-button").addEventListener('click', e => {
+document.querySelector("body .p-home .go-to-game-button").addEventListener('click', e => {
     updateSavedModulesContainer();
 });
 
@@ -128,7 +128,7 @@ uploadContainer.querySelector(".start-button").addEventListener("click", (e) => 
 //#endregion
 
 //#region Load Tab
-const loadContainer = homePage.querySelector(".p-home .s-load");
+const loadContainer = homePage.querySelector(".s-load");
 const loadButtonsContainer = loadContainer.querySelector(".s-container");
 const loadButtonTemplate = loadButtonsContainer.querySelector("template");
 var loadModuleName = undefined;
