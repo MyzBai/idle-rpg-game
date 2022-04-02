@@ -6,6 +6,8 @@ import * as modTree from "./sub-modules/modTree.js";
 import * as combat from "./combat.js";
 import * as save from "./save.js";
 import { clear as clearEventListeners } from "./eventListener.js";
+import Global from "./global.js";
+import * as gameLoop from "./gameLoop.js";
 
 initMenu();
 
@@ -38,6 +40,13 @@ export function init(data) {
 	});
 
 	save.load();
+
+	const isProduction = Global.env.ENV_TYPE === "production";
+	document.querySelector(".p-game .s-dev-tools").classList.toggle("hide", isProduction);
+    gameLoop.stop();
+	if (isProduction) {
+		gameLoop.start();
+	}
 }
 
 function initMenu() {

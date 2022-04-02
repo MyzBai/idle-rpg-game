@@ -33,7 +33,7 @@ async function init() {
 	resetButton.addEventListener("click", resetGame);
 
 	
-    document.querySelector('.p-game .s-dev-tools').classList.toggle('hide', Global.env.ENV_TYPE !== 'development')
+    
 }
 
 function startGame() {
