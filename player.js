@@ -75,8 +75,6 @@ export async function init(data) {
     });
     essenceSpan.textContent = essence;
 
-    registerSave(save);
-    registerLoad(load);
     eventListener.add(eventListener.EventType.SAVE_GAME, save);
     eventListener.add(eventListener.EventType.LOAD_GAME, save);
 }
