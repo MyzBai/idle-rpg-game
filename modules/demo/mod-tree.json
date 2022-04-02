@@ -2,6 +2,7 @@
     "$schema": "../../json/schemas/mod-tree-schema.json",
     "data": {
         "numPointsPerLevel": 1,
+        "unassignCost": 1,
         "nodes": [
             {
                 "name": "Strength",

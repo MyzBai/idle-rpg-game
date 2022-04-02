@@ -30,13 +30,17 @@ const nodeInfoContainer = modTreeElement.querySelector(".s-node-info");
 var nodes = [];
 
 var selectedNode = undefined;
-var numPointsPerLevel = 1;
 var assignClickEvent = undefined;
 var unassignClickEvent = undefined;
 var levelUpEvtId = undefined;
+var numPointsPerLevel = undefined;
+var unassignCost = undefined;
 
 export async function init(data) {
 	console.log("init mod-tree");
+
+	unassignCost = data.unassignCost || 0;
+	numPointsPerLevel = data.numPointsPerLevel || 0;
 
 	nodes = [];
 	nodeContainer.replaceChildren([]);
@@ -59,14 +63,17 @@ export async function init(data) {
 		nodes.push(node);
 	}
 
-	if (!levelUpEvtId) {
-		levelUpEvtId = eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
-			console.log("player leveled up observed in modTree.js", level);
-			updatePoints();
-			updateNodes();
-			selectNode(selectedNode);
-		});
-	}
+	eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
+		console.log("player leveled up observed in modTree.js", level);
+		updatePoints();
+		updateNodes();
+		selectNode(selectedNode);
+	});
+
+    eventListener.add(eventListener.EventType.ESSENCE_CHANGED, () => {
+        const unassignButton = nodeInfoContainer.querySelector(".unassign");
+        unassignButton.toggleAttribute('disabled', !validateUnassign(selectedNode));
+    });
 
 	selectNode(nodes[0]);
 
@@ -85,10 +92,12 @@ function updatePoints() {
 
 /**@param {Node} node */
 function selectNode(node) {
-	if (!node) return;
+	if (!node) {
+		return;
+	}
 
 	nodes.forEach((x) => x.element.classList.toggle("active", x.element === node.element));
-	setNodeIndo(node);
+	setNodeInfo(node);
 	selectedNode = node;
 }
 
@@ -110,10 +119,10 @@ function createNodeElement(node) {
 	node.element.addEventListener("click", (e) => {
 		selectNode(node);
 	});
-    nodeContainer.appendChild(node.element);
+	nodeContainer.appendChild(node.element);
 }
 
-function setNodeIndo(node) {
+function setNodeInfo(node) {
 	nodeInfoContainer.querySelector(".name").textContent = node.name;
 	var modsText = "";
 	node.mods.forEach((x) => {
@@ -133,19 +142,20 @@ function setNodeIndo(node) {
 	unassignClickEvent = () => {
 		unallocate(node.name);
 	};
-	assignButton.toggleAttribute('disabled', !validateAssign(node));
-	unassignButton.toggleAttribute('disabled', !validateUnassign(node));
+	assignButton.toggleAttribute("disabled", !validateAssign(node));
+	unassignButton.toggleAttribute("disabled", !validateUnassign(node));
+	unassignButton.querySelector("span").innerText = unassignCost;
 	assignButton.addEventListener("click", assignClickEvent);
 	unassignButton.addEventListener("click", unassignClickEvent);
 }
 
 function getNodeByName(name) {
-    var node = nodes.find(x => x.name === name);
-    return node;
+	var node = nodes.find((x) => x.name === name);
+	return node;
 }
 
 function getSpentPoints() {
-    return nodes.reduce((a, c) => a += c.curPoints, 0);
+	return nodes.reduce((a, c) => (a += c.curPoints), 0);
 }
 
 function getMaxPoints() {
@@ -158,11 +168,11 @@ function getRemainingPoints() {
 }
 
 function validateAssign(node) {
-    return node.curPoints < node.maxPoints && getRemainingPoints() > 0;
+	return node.curPoints < node.maxPoints && getRemainingPoints() > 0;
 }
 
 function validateUnassign(node) {
-	return node.curPoints > 0;
+	return node.curPoints > 0 && player.getEssenceAmount() >= unassignCost;
 }
 
 function allocate(name) {
