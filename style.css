@@ -127,7 +127,7 @@ div.hide,
 
 /*Modules tab*/
 .p-home .s-modules.active{
-    min-height: 0%;
+    min-height: 0px;
     flex: 1;
     display: flex;
 }
@@ -142,10 +142,7 @@ div.hide,
     flex-direction: column;
 }
 .p-home .s-modules .s-column-list .s-container{
-    padding: 3px 0px 3px;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
+    padding-left: 0px;
 }
 .p-home .s-modules .s-filter input[type="url"]{
     outline: none;
@@ -190,6 +187,7 @@ div.hide,
 
 .p-home .s-load .s-container{
     padding: 3px;
+    text-align: left;
 }
 
 
