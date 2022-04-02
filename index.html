@@ -93,17 +93,15 @@
 
         <div class="container">
             <!--Menu-->
-            <div class="s-menu">
-                <fieldset>
-                    <legend>Main Menu</legend>
-                    <div class="g-vertical-menu-container .u-separator">
-                        <div class="g-button" data-tab-target=".s-combat">Combat</div>
-                        <div class="g-button" data-tab-target=".s-skills">Skills</div>
-                        <div class="g-button" data-tab-target=".s-items">Items</div>
-                        <div class="g-button" data-tab-target=".s-mod-tree">Mod Tree</div>
-                    </div>
-                </fieldset>
-            </div>
+            <fieldset class="s-menu">
+                <legend>Main Menu</legend>
+                <div class="g-vertical-menu-container">
+                    <div class="g-button" data-tab-target=".s-combat">Combat</div>
+                    <div class="g-button" data-tab-target=".s-skills">Skills</div>
+                    <div class="g-button" data-tab-target=".s-items">Items</div>
+                    <div class="g-button" data-tab-target=".s-mod-tree">Mod Tree</div>
+                </div>
+            </fieldset>
             <!--Main-->
             <div class="s-main">
                 <fieldset class="s-combat active" data-tab-content>
@@ -121,11 +119,11 @@
                 <fieldset class="s-skills" data-tab-content>
                     <legend>Skills</legend>
                     <div class="s-skill-list">
-                        <fieldset class="s-attack-skills list">
+                        <fieldset class="s-attack-skills list g-vertical-menu-container">
                             <Legend>Attack Skills</Legend>
                             <div class="g-button">Default Attack</div>
                         </fieldset>
-                        <fieldset class="s-supports list">
+                        <fieldset class="s-supports list g-vertical-menu-container">
                             <Legend>Supports</Legend>
                             <div class="g-button">Increased Damage</div>
                         </fieldset>
@@ -175,7 +173,7 @@
                     <div class="s-top">
                         <div class="points">Points: <span>0</span></div>
                     </div>
-                    <div class="s-list">
+                    <div class="s-list g-vertical-menu-container">
                         <template id="nodeTemplate">
                             <div class="s-node g-button">
                                 <div class="name"></div>

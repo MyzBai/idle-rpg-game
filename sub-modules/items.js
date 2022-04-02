@@ -169,9 +169,7 @@ function setupBasicCrafting(basicCraftings) {
             cost = tierTargetOptions[selectedIndex].cost;
             costSpan.textContent = cost;
             tierTarget = tierTargetOptions[selectedIndex].name;
-            if (player.getEssenceAmount() < cost) {
-                craftButton.disabled = true;
-            }
+            craftButton.toggleAttribute('disabled', player.getEssenceAmount() < cost);
         });
         const craftButton = element.querySelector('.craft-button');
         craftButton.addEventListener('click', e => {
@@ -184,12 +182,12 @@ function setupBasicCrafting(basicCraftings) {
             const canAfford = player.getEssenceAmount() >= cost;
             return canAfford;
         }
-        craftButton.disabled = !validateCraft();
+        craftButton.toggleAttribute('disabled',!validateCraft());
         eventListener.add(eventListener.EventType.ESSENCE_CHANGED, item => {
-            craftButton.disabled = !validateCraft();
+            craftButton.toggleAttribute('disabled',!validateCraft());
         });
         eventListener.add(eventListener.EventType.ITEM_CHANGED, item => {
-            craftButton.disabled = !validateCraft();
+            craftButton.toggleAttribute('disabled',!validateCraft());
         });
     }
     if (actions.addMod) {
@@ -208,9 +206,7 @@ function setupBasicCrafting(basicCraftings) {
             cost = tierTargetOptions[selectedIndex].cost;
             costSpan.textContent = cost;
             tierTarget = tierTargetOptions[selectedIndex].name;
-            if (player.getEssenceAmount() < cost) {
-                craftButton.disabled = true;
-            }
+            craftButton.toggleAttribute('disabled', player.getEssenceAmount() < cost);
         });
 
         const craftButton = element.querySelector('.craft-button');
@@ -226,12 +222,12 @@ function setupBasicCrafting(basicCraftings) {
             const hasMaxMods = selectedItem.getMods().length >= maxMods;
             return canAfford && !hasMaxMods;
         }
-        craftButton.disabled = !validateCraft();
+        craftButton.toggleAttribute('disabled', !validateCraft());
         eventListener.add(eventListener.EventType.ESSENCE_CHANGED, amount => {
-            craftButton.disabled = !validateCraft();
+            craftButton.toggleAttribute('disabled', !validateCraft());
         });
         eventListener.add(eventListener.EventType.ITEM_CHANGED, item => {
-            craftButton.disabled =!validateCraft();
+            craftButton.toggleAttribute('disabled', !validateCraft());
         });
 
     }
@@ -254,12 +250,12 @@ function setupBasicCrafting(basicCraftings) {
         const validateCraft = () => {
             return player.getEssenceAmount() >= cost;
         }
-        craftButton.disabled = !validateCraft();
+        craftButton.toggleAttribute('disabled', !validateCraft());
         eventListener.add(eventListener.EventType.ESSENCE_CHANGED, () => {
-            craftButton.disabled = !validateCraft();
+            craftButton.toggleAttribute('disabled', !validateCraft());
         });
         eventListener.add(eventListener.EventType.ITEM_CHANGED, () => {
-            craftButton.disabled = !validateCraft();
+            craftButton.toggleAttribute('disabled', !validateCraft());
         });
     }
     if(actions.remove){
@@ -282,12 +278,12 @@ function setupBasicCrafting(basicCraftings) {
             const canAfford = player.getEssenceAmount() >= cost;
             return hasMods && canAfford;
         }
-        craftButton.disabled = !validateCraft();
+        craftButton.toggleAttribute('disabled', !validateCraft());
         eventListener.add(eventListener.EventType.ESSENCE_CHANGED, () => {
-            craftButton.disabled = !validateCraft();
+            craftButton.toggleAttribute('disabled', !validateCraft());
         });
         eventListener.add(eventListener.EventType.ITEM_CHANGED, () => {
-            craftButton.disabled = !validateCraft();
+            craftButton.toggleAttribute('disabled', !validateCraft());
         });
     }
 }
