@@ -1,5 +1,4 @@
 import Global from "./global.js";
-import { init as subModulesInit } from "./init-game.js";
 import * as gameLoop from "./gameLoop.js";
 import * as loadModule from "./loadModule.js";
 import { isLocalNetwork } from "./helperFunctions.js";
@@ -10,7 +9,7 @@ const homeButton = document.querySelector("body .p-game .go-to-home-button");
 const gameButton = document.querySelector("body .p-home .go-to-game-button");
 const tabs = [homeButton, gameButton];
 registerTabs(tabs);
-tabs[1].click();
+tabs[0].click();
 
 const startButton = document.querySelector(".start-game");
 const stopButton = document.querySelector(".stop-game");
@@ -33,12 +32,8 @@ async function init() {
 	stopButton.addEventListener("click", stopGame);
 	resetButton.addEventListener("click", resetGame);
 
-	// const moduleData = await loadModule.load();
-	// console.log('save path', Global.env.SAVE_PATH);
-	// subModulesInit(moduleData);
-	// save.load();
-
-	// tabs[1].click();
+	
+    document.querySelector('.p-game .s-dev-tools').classList.toggle('hide', Global.env.ENV_TYPE !== 'development')
 }
 
 function startGame() {

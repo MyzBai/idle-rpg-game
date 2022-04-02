@@ -254,9 +254,9 @@ function updateSavedModulesContainer(){
 function startModule(module) {
 	subModulesInit(module);
 
-
-    document.querySelector('.p-home .go-to-game-button').click();
-	tabs[1].click();
+    const btn = document.querySelector('.p-home .go-to-game-button');
+    btn.classList.remove('hide');
+    btn.click();
 }
 
 

@@ -55,5 +55,5 @@ function initMenu() {
 			}
 		});
 	}
-	tabs[2].click();
+	tabs[0].click();
 }

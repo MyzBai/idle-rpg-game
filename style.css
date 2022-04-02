@@ -41,6 +41,11 @@ fieldset{
     display: none; 
 }
 
+div.hide,
+*.hide{
+    display: none;
+}
+
 .active[data-tab-content]{
     display: block;
 }
@@ -102,7 +107,6 @@ fieldset{
 /*#region Home Page*/
 
 .p-home.active{
-    padding: 3px;
     display: flex;
     flex-direction: column;
     min-height: 0;
