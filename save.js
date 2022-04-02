@@ -2,8 +2,8 @@ import { uuidv4 } from "./helperFunctions.js";
 import Global from "./global.js";
 import * as eventListener from "./eventListener.js";
 
-const saveInstances = [];
-const loadInstances = [];
+// const saveInstances = [];
+// const loadInstances = [];
 
 export function hasSave() {
 	try {
@@ -20,13 +20,13 @@ export function save() {
 		return;
 	}
 	const savedObj = {};
-	for (const instance of saveInstances) {
-		instance.callback(savedObj);
-	}
+	// for (const instance of saveInstances) {
+	// 	instance.callback(savedObj);
+	// }
 
 	try {
-		localStorage.setItem(Global.env.SAVE_PATH, JSON.stringify(savedObj));
         eventListener.invoke(eventListener.EventType.SAVE_GAME, savedObj);
+		localStorage.setItem(Global.env.SAVE_PATH, JSON.stringify(savedObj));
 	} catch (e) {
 		console.error(e);
 	}
@@ -38,10 +38,11 @@ export function save() {
 export async function load() {
 	const data = getSavedObj();
 	if (data) {
+        eventListener.invoke(eventListener.EventType.LOAD_GAME, data);
 		console.log("data loaded", data);
-		for (const instance of loadInstances) {
-			instance.callback(data);
-		}
+		// for (const instance of loadInstances) {
+		// 	instance.callback(data);
+		// }
 	}
 }
 
