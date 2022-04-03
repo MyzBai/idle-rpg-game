@@ -1,5 +1,5 @@
 
-/**@typedef {import('../type-definitions.js')} ModuleConfig */
+/**@typedef {import('../loadModule.js')} ModuleConfig */
 /**@typedef {import('../loadModule.js')} ModuleFile */
 
 /**@returns {Promise<ModuleConfig[]>} */
@@ -29,7 +29,7 @@ export async function loadModule(foldername, includes) {
     return files;
 }
 
-/**@returns {Promise<import('@root/type-definitions.js').ModuleConfig} */
+/**@returns {Promise<ModuleConfig} */
 async function loadConfig(name){
     try{
         return await import(`./${name}/config.json`, { assert: { type: 'json' } });
