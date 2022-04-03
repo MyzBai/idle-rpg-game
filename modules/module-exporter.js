@@ -6,7 +6,9 @@
 export async function loadConfigs(){
     const configs = [];
     const demoConfig = await loadConfig('demo');
-    configs.push(demoConfig);
+    if(demoConfig){
+        configs.push(demoConfig);
+    }
     return configs;
 }
 
@@ -29,7 +31,10 @@ export async function loadModule(foldername, includes) {
 
 /**@returns {Promise<import('@root/type-definitions.js').ModuleConfig} */
 async function loadConfig(name){
-    const { default: config } = await import(`./${name}/config.json`, { assert: { type: 'json' } });
-    return config;
+    try{
+        return await import(`./${name}/config.json`, { assert: { type: 'json' } });
+    } catch(e){
+        console.error(e);
+    }
 }
 
