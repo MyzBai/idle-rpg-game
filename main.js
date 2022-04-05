@@ -1,7 +1,6 @@
 import Global from "./global.js";
 import * as gameLoop from "./gameLoop.js";
-// import * as loadModule from "./loadModule.js";
-import * as loadModule from './loadModuleNew.js';
+import * as loadModule from './loadModule.js';
 import { isLocalNetwork } from "./helperFunctions.js";
 import * as save from "./save.js";
 import { registerTabs } from "./helperFunctions.js";

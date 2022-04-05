@@ -1,6 +1,6 @@
 
 /**
- * @typedef {import('../loadModuleNew.js').Module} Module
+ * @typedef {import('../loadModule.js').Module} Module
  */
 
 /**@returns {{name: string, description: string}[]} */
