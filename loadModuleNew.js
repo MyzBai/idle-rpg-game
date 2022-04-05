@@ -106,7 +106,7 @@ export async function init() {
 				if (!content.config) {
 					continue;
 				}
-				const { src, id, name, lastSaved, description } = content.config;
+				const { src, id, name, lastSave, description } = content.config;
 				const btn = buttonTemplate.content.cloneNode(true).firstElementChild;
 				btn.querySelector(".title").innerText = name;
                 const dateOptions = {
@@ -114,7 +114,7 @@ export async function init() {
                     hour: 'numeric', minute: 'numeric', second: 'numeric',
                     hour12: false
                   };
-				const date = new Intl.DateTimeFormat("ban", dateOptions).format(new Date(lastSaved || Date.now())).split(",").join(' ');
+				const date = new Intl.DateTimeFormat("ban", dateOptions).format(new Date(lastSave) || Date.now()).split(",").join(' ');
 				btn.querySelector(".date").innerText = date;
 				const startCallback = async () => {
 					let module = undefined;
