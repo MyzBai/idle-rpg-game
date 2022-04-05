@@ -1,6 +1,7 @@
 import Global from "./global.js";
 import * as gameLoop from "./gameLoop.js";
 import * as loadModule from "./loadModule.js";
+// import * as loadModule from './loadModuleNew.js';
 import { isLocalNetwork } from "./helperFunctions.js";
 import * as save from "./save.js";
 import { registerTabs } from "./helperFunctions.js";
@@ -25,6 +26,7 @@ document.querySelector("body .p-game .load-btn").addEventListener("click", (e) =
 
 init();
 async function init() {
+    await registerServiceWorker();
 	await loadEnvironment();
 	await loadModule.init();
 
@@ -32,9 +34,11 @@ async function init() {
 	stopButton.addEventListener("click", stopGame);
 	resetButton.addEventListener("click", resetGame);
 
-	
-    
+
 }
+
+
+
 
 function startGame() {
 	startButton.classList.add("active");
@@ -56,6 +60,29 @@ function resetGame() {
 	save.reset();
 	location.reload();
 }
+
+async function registerServiceWorker(){
+    if(!('serviceWorker' in navigator)){
+        return;
+    }
+    try{
+        const registration = await navigator.serviceWorker.register('/sw.js', {
+            scope: '/',
+        });
+        console.log('service worker registered');
+
+        if(navigator.serviceWorker.controller){
+            console.log(navigator.serviceWorker.controller.state);
+        }
+
+        navigator.serviceWorker.addEventListener('controllerchange', e => {
+            console.log('new service worker activated');
+        });
+    } catch(e){
+        console.error(e);
+    }
+}
+
 
 async function loadEnvironment() {
 	const isLocal = isLocalNetwork(window.location.hostname);
