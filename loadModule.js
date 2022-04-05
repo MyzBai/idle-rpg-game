@@ -118,9 +118,9 @@ export async function init() {
 						return;
 					}
 					if (moduleInfo.src === "local") {
-						save.setSaveKey(`${moduleInfo.name}`);
+						save.setSaveKey(`local-${moduleInfo.name}`);
 					} else {
-						save.setSaveKey(`${moduleInfo.name}-${moduleInfo.id}`);
+						save.setSaveKey(`${moduleInfo.src}-${moduleInfo.name}-${moduleInfo.id}`);
 					}
 					if (save.hasSave()) {
 						if (!confirm("This will overwrite an existing save. Are you sure you want to proceed?")) {
@@ -246,6 +246,8 @@ function startModule(module) {
 	const btn = document.querySelector(".p-home .go-to-game-button");
 	btn.classList.remove("hide");
 	btn.click();
+
+    save.save();
 }
 
 async function loadSchemas() {
