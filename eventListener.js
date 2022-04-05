@@ -7,7 +7,9 @@ export const EventType = {
 	ESSENCE_CHANGED: 3,
 	ITEM_CHANGED: 4,
     SAVE_GAME: 5,
-    LOAD_GAME: 6
+    SAVE_GAME_DONE: 6,
+    LOAD_GAME: 7,
+    LOAD_GAME_DONE: 8
 };
 Object.freeze(EventType);
 
