@@ -82,7 +82,7 @@ export async function init() {
 			}
 		}
 
-		{
+		if (Global.env.features.LOAD_GITHUB_MODULES) {
 			//Github Modules
 			const repos = await loadGithubRepositories();
 			for (const repo of repos) {
@@ -117,16 +117,10 @@ export async function init() {
 						printErrors(errors);
 						return;
 					}
-					if (moduleInfo.src === "local") {
-						save.setSaveKey(`local-${moduleInfo.name}`);
-					} else {
-						save.setSaveKey(`${moduleInfo.src}-${moduleInfo.name}-${moduleInfo.id}`);
-					}
 					if (save.hasSave()) {
 						if (!confirm("This will overwrite an existing save. Are you sure you want to proceed?")) {
 							return;
 						}
-						save.reset();
 					}
 					module.config.name = moduleInfo.name;
 					module.config.src = moduleInfo.src;
@@ -188,8 +182,7 @@ export async function init() {
 				module.config.name = name;
 				module.config.src = src;
 				module.config.id = id;
-				save.setSaveKey(`${name}-${id}`);
-				startModule(module, "load");
+				startModule(module);
 			};
 			btn.addEventListener("click", () => {
 				moduleInfoContainer.querySelector(".name").innerText = name;
@@ -230,7 +223,6 @@ export async function init() {
 				const module = content;
 				module.config.id = module.config.id || module.config.name || "upload";
 				module.config.src = "upload";
-				save.setSaveKey("temp");
 				startModule(module);
 			};
 			startButton.removeEventListener("click", startCallback);
@@ -241,13 +233,22 @@ export async function init() {
 
 /**@param {Module} module*/
 function startModule(module) {
+	switch (module.config.src) {
+		case "local":
+			save.setSaveKey(`local-${module.config.name}`);
+			break;
+		case "github":
+			save.setSaveKey(`${module.config.src}-${module.config.id}`);
+			break;
+		case "upload":
+			save.setSaveKey(`temp`); //temp save
+			break;
+	}
 	subModulesInit(module);
 
 	const btn = document.querySelector(".p-home .go-to-game-button");
 	btn.classList.remove("hide");
 	btn.click();
-
-    save.save();
 }
 
 async function loadSchemas() {
@@ -258,7 +259,6 @@ async function loadSchemas() {
 			const { default: data } = await import(`./json/schemas/${schemaFilename}`, { assert: { type: "json" } });
 			ajv.addSchema(data, schemaFilename);
 		}
-		console.log("test");
 		ajvValidator = ajv.getSchema("module-schema.json");
 	} catch (e) {
 		console.log(e);
