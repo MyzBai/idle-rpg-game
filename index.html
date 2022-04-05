@@ -20,13 +20,13 @@
         <fieldset>
             <legend>Buttons</legend>
             <div class="s-buttons">
-                <div class="new-module-button g-button" data-tab-target=".s-modules">New</div>
-                <div class="load-module-button g-button" data-tab-target=".s-load">Load</div>
+                <div class="new-module-button g-button" data-tab-target=".s-new-modules">New</div>
+                <div class="load-module-button g-button" data-tab-target=".s-load-modules">Load</div>
                 <div class="custom-module-button g-button" data-tab-target=".s-upload">Custom</div>
             </div>
         </fieldset>
 
-        <fieldset class="s-modules" data-tab-content>
+        <fieldset class="s-new-modules" data-tab-content>
             <legend>New Module</legend>
                 <div class="s-module-list">
                     <div class="s-filter">
@@ -43,7 +43,7 @@
                 </div>
         </fieldset>
 
-        <fieldset class="s-load" data-tab-content>
+        <fieldset class="s-load-modules" data-tab-content>
             <legend>Load Game</legend>
             <div class="s-module-list">
                 <div class="s-container g-vertical-menu-container">
@@ -63,11 +63,10 @@
         </fieldset>
 
         <fieldset class="s-upload" data-tab-content>
-            <legend>Upload Files</legend>
-            <div class="s-drop-area empty">
-                <input type="file" name="file" accept=".json" multiple>
+            <legend>Upload File</legend>
+            <div>
+                <input type="file" name="file" accept=".json">
             </div>
-            <div class="warning"></div>
             <div class="start-button g-button" disabled >Start</div>
         </fieldset>
 

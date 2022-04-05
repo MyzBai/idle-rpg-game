@@ -1,13 +1,14 @@
-import { uuidv4 } from "./helperFunctions.js";
 import Global from "./global.js";
 import * as eventListener from "./eventListener.js";
 
-// const saveInstances = [];
-// const loadInstances = [];
+var saveKey = `g-temp`;
+export function setSaveKey(name){
+    saveKey = `g-${name.toLowerCase()}`;
+}
 
 export function hasSave() {
 	try {
-		const item = localStorage.getItem(Global.env.SAVE_PATH);
+		const item = localStorage.getItem(saveKey);
 		return item && item.length !== 0;
 	} catch (e) {
 		console.error(e);
@@ -16,13 +17,10 @@ export function hasSave() {
 }
 
 export function save() {
-	if (Global.env.SAVE_PATH === undefined) {
-		return;
-	}
 	try {
         const savedObj = {};
         eventListener.invoke(eventListener.EventType.SAVE_GAME, savedObj);
-		localStorage.setItem(Global.env.SAVE_PATH, JSON.stringify(savedObj));
+		localStorage.setItem(saveKey, JSON.stringify(savedObj));
         eventListener.invoke(eventListener.EventType.SAVE_GAME_DONE, savedObj);
 	} catch (e) {
 		console.error(e);
@@ -38,47 +36,20 @@ export async function load() {
         eventListener.invoke(eventListener.EventType.LOAD_GAME, data);
         eventListener.invoke(eventListener.EventType.LOAD_GAME_DONE, data);
 		console.log("data loaded", data);
-		// for (const instance of loadInstances) {
-		// 	instance.callback(data);
-		// }
 	}
 }
 
 export function reset() {
 	try {
-		localStorage.removeItem(Global.env.SAVE_PATH);
+		localStorage.removeItem(saveKey);
 	} catch (e) {
 		console.error(e);
 	}
 }
 
-/**
- *
- * @param {function} callback
- * @returns {string} key
- */
-export function registerSave(callback) {
-	var id = uuidv4();
-	var instance = { id, callback };
-	saveInstances.push(instance);
-	return id;
-}
-
-/**
- *
- * @param {function} callback
- * @returns {string} key
- */
-export function registerLoad(callback) {
-	var id = uuidv4();
-	var instance = { id, callback };
-	loadInstances.push(instance);
-	return id;
-}
-
 export function getSavedObj() {
 	try {
-		const data = localStorage.getItem(Global.env.SAVE_PATH);
+		const data = localStorage.getItem(saveKey);
 		if (data) {
 			return JSON.parse(data);
 		}
@@ -105,4 +76,22 @@ export function removeSaveItem(key) {
 	} catch (e) {
 		console.error(e);
 	}
+}
+
+export function getAllSaves(){
+    const saves = [];
+    try {
+        for (const [key, value] of Object.entries(localStorage)){
+            if(key.startsWith('g-')){
+                const content = JSON.parse(value);
+                if(!content.config){
+                    continue;
+                }
+                saves.push(content);
+            }
+        }
+    } catch (e) {
+        console.error(e);
+    }
+    return saves;
 }

@@ -2,6 +2,7 @@ import { registerTabs } from "./helperFunctions.js";
 import { getLocalModule, getLocalModulesInfo } from "./modules/module-exporter.js";
 import { init as subModulesInit } from "./init-game.js";
 import Global from "./global.js";
+import * as save from './save.js';
 
 /**
  * @typedef ModuleConfig
@@ -43,114 +44,148 @@ const tabs = homePage.querySelectorAll(".s-buttons [data-tab-target]");
 registerTabs(tabs);
 tabs[1].click();
 
-const moduleListContainer = homePage.querySelector(".s-modules .s-container");
-const moduleInfoContainer = homePage.querySelector(".s-modules .s-module-info");
-var startModuleCallback = undefined;
-
 const ajv = new ajv7({ allowUnionTypes: true });
 var ajvValidator = undefined;
+
 export async function init() {
 	await loadSchemas();
 
 	{
-		//load local module
-		const localModules = getLocalModulesInfo();
-		for (const info of localModules) {
-			createModuleButton(info.name, info.description, async () => {
-				const module = await getLocalModule(info.name);
-				const errors = validateModule(module);
-				if (errors) {
-					printErrors(errors);
-					return;
-				}
-				module.config.name = info.name;
-				module.config.src = "local";
-				module.config.id = info.name;
-				startModule(module);
-			});
-		}
-	}
+        const moduleListContainer = homePage.querySelector(".s-new-modules .s-module-list .s-container");
+		const moduleInfoContainer = homePage.querySelector(".s-new-modules .s-module-info");
+		const moduleInfos = [];
 
-	{
-		if (Global.env.ENV_TYPE === "production" || true) {
-			//load configs
-			const repos = await loadGithubRepositories();
-			for (const repo of repos) {
-				const { full_name: fullName, description, id } = repo;
-				createModuleButton(fullName, description, async () => {
-					const module = await getGithubModule(repo.id);
-					const errors = validateModule(module);
-					if (errors) {
-						printErrors(errors);
-						return;
-					}
-					module.config.name = module.config.name || fullName;
-					module.config.src = "github";
-					module.config.id = id;
-					startModule(module);
-				});
-			}
-		}
-	}
-	{
-		//saved games
+        { //Local Modules
+            const localModules = getLocalModulesInfo();
+            for (const info of localModules) {
+                moduleInfos.push({
+                    name: info.name,
+                    description: info.description,
+                    src: 'local',
+                    id: info.name,
+                    getModuleCallback: async () => {
+                        return await getLocalModule(info.name);
+                    },
+                });
+            }
+    
+        }
 
-		const loadContainer = homePage.querySelector(".s-load");
-		const moduleListContainer = loadContainer.querySelector(".s-module-list");
-		const moduleInfoContainer = loadContainer.querySelector(".s-module-info");
-		const buttonTemplate = moduleListContainer.querySelector("template");
+        { //Github Modules
+            const repos = await loadGithubRepositories();
+            for (const repo of repos) {
+                const username = repo.owner.login;
+                const repositoryName = repo.name;
+                const id = repo.id;
+                const description = repo.description;
+                moduleInfos.push({
+                    name: `${username} | ${repositoryName}`,
+                    description: description,
+                    src: 'github',
+                    id,
+                    getModuleCallback: async () => {
+                        return await getGithubModule(id);
+                    },
+                });
+            }
+    
+        }
 
-		for (const [key, value] of Object.entries(localStorage)) {
-			if (key.startsWith("g-")) {
-				const content = JSON.parse(value);
-				if (!content.config) {
-					continue;
-				}
-				const { src, id, name, lastSave, description } = content.config;
-				const btn = buttonTemplate.content.cloneNode(true).firstElementChild;
-				btn.querySelector(".title").innerText = name;
-                const dateOptions = {
-                    year: 'numeric', month: 'short', day: 'numeric',
-                    hour: 'numeric', minute: 'numeric', second: 'numeric',
-                    hour12: false
-                  };
-				const date = new Intl.DateTimeFormat("ban", dateOptions).format(new Date(lastSave) || Date.now()).split(",").join(' ');
-				btn.querySelector(".date").innerText = date;
-				const startCallback = async () => {
-					let module = undefined;
-					if (src === "local") {
-						module = await getLocalModule(name);
-					} else if (src === "github") {
-						module = await getGithubModule(id);
-					}
-					const errors = validateModule(module);
-					if (errors) {
-						printErrors(errors);
-						return;
-					}
-					module.config.name = name;
-					module.config.src = src;
-					module.config.id = id;
-					startModule(module);
-				};
-				btn.addEventListener("click", (e) => {
-					moduleInfoContainer.querySelector(".name").innerText = name;
-					moduleInfoContainer.querySelector(".description").innerText = description;
-					moduleInfoContainer.querySelector(".start-button").addEventListener("click", startCallback);
-				});
-				moduleListContainer.appendChild(btn);
-			}
-		}
-	}
+        for (const moduleInfo of moduleInfos) {
+            const btn = document.createElement('div');
+            btn.classList.add('module-button', 'g-button');
+            btn.innerText = moduleInfo.name;
+            btn.addEventListener('click', () => {
+                moduleInfoContainer.querySelector(".name").innerText = moduleInfo.name;
+                moduleInfoContainer.querySelector(".description").innerText = moduleInfo.description;
+                moduleInfoContainer.querySelector(".start-button").addEventListener("click", async () => {
+                    const module = await moduleInfo.getModuleCallback();
+                    const errors = validateModule(module);
+                    if(errors){
+                        printErrors(errors);
+                        return;
+                    }
+                    module.config.name = moduleInfo.name;
+                    module.config.src = moduleInfo.src;
+                    module.config.id = moduleInfo.id;
+                    startModule(module, true);
+                });
+                moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
+                    x.classList.toggle("active", x === btn);
+                });
+            });
+            moduleListContainer.appendChild(btn);
+        }
 
-	if (moduleListContainer.children.length > 0) {
 		moduleListContainer.firstElementChild.click();
 	}
+
+    {
+        const moduleListContainer = homePage.querySelector(".s-load-modules .s-module-list .s-container");
+		const moduleInfoContainer = homePage.querySelector(".s-load-modules .s-module-info");
+        const buttonTemplate = moduleListContainer.querySelector("template");
+
+        const saves = save.getAllSaves();
+        console.log(saves);
+        for (const save of saves) {
+            const {name, description, src, id, lastSave} = save.config;
+            const btn = buttonTemplate.content.cloneNode(true).firstElementChild;
+            btn.querySelector('.title').innerText = name;
+            const dateOptions = {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric",
+                hour12: false,
+            };
+            const date = new Intl.DateTimeFormat("ban", dateOptions)
+                .format(new Date(lastSave || Date.now()))
+                .split(",")
+                .join(" ");
+            btn.querySelector('.date').innerText = date;
+
+            const startCallback = async () => {
+                let module = undefined;
+                if (src === "local") {
+                    module = await getLocalModule(name);
+                } else if (src === "github") {
+                    module = await getGithubModule(id);
+                }
+                const errors = validateModule(module);
+                if (errors) {
+                    printErrors(errors);
+                    return;
+                }
+                module.config.name = name;
+                module.config.src = src;
+                module.config.id = id;
+                startModule(module, false);
+            };
+            btn.addEventListener('click', () => {
+                moduleInfoContainer.querySelector(".name").innerText = name;
+                moduleInfoContainer.querySelector(".description").innerText = description;
+                moduleInfoContainer.querySelector(".start-button").addEventListener("click", startCallback);
+                moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
+                    x.classList.toggle("active", x === btn);
+                });
+            });
+
+            moduleListContainer.appendChild(btn);
+        }
+    }
 }
 
 /**@param {Module} module*/
-function startModule(module) {
-	Global.env.SAVE_PATH = `g-${module.config.src}-${module.config.id}`.toLowerCase();
+function startModule(module, isNew) {
+    save.setSaveKey(`${module.config.src}-${module.config.id}`);
+    if(isNew && save.hasSave()){
+        if(!confirm('This will overwrite an existing save. Are you sure you want to proceed?')){
+            return;
+        }
+        save.reset();
+    }
 	subModulesInit(module);
 
 	const btn = document.querySelector(".p-home .go-to-game-button");
@@ -170,26 +205,6 @@ async function loadSchemas() {
 	} catch (e) {
 		console.log(e);
 	}
-}
-
-async function createModuleButton(title, desc, startCallback) {
-	const btn = document.createElement("div");
-	btn.classList.add("module-button", "g-button");
-	btn.innerText = title;
-	btn.addEventListener("click", (e) => {
-		showModuleInfo(title, desc, startCallback);
-		moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
-			x.classList.toggle("active", x === btn);
-		});
-	});
-
-	moduleListContainer.appendChild(btn);
-}
-
-function showModuleInfo(name, desc, startCallback) {
-	moduleInfoContainer.querySelector(".name").textContent = name;
-	moduleInfoContainer.querySelector(".description").textContent = desc;
-	moduleInfoContainer.querySelector(".start-button").addEventListener("click", startCallback);
 }
 
 function printErrors(errors) {

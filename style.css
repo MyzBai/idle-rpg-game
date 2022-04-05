@@ -125,6 +125,34 @@ div.hide,
     margin-top: 6px;
 }
 
+.p-home .go-to-game-button{
+    align-self: start;
+}
+
+.p-home .s-module-list{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.p-home .s-module-list .s-container{
+    padding-left: 0px;
+}
+
+.p-home .s-filter input[type="url"]{
+    outline: none;
+    display: inline-block;
+    margin: auto;
+    font-size: 1em;
+}
+.p-home .s-module-list .module-button{
+    display: block;
+    text-align: left;
+}
+.p-home .s-module-list .module-button.filter-hidden{
+    display: none;
+}
+
 .p-home .s-module-info{
     flex: 0.7;
     padding: 6px;
@@ -147,72 +175,25 @@ div.hide,
 }
 
 /*Modules tab*/
-.p-home .s-modules.active{
+.p-home .s-new-modules.active{
     min-height: 0px;
     flex: 1;
     display: flex;
-}
-
-.p-home .go-to-game-button{
-    align-self: start;
-}
-
-.p-home .s-modules .s-module-list{
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-.p-home .s-modules .s-module-list .s-container{
-    padding-left: 0px;
-}
-.p-home .s-modules .s-filter input[type="url"]{
-    outline: none;
-    display: inline-block;
-    margin: auto;
-    font-size: 1em;
-}
-
-.p-home .s-modules .s-module-list .module-button{
-    display: block;
-    text-align: left;
-}
-.p-home .s-modules .s-module-list .module-button.filter-hidden{
-    display: none;
 }
 
 /*Load tab*/
-.p-home .s-load.active{
+.p-home .s-load-modules.active{
     min-height: 0px;
+    flex: 1;
     display: flex;
-    flex: 1;
 }
-.p-home .s-load .load-button{
-    display: inline-block;
-    width: 60px;
-    text-align: center;
-}
-
-.p-home .s-load .s-container{
-    padding: 3px;
-    text-align: left;
-}
-
-.p-home .s-load .s-module-list{
-    flex: 1;
-}
-.p-home .s-load .s-module-list .module-button{
+.p-home .s-load-modules .s-module-list .module-button{
     display: flex;
-    text-align: left;
 }
-.p-home .s-load .s-module-list .module-button .title{
+.p-home .s-load-modules .s-module-list .module-button .title{
     flex: 1;
 }
-.p-home .s-load .s-module-info{
-    flex: 0.7;
-    padding: 6px;
-    text-align: center;
 
-}
 /*Upload tab*/
 .p-home .s-upload .s-drop-area{
     min-height: 100px;
