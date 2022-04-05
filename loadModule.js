@@ -2,7 +2,7 @@ import { registerTabs } from "./helperFunctions.js";
 import { getLocalModule, getLocalModulesInfo } from "./modules/module-exporter.js";
 import { init as subModulesInit } from "./init-game.js";
 import Global from "./global.js";
-import * as save from './save.js';
+import * as save from "./save.js";
 
 /**
  * @typedef ModuleConfig
@@ -44,203 +44,203 @@ var ajvValidator = undefined;
 export async function init() {
 	await loadSchemas();
 
-    //new module
+	//new module
 	{
-        let startModuleCallback = undefined;
-        const moduleListContainer = homePage.querySelector(".s-new-modules .s-module-list .s-container");
+		let startModuleCallback = undefined;
+		const moduleListContainer = homePage.querySelector(".s-new-modules .s-module-list .s-container");
 		const moduleInfoContainer = homePage.querySelector(".s-new-modules .s-module-info");
-        /**@type {HTMLInputElement} */
-        const filterInput = homePage.querySelector('.s-new-modules .s-module-list .s-filter input');
-        filterInput.addEventListener('input', e => {
-        	if (!e.target.delayUpdate) {
-                e.target.delayUpdate = true;
-                setTimeout(() => {
-                    const filter = e.target.value;
-                    e.target.delayUpdate = false;
-                    moduleListContainer.querySelectorAll('.module-button').forEach(x => {
-                        const hide = !x.innerText.toLowerCase().startsWith(filter) && filter.length > 0 && !x.classList.contains('active');
-                        x.toggleAttribute('data-hidden', hide);
-                    });
-                }, 500);
-            }
-            
-        });
+		/**@type {HTMLInputElement} */
+		const filterInput = homePage.querySelector(".s-new-modules .s-module-list .s-filter input");
+		filterInput.addEventListener("input", (e) => {
+			if (!e.target.delayUpdate) {
+				e.target.delayUpdate = true;
+				setTimeout(() => {
+					const filter = e.target.value;
+					e.target.delayUpdate = false;
+					moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
+						const hide = !x.innerText.toLowerCase().startsWith(filter) && filter.length > 0 && !x.classList.contains("active");
+						x.toggleAttribute("data-hidden", hide);
+					});
+				}, 500);
+			}
+		});
 		const moduleInfos = [];
 
-        { //Local Modules
-            const localModules = getLocalModulesInfo();
-            for (const info of localModules) {
-                moduleInfos.push({
-                    name: info.name,
-                    description: info.description,
-                    src: 'local',
-                    id: info.name,
-                    getModuleCallback: async () => {
-                        return await getLocalModule(info.name);
-                    },
-                });
-            }
-    
-        }
+		{
+			//Local Modules
+			const localModules = getLocalModulesInfo();
+			for (const info of localModules) {
+				moduleInfos.push({
+					name: info.name,
+					description: info.description,
+					src: "local",
+					id: info.name,
+					getModuleCallback: async () => {
+						return await getLocalModule(info.name);
+					},
+				});
+			}
+		}
 
-        { //Github Modules
-            const repos = await loadGithubRepositories();
-            for (const repo of repos) {
-                const username = repo.owner.login;
-                const repositoryName = repo.name;
-                const id = repo.id;
-                const description = repo.description;
-                moduleInfos.push({
-                    name: `${username} | ${repositoryName}`,
-                    description: description,
-                    src: 'github',
-                    id,
-                    getModuleCallback: async () => {
-                        return await getGithubModule(id);
-                    },
-                });
-            }
-    
-        }
-       
-        for (const moduleInfo of moduleInfos) {
-            const btn = document.createElement('div');
-            btn.classList.add('module-button', 'g-button');
-            btn.innerText = moduleInfo.name;
-            btn.addEventListener('click', () => {
-                moduleInfoContainer.querySelector(".name").innerText = moduleInfo.name;
-                moduleInfoContainer.querySelector(".description").innerText = moduleInfo.description;
-                moduleInfoContainer.querySelector('.start-button').removeEventListener('click', startModuleCallback);
-                startModuleCallback = async () => {
-                    const module = await moduleInfo.getModuleCallback();
-                    const errors = validateModule(module);
-                    if(errors){
-                        printErrors(errors);
-                        return;
-                    }
-                    if(moduleInfo.src === 'local'){
-                        save.setSaveKey(`${moduleInfo.name}`);
-                    } else{
-                        save.setSaveKey(`${moduleInfo.name}-${moduleInfo.id}`);
-                    }
-                    if(save.hasSave()){
-                        if(!confirm('This will overwrite an existing save. Are you sure you want to proceed?')){
-                            return;
-                        }
-                        save.reset();
-                    }
-                    module.config.name = moduleInfo.name;
-                    module.config.src = moduleInfo.src;
-                    module.config.id = moduleInfo.id;
-                    startModule(module);
-                };
-                moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
-                moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
-                    x.classList.toggle("active", x === btn);
-                });
-            });
-            moduleListContainer.appendChild(btn);
-        }
+		{
+			//Github Modules
+			const repos = await loadGithubRepositories();
+			for (const repo of repos) {
+				const username = repo.owner.login;
+				const repositoryName = repo.name;
+				const id = repo.id;
+				const description = repo.description;
+				moduleInfos.push({
+					name: `${username} | ${repositoryName}`,
+					description: description,
+					src: "github",
+					id,
+					getModuleCallback: async () => {
+						return await getGithubModule(id);
+					},
+				});
+			}
+		}
+
+		for (const moduleInfo of moduleInfos) {
+			const btn = document.createElement("div");
+			btn.classList.add("module-button", "g-button");
+			btn.innerText = moduleInfo.name;
+			btn.addEventListener("click", () => {
+				moduleInfoContainer.querySelector(".name").innerText = moduleInfo.name;
+				moduleInfoContainer.querySelector(".description").innerText = moduleInfo.description;
+				moduleInfoContainer.querySelector(".start-button").removeEventListener("click", startModuleCallback);
+				startModuleCallback = async () => {
+					const module = await moduleInfo.getModuleCallback();
+					const errors = validateModule(module);
+					if (errors) {
+						printErrors(errors);
+						return;
+					}
+					if (moduleInfo.src === "local") {
+						save.setSaveKey(`${moduleInfo.name}`);
+					} else {
+						save.setSaveKey(`${moduleInfo.name}-${moduleInfo.id}`);
+					}
+					if (save.hasSave()) {
+						if (!confirm("This will overwrite an existing save. Are you sure you want to proceed?")) {
+							return;
+						}
+						save.reset();
+					}
+					module.config.name = moduleInfo.name;
+					module.config.src = moduleInfo.src;
+					module.config.id = moduleInfo.id;
+					startModule(module);
+				};
+				moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
+				moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
+					x.classList.toggle("active", x === btn);
+				});
+			});
+			moduleListContainer.appendChild(btn);
+		}
 
 		moduleListContainer.firstElementChild.click();
 	}
 
-    //load module
-    {
-        let startModuleCallback = undefined;
-        const moduleListContainer = homePage.querySelector(".s-load-modules .s-module-list .s-container");
+	//load module
+	{
+		let startModuleCallback = undefined;
+		const moduleListContainer = homePage.querySelector(".s-load-modules .s-module-list .s-container");
 		const moduleInfoContainer = homePage.querySelector(".s-load-modules .s-module-info");
-        const buttonTemplate = moduleListContainer.querySelector("template");
+		const buttonTemplate = moduleListContainer.querySelector("template");
 
-        const saves = save.getAllSaves().sort((a,b) => {return b.config.lastSave - a.config.lastSave});
-        for (const save of saves) {
-            const {name, description, src, id, lastSave} = save.config;
-            const btn = buttonTemplate.content.cloneNode(true).firstElementChild;
-            btn.querySelector('.title').innerText = name;
-            const dateOptions = {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
-                hour12: false,
-            };
-            const date = new Intl.DateTimeFormat("ban", dateOptions)
-                .format(new Date(lastSave || Date.now()))
-                .split(",")
-                .join(" ");
-            btn.querySelector('.date').innerText = date;
+		const saves = save.getAllSaves().sort((a, b) => {
+			return b.config.lastSave - a.config.lastSave;
+		});
+		for (const savedModule of saves) {
+			const { name, description, src, id, lastSave } = savedModule.config;
+			const btn = buttonTemplate.content.cloneNode(true).firstElementChild;
+			btn.querySelector(".title").innerText = name;
+			const dateOptions = {
+				year: "numeric",
+				month: "short",
+				day: "numeric",
+				hour: "numeric",
+				minute: "numeric",
+				second: "numeric",
+				hour12: false,
+			};
+			const date = new Intl.DateTimeFormat("ban", dateOptions)
+				.format(new Date(lastSave || Date.now()))
+				.split(",")
+				.join(" ");
+			btn.querySelector(".date").innerText = date;
 
-            const startCallback = async () => {
-                let module = undefined;
-                if (src === "local") {
-                    module = await getLocalModule(name);
-                } else if (src === "github") {
-                    module = await getGithubModule(id);
-                }
-                const errors = validateModule(module);
-                if (errors) {
-                    printErrors(errors);
-                    return;
-                }
-                module.config.name = name;
-                module.config.src = src;
-                module.config.id = id;
-                save.setSaveKey(`${name}-${id}`);
-                startModule(module, 'load');
-            };
-            btn.addEventListener('click', () => {
-                moduleInfoContainer.querySelector(".name").innerText = name;
-                moduleInfoContainer.querySelector(".description").innerText = description;
-                moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
-                startModuleCallback = startCallback;
-                moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
-                moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
-                    x.classList.toggle("active", x === btn);
-                });
-            });
+			const startCallback = async () => {
+				let module = undefined;
+				if (src === "local") {
+					module = await getLocalModule(name);
+				} else if (src === "github") {
+					module = await getGithubModule(id);
+				}
+				const errors = validateModule(module);
+				if (errors) {
+					printErrors(errors);
+					return;
+				}
+				module.config.name = name;
+				module.config.src = src;
+				module.config.id = id;
+				save.setSaveKey(`${name}-${id}`);
+				startModule(module, "load");
+			};
+			btn.addEventListener("click", () => {
+				moduleInfoContainer.querySelector(".name").innerText = name;
+				moduleInfoContainer.querySelector(".description").innerText = description;
+				moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
+				startModuleCallback = startCallback;
+				moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
+				moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
+					x.classList.toggle("active", x === btn);
+				});
+			});
 
-            moduleListContainer.appendChild(btn);
-        }
-    }
+			moduleListContainer.appendChild(btn);
+		}
+	}
 
-    //upload module
-    {
-        const input = homePage.querySelector('.s-upload input');
-        const startButton = homePage.querySelector('.s-upload .start-button');
-        let startCallback = undefined;
-        input.addEventListener('change', async e => {
-            let content = undefined;
-            try{
-                content = JSON.parse(await e.target.files[0].text());
-            } catch(e){
-                console.error(e);
-            } 
-            const errors = validateModule(content);
-            startButton.toggleAttribute('disabled', errors !== null);
-            if(errors){
-                alert(`Errors detected.\nCheck the console in devtools for more info`);
-                console.error(errors);
-                return;
-            }
-            startCallback = async () => {
-                /**@type {Module} */
-                const module = content;
-                module.config.id = module.config.id || module.config.name || 'upload';
-                module.config.src = 'upload';
-                save.setSaveKey('temp');
-                startModule(module);
-            };
-            startButton.removeEventListener('click', startCallback);
-            startButton.addEventListener('click', startCallback);
-        });
-    }
+	//upload module
+	{
+		const input = homePage.querySelector(".s-upload input");
+		const startButton = homePage.querySelector(".s-upload .start-button");
+		let startCallback = undefined;
+		input.addEventListener("change", async (e) => {
+			let content = undefined;
+			try {
+				content = JSON.parse(await e.target.files[0].text());
+			} catch (e) {
+				console.error(e);
+			}
+			const errors = validateModule(content);
+			startButton.toggleAttribute("disabled", errors !== null);
+			if (errors) {
+				alert(`Errors detected.\nCheck the console in devtools for more info`);
+				console.error(errors);
+				return;
+			}
+			startCallback = async () => {
+				/**@type {Module} */
+				const module = content;
+				module.config.id = module.config.id || module.config.name || "upload";
+				module.config.src = "upload";
+				save.setSaveKey("temp");
+				startModule(module);
+			};
+			startButton.removeEventListener("click", startCallback);
+			startButton.addEventListener("click", startCallback);
+		});
+	}
 }
 
 /**@param {Module} module*/
 function startModule(module) {
-
 	subModulesInit(module);
 
 	const btn = document.querySelector(".p-home .go-to-game-button");
@@ -256,7 +256,7 @@ async function loadSchemas() {
 			const { default: data } = await import(`./json/schemas/${schemaFilename}`, { assert: { type: "json" } });
 			ajv.addSchema(data, schemaFilename);
 		}
-        console.log('test');
+		console.log("test");
 		ajvValidator = ajv.getSchema("module-schema.json");
 	} catch (e) {
 		console.log(e);
@@ -290,7 +290,7 @@ async function getGithubModule(id) {
 function validateModule(content) {
 	try {
 		ajvValidator(content);
-        return ajvValidator.errors;
+		return ajvValidator.errors;
 	} catch (e) {
 		console.error(e);
 	}
