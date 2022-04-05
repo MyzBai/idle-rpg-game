@@ -181,6 +181,11 @@ div.hide,
 }
 
 /*Load tab*/
+.p-home .s-load.active{
+    min-height: 0px;
+    display: flex;
+    flex: 1;
+}
 .p-home .s-load .load-button{
     display: inline-block;
     width: 60px;
@@ -191,11 +196,7 @@ div.hide,
     padding: 3px;
     text-align: left;
 }
-.p-home .s-load{
-    min-height: 0px;
-    display: flex;
-    flex: 1;
-}
+
 .p-home .s-load .s-module-list{
     flex: 1;
 }
