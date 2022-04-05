@@ -25,19 +25,14 @@ document.querySelector("body .p-game .load-btn").addEventListener("click", (e) =
 
 init();
 async function init() {
+    await loadEnvironment();
     await registerServiceWorker();
-	await loadEnvironment();
 	await loadModule.init();
 
 	startButton.addEventListener("click", startGame);
 	stopButton.addEventListener("click", stopGame);
 	resetButton.addEventListener("click", resetGame);
-
-
 }
-
-
-
 
 function startGame() {
 	startButton.classList.add("active");
@@ -65,16 +60,7 @@ async function registerServiceWorker(){
         return;
     }
     try{
-        const registration = await navigator.serviceWorker.register('./sw.js');
-        console.log('service worker registered');
-
-        if(navigator.serviceWorker.controller){
-            console.log(navigator.serviceWorker.controller.state);
-        }
-
-        navigator.serviceWorker.addEventListener('controllerchange', e => {
-            console.log('new service worker activated');
-        });
+        await navigator.serviceWorker.register('./sw.js');
     } catch(e){
         console.error(e);
     }
@@ -82,7 +68,7 @@ async function registerServiceWorker(){
 
 
 async function loadEnvironment() {
-	const isLocal = isLocalNetwork(window.location.hostname);
+	const isLocal = window.location.search.includes('production') ? false : isLocalNetwork(window.location.hostname);
 	const envFilePath = `./env/${isLocal ? "development" : "production"}.env.js`;
 	const env = await import(envFilePath);
 	Global.env = env.default;
