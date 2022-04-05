@@ -1,5 +1,5 @@
 {
-    "$schema": "../../json/schemas/enemy-schema.json",
+    "$schema": "../../json/schemas/enemies-schema.json",
     "data": {
         "enemies": [
             {

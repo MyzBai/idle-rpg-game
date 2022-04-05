@@ -1,0 +1,26 @@
+{
+    "$id": "module-schema.json",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "$schema": {"type":"string"},
+        "config":{
+            "$ref": "config-schema.json"
+        },
+        "defaultMods": {
+            "$ref": "default-mods-schema.json#/properties/data"
+        },
+        "enemies": {
+            "$ref": "enemies-schema.json#/properties/data"
+        },
+        "skills": {
+            "$ref": "skills-schema.json#/properties/data"
+        },
+        "items": {
+            "$ref": "items-schema.json#/properties/data"
+        },
+        "modTree": {
+            "$ref": "mod-tree-schema.json#/properties/data"
+        }
+    }
+}

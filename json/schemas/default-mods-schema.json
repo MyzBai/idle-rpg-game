@@ -1,5 +1,5 @@
 {
-    "$id": "module/default-stat-mods.json",
+    "$id": "default-mods.json",
     "type": "object",
     "additionalProperties": false,
     "required": ["data"],
@@ -8,9 +8,7 @@
         "data": {
             "type": "array",
             "items": {
-                "$ref": "mods-schema.json#/definitions/stat",
-                "type": "object",
-                "required": ["name", "value", "valueType"]
+                "$ref": "mods-schema.json#/definitions/mod"
             }
         }
     }

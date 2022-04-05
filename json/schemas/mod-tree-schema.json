@@ -1,5 +1,5 @@
 {
-    "$id": "module/mod-tree-schema.json",
+    "$id": "mod-tree-schema.json",
     "type": "object",
     "required": ["data"],
     "properties": {

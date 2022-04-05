@@ -1,27 +1,15 @@
 {
-    "$id": "module/config-schema.json",
-    "type": "object",
-    "required": ["name"],
-    "properties": {
-        "$schema": {
-            "type": "string"
-        },
-        "name": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 32,
-            "pattern": "^[a-zA-Z0-9 ]*$"
-        },
-        "description": {
-            "type": "string",
-            "maxLength": 320,
-            "pattern": "^[a-zA-Z0-9 ,.\\-!\"#%&/()?@]*$"
-        },
-        "include": {
-            "type": "array",
-            "items": {
-                "type": "string"
-            }
-        }
-    }
+	"$id": "config-schema.json",
+	"type": "object",
+	"properties": {
+		"$schema": { "type": "string" },
+		"include": {
+			"type": "array",
+			"items": { "type": "string" }
+		},
+		"exclude": {
+			"type": "array",
+			"items": { "type": "string" }
+		}
+	}
 }

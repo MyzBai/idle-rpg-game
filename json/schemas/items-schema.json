@@ -1,5 +1,5 @@
 {
-    "$id": "module/items-schema.json",
+    "$id": "items-schema.json",
     "type": "object",
     "required": ["data"],
     "properties": {

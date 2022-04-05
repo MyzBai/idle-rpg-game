@@ -1,0 +1,22 @@
+{
+    "$id": "enemies-schema.json",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["data"],
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"data": {
+            "type": "object",
+			"properties": {
+				"health": {
+					"type": "array",
+					"items": {
+						"type": "number"
+					}
+				}
+			}
+		}
+	}
+}

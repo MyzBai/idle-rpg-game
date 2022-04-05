@@ -15,26 +15,12 @@ export {};
  */
 
 /**
- * Raw stat modifier with flags/conditions as string arrays
- * @typedef RawStatMod
+ * @typedef StatMod
  * @property {string} name
  * @property {number} [value]
- * @property {number} [min]
- * @property {number} [max]
- * @property {string} [valueType]
- * @property {string[]} [flags]
- * @property {string[]} [conditions]
- * @property {StatKeyword[]} [keywords]
- */
-
-/**
- * Final stat modifier with flags/conditions as a number
- * @typedef StatMod
- * @property {number} value
  * @property {string} valueType
- * @property {string} name
- * @property {number} flags
- * @property {number} conditions
+ * @property {number | string[]} [flags]
+ * @property {number | string[]} [conditions]
  * @property {StatKeyword[]} [keywords]
  * @property {object} [source]
  */

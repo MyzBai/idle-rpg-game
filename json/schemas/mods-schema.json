@@ -1,5 +1,5 @@
 {
-    "$id": "module/mods-schema.json",
+    "$id": "mods-schema.json",
     "definitions": {
         "mod": {
             "type": "object",

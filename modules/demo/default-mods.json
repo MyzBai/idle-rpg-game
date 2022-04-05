@@ -1,0 +1,15 @@
+{
+	"$schema": "../../json/schemas/default-mods-schema.json",
+	"data": [
+		{ "id": "minPhysicalDamage", "stats": [{ "value": 1 }] },
+		{ "id": "maxPhysicalDamage", "stats": [{ "value": 3 }] },
+		{ "id": "baseCritMulti", "stats": [{ "value": 150 }] },
+		{ "id": "baseBleedDuration", "stats": [{ "value": 6 }] },
+		{ "id": "baseMana", "stats": [{ "value": 50 }] },
+		{ "id": "baseManaRegen", "stats": [{ "value": 1 }] },
+		{ "id": "baseStrength", "stats": [{ "value": 100 }] },
+		{ "id": "incStrength", "stats": [{ "value": 100 }] },
+		{ "id": "baseDexterity", "stats": [{ "value": 100 }] },
+		{ "id": "baseIntelligence", "stats": [{ "value": 100 }] }
+	]
+}

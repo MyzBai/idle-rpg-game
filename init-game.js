@@ -10,14 +10,13 @@ import Global from "./global.js";
 import * as gameLoop from "./gameLoop.js";
 
 initMenu();
-
+var saveGameEventId = undefined;
 /**
  * @param {import('./loadModule.js').ModuleData} data
  */
 export function init(data) {
 	console.log("init sub modules");
 
-	eventListener.clear();
 	gameLoop.clear();
 	gameLoop.stop();
 	//make sure we copy the data before distributing it to all the sub-modules
@@ -25,20 +24,21 @@ export function init(data) {
 
 	//player must be initialized first because it has no dependencies
 	//without default statmods,
-	player.init({ defaultStatMods: data.defaultStatMods });
+	player.init({ defaultMods: data.defaultMods });
 
-	enemy.init(data.enemy);
+	enemy.init(data.enemies);
 	skills.init(data.skills);
 	items.init(data.items);
 	modTree.init(data.modTree);
-
 	combat.init();
     
-    eventListener.add(eventListener.EventType.SAVE_GAME, savedObj => {
+    eventListener.remove(saveGameEventId);
+    saveGameEventId = eventListener.add(eventListener.EventType.SAVE_GAME, savedObj => {
         savedObj.config = {
-			name: data.config.name,
-			src: data.config.src,
-			path: data.config.path,
+            name: data.config.name,
+            src: data.config.src,
+            id: data.config.id,
+            lastSave: new Date().getTime()
 		};
     });
 
@@ -47,7 +47,7 @@ export function init(data) {
 	const isProduction = Global.env.ENV_TYPE === "production";
 	document.querySelector(".p-game .s-dev-tools").classList.toggle("hide", isProduction);
 	gameLoop.stop();
-	if (isProduction || true) {
+	if (isProduction) {
 		gameLoop.start();
 
         //auto save

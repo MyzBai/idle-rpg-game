@@ -28,7 +28,7 @@ import * as eventListener from "./eventListener.js";
 /**
  * @typedef Module
  * @property {ModuleConfig} config
- * @property {object} defaultStatMods
+ * @property {object} defaultMods
  * @property {object} enemy
  * @property {object} skills
  * @property {object} [items]
@@ -60,7 +60,7 @@ document.querySelector("body .p-home .go-to-game-button").addEventListener("clic
 //#region Modules Tab
 const moduleFilterInput = homePage.querySelector(".s-modules .s-filter input");
 const moduleButtonsContainer = homePage.querySelector(".s-modules .s-container");
-const moduleInfoContainer = homePage.querySelector(".s-modules .s-column-info");
+const moduleInfoContainer = homePage.querySelector(".s-modules .s-module-info");
 // const moduleButtonTemplate = moduleButtonsContainer.querySelector("template");
 moduleFilterInput.addEventListener("input", (e) => {
 	if (!moduleFilterInput.delayUpdate) {
@@ -196,7 +196,7 @@ export async function init() {
 	//populate saved modules list
 	{
 		//saves
-        eventListener.add(eventListener.EventType.SAVE_GAME, () => {
+        eventListener.add(eventListener.EventType.SAVE_GAME_DONE, () => {
             updateSavedModulesContainer();
         });
 	
@@ -425,8 +425,8 @@ async function getModuleData(files) {
 		}
 	}
 
-	if (!moduleData.defaultStatMods) {
-		console.error("defaultStatMods.json is missing");
+	if (!moduleData.defaultMods) {
+		console.error("defaultMods.json is missing");
 		return;
 	}
 	if (!moduleData.enemy) {
@@ -523,7 +523,7 @@ async function getModuleByUrl(url) {
 
 /**
  * @param {string} string
- * @returns {string} e.g default-stat-mods > defaultStatMods
+ * @returns {string} e.g default-stat-mods > defaultMods
  */
 function filenameToCamelCase(string) {
 	const propertyName = string

@@ -1,58 +1,70 @@
-import { ModFlags } from "./damageCalc.js";
+import { ModFlags, Conditions } from "./damageCalc.js";
+import { getModTemplate } from "./modTemplates.js";
 
 /**
  * @typedef {import('./type-definitions.js').StatMod} StatMod
- * @typedef {import('./type-definitions.js').RawStatMod} RawStatMod
+ * @typedef {import('./modTemplates.js').ModTemplate} ModTemplate
  */
 
 /**
- * @param {RawStatMod | RawStatMod[]} rawStatMods
+ * @typedef Mod
+ * @property {string} id
+ * @property {{value: number}[]} stats
+ */
+
+/**
+ * @param {Mod | Mod[]} mods
  * @returns {StatMod[]}
  */
-export function convertStatMods(rawStatMods, source = undefined) {
+export function convertModToStatMods(mods, source = undefined) {
 
-    const statMods = [];
-    if (Array.isArray(rawStatMods)) {
-        for (const rawStatMod of rawStatMods) {
-            statMods.push(...convertStatMods(rawStatMod, source));
+    if(Array.isArray(mods)){
+        let statMods = [];
+        for (const mod of mods) {
+            statMods.push(...convertModToStatMods(mod, source));
         }
         return statMods;
     }
+    const mod = mods;
 
+	const template = getModTemplate(mod.id);
+	if (template.stats.length !== mod.stats.length) {
+		console.error("mod does not match template");
+		return [];
+	}
 
-    var flags = rawStatMods.flags ? rawStatMods.flags.reduce((a, b) => a | ModFlags[b], 0) : 0;
-    const conditions = 0;
-    // var conditions = mod.conditions ? mod.conditions.reduce((a, b) => b ? a | ConditionFlags[b] : 0, 0) : 0;
-    /**@type {StatMod} */
-    var newMod = {
-        name: rawStatMods.name,
-        value: rawStatMods.value,
-        valueType: rawStatMods.valueType,
-        flags,
-        conditions,
-        keywords: rawStatMods.keywords,
-        source
-    }
-    Object.freeze(newMod);
-    statMods.push(newMod);
-    return statMods;
+	const statMods = [];
+	for (let i = 0; i < template.stats.length; i++) {
+		const statValue = mod.stats[i].value;
+		const statMod = template.stats[i];
+		statMod.value = statValue;
+		statMod.source = source;
+		statMod.flags = statMod.flags ? statMod.flags.reduce((a, c) => a | ModFlags[c], 0) : 0;
+		statMod.conditions = statMod.flags ? statMod.flags.reduce((a, c) => a | Conditions[c], 0) : 0;
+		Object.freeze(statMod);
+		statMods.push(statMod);
+	}
+	return statMods;
 }
 
 export class ModDB {
-    constructor() {
-        let modList = [];
+	constructor() {
+		let modList = [];
 
-        /**@param {StatMod | StatMod[]} statModifiers */
-        this.add = function (statModifiers) {
-            modList.push(...statModifiers);
-        };
+		/**@param {StatMod | StatMod[]} statModifiers */
+		this.add = function (statModifiers) {
+			if (!Array.isArray(statModifiers)) {
+				statModifiers = [statModifiers];
+			}
+			modList.push(...statModifiers);
+		};
 
-        this.removeBySource = function (source) {
-            modList = modList.filter(x => x.source !== source);
-        };
+		this.removeBySource = function (source) {
+			modList = modList.filter((x) => x.source !== source);
+		};
 
-        this.getModList = function () {
-            return modList;
-        };
-    }
+		this.getModList = function () {
+			return modList;
+		};
+	}
 }

@@ -78,7 +78,7 @@ div.hide,
     text-align: center;
     padding: 6px;
     overflow-y: auto;
-    flex: 1;
+    /* flex: 1; */
 }
 .g-vertical-menu-container .g-button:not(:last-of-type){
     border-bottom: 1px solid var(--primary-color-button-disabled);
@@ -125,6 +125,27 @@ div.hide,
     margin-top: 6px;
 }
 
+.p-home .s-module-info{
+    flex: 0.7;
+    padding: 6px;
+    text-align: center;
+    box-shadow: inset 0px 0px 3px;
+    margin: 6px;
+    display: flex;
+    flex-direction: column;
+}
+.p-home .s-module-info .name{
+    white-space: pre-wrap;
+    margin: 0;
+    font-size: 1.1rem;
+}
+.p-home .s-module-info .description{
+    flex: 1;
+    white-space: pre-wrap;
+    font-size: 0.8rem;
+    overflow-y: auto;
+}
+
 /*Modules tab*/
 .p-home .s-modules.active{
     min-height: 0px;
@@ -136,12 +157,12 @@ div.hide,
     align-self: start;
 }
 
-.p-home .s-modules .s-column-list{
+.p-home .s-modules .s-module-list{
     flex: 1;
     display: flex;
     flex-direction: column;
 }
-.p-home .s-modules .s-column-list .s-container{
+.p-home .s-modules .s-module-list .s-container{
     padding-left: 0px;
 }
 .p-home .s-modules .s-filter input[type="url"]{
@@ -151,33 +172,14 @@ div.hide,
     font-size: 1em;
 }
 
-.p-home .s-modules .s-column-list .module-button{
+.p-home .s-modules .s-module-list .module-button{
     display: block;
     text-align: left;
 }
-.p-home .s-modules .s-column-list .module-button.filter-hidden{
+.p-home .s-modules .s-module-list .module-button.filter-hidden{
     display: none;
 }
-.p-home .s-modules .s-column-info{
-    flex: 0.7;
-    padding: 6px;
-    text-align: center;
-    box-shadow: inset 0px 0px 3px;
-    margin: 6px;
-    display: flex;
-    flex-direction: column;
-}
-.p-home .s-modules .s-column-info .name{
-    white-space: pre-wrap;
-    margin: 0;
-    font-size: 1.1rem;
-}
-.p-home .s-modules .s-column-info .description{
-    flex: 1;
-    white-space: pre-wrap;
-    font-size: 0.8rem;
-    overflow-y: auto;
-}
+
 /*Load tab*/
 .p-home .s-load .load-button{
     display: inline-block;
@@ -189,8 +191,27 @@ div.hide,
     padding: 3px;
     text-align: left;
 }
+.p-home .s-load{
+    min-height: 0px;
+    display: flex;
+    flex: 1;
+}
+.p-home .s-load .s-module-list{
+    flex: 1;
+}
+.p-home .s-load .s-module-list .module-button{
+    display: flex;
+    text-align: left;
+}
+.p-home .s-load .s-module-list .module-button .title{
+    flex: 1;
+}
+.p-home .s-load .s-module-info{
+    flex: 0.7;
+    padding: 6px;
+    text-align: center;
 
-
+}
 /*Upload tab*/
 .p-home .s-upload .s-drop-area{
     min-height: 100px;
@@ -244,6 +265,9 @@ div.hide,
 .p-game .s-menu{
     display: flex;
     min-width: 150px;
+}
+.p-game .s-menu > .s-container{
+    flex: 1;
 }
 
 .p-game .s-main {
@@ -358,7 +382,7 @@ div.hide,
 }
 
 .p-game .s-main .s-items .s-item-list{
-    flex: 0 0 0.3;
+    flex: 0.3;
 }
 
 .p-game .s-main .s-items .s-item{

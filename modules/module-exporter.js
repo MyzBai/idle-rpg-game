@@ -1,40 +1,33 @@
 
-/**@typedef {import('../loadModule.js')} ModuleConfig */
-/**@typedef {import('../loadModule.js')} ModuleFile */
+/**
+ * @typedef {import('../loadModuleNew.js').Module} Module
+ */
 
-/**@returns {Promise<ModuleConfig[]>} */
-export async function loadConfigs(){
-    const configs = [];
-    const demoConfig = await loadConfig('demo');
-    if(demoConfig){
-        configs.push(demoConfig);
-    }
-    return configs;
+/**@returns {{name: string, description: string}[]} */
+export function getLocalModulesInfo(){
+    const localModules = [];
+    localModules.push({name: 'Demo', description: `This demo is a proof of concept.\nIt's short and simple.\nEnjoy!`});
+    return localModules;
 }
 
+
 /**
- * @param {string} foldername
- * @param {string[]} includes - files to include
- * @returns {Promise<ModuleFile>} */
-export async function loadModule(foldername, includes) {
-    const files = [];
-    for (const filename of includes) {
-        try {
-            const { default: data } = await import(`./${foldername.toLowerCase()}/${filename.toLowerCase()}`, { assert: { type: 'json' } });
-            files.push({ name: filename, content: data });
-        } catch (e) {
-            console.error(e);
-        }
-    }
-    return files;
+ * @returns {Promise<Module>} */
+export async function getLocalModule(name) {
+	try {
+		const { default: data } = await import(`./${name}/module.json`, { assert: { type: "json" } });
+        return data;
+	} catch (e) {
+        console.error(e);
+	}
 }
 
 /**@returns {Promise<ModuleConfig} */
-async function loadConfig(name){
-    try{
-        return await import(`./${name}/config.json`, { assert: { type: 'json' } });
-    } catch(e){
-        console.error(e);
-    }
+async function loadConfig(name) {
+	try {
+		const { default: data } = await import(`./${name}/config.json`, { assert: { type: "json" } });
+		return data;
+	} catch (e) {
+		console.error(e);
+	}
 }
-

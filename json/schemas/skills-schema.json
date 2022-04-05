@@ -1,5 +1,5 @@
 {
-    "$id": "module/skills-schema.json",
+    "$id": "skills-schema.json",
     "type": "object",
     "additionalProperties": false,
     "required": ["data"],

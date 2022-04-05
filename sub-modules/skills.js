@@ -1,13 +1,12 @@
 import * as player from "../player.js";
-import { convertStatMods } from "../modDB.js";
+import { convertModToStatMods } from "../modDB.js";
 import { parseModDescription, deepFreeze } from "../helperFunctions.js";
-import { getStatModifierTemplate } from "../modTemplates.js";
+import { getModTemplate } from "../modTemplates.js";
 import * as eventListener from '../eventListener.js';
 
 /**
  * @typedef SkillMod
  * @property {string} id
- * @property {string} [desc]
  * @property {Stat[]} stats
  */
 /**
@@ -32,26 +31,6 @@ import * as eventListener from '../eventListener.js';
  * @property {SkillsAttack} attacks
  * @property {SkillsSupport} supports
  */
-
-const defaultAttackSkill = {
-	name: "Default Attack",
-	attackSpeed: 1,
-	manaCost: 0,
-	baseDamageMultiplier: 100,
-	mods: [
-		{
-			id: "hitChance",
-			desc: "+#% To Hit Chance",
-			stats: [
-				{
-					name: "hitChance",
-					value: 100,
-					valueType: "base",
-				},
-			],
-		},
-	],
-};
 
 const skillView = document.querySelector(".s-skills .s-skill-info");
 const attackSkillContainer = document.querySelector(".s-skills .s-attack-skills");
@@ -78,7 +57,6 @@ export async function init(data = {}) {
 
 	const attackSkills = data.attacks || [];
 	attackSkillsCollection = [...attackSkills];
-	attackSkillsCollection.unshift(defaultAttackSkill);
 	if (new Set(attackSkillsCollection.map((x) => x.name)).size !== attackSkillsCollection.length) {
 		console.error("duplicated skill names were found");
 		return;
@@ -99,7 +77,10 @@ export async function init(data = {}) {
 		supportSkillContainer.style.display = "none";
 	}
 
-	setActiveAttackSkill(defaultAttackSkill.name);
+    const defaultAttackSkill = attackSkillsCollection[0];
+    if(defaultAttackSkill){
+        setActiveAttackSkill(defaultAttackSkill.name);
+    }
 	viewSkill(defaultAttackSkill.name, "attack");
 	updateSkillButtons();
 
@@ -186,7 +167,7 @@ function viewSkill(name, type) {
 	let modsText = "";
 	skill.mods.forEach((x) => {
 		var values = x.stats.map((x) => x.value);
-		var desc = getStatModifierTemplate(x.id).desc;
+		var desc = getModTemplate(x.id).desc;
 		desc = parseModDescription(desc, values);
 		modsText += `${desc}\n`;
 	});
@@ -280,15 +261,19 @@ export class AttackSkill {
 		const rebuildModList = () => {
 			modList = [];
 
-			let statMods = mods.flatMap((x) => x.stats);
-			modList.push(...convertStatMods(statMods, this));
+            for (const mod of mods) {
+                const statMods = convertModToStatMods(mod, this);
+                modList.push(...statMods);
+            }
 
-			for (const support of supports.filter((x) => x)) {
-				const statMods = convertStatMods(
-					support.mods.flatMap((x) => x.stats),
-					support
-				);
-				modList.push(...statMods);
+			for (const support of supports) {
+                if(!support){
+                    continue;
+                }
+                for (const mod of support.mods) {
+                    const statMods = convertModToStatMods(mod, this);
+                    modList.push(...statMods);
+                }
 			}
 		};
 

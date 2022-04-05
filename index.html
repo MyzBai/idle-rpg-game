@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv='cache-control' content='no-cache'> 
+    <!-- <meta http-equiv='cache-control' content='no-cache'> 
     <meta http-equiv='expires' content='0'> 
-    <meta http-equiv='pragma' content='no-cache'>
+    <meta http-equiv='pragma' content='no-cache'> -->
     <title>Document</title>
     <link rel="stylesheet" href="./style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.10.0/ajv7.min.js"></script>
@@ -28,23 +28,15 @@
 
         <fieldset class="s-modules" data-tab-content>
             <legend>New Module</legend>
-                <div class="s-column-list">
+                <div class="s-module-list">
                     <div class="s-filter">
                         <input type="url">
                     </div>
                     <div class="s-container g-vertical-menu-container">
-                        <template>
-                            <div class="module-button">
-                                <div class="title g-button" ></div>
-                                <div class="content"> 
-                                    <p class="desc"></p>
-                                    <div class="start-button g-button">Start</div>
-                                </div>
-                            </div>
-                        </template>
+            
                     </div>
                 </div>
-                <div class="s-column-info">
+                <div class="s-module-info">
                     <p class="name"></p>
                     <p class="description"></p>
                     <div class="start-button g-button">Start</div>
@@ -52,14 +44,22 @@
         </fieldset>
 
         <fieldset class="s-load" data-tab-content>
-            <legend>Saved Games</legend>
-            <div class="s-container g-vertical-menu-container">
-                <template>
-                    <div class="module-button g-button"></div>
-                </template>
-                <div class="empty-label">You have no saved games</div>
+            <legend>Load Game</legend>
+            <div class="s-module-list">
+                <div class="s-container g-vertical-menu-container">
+                    <template>
+                        <div class="module-button g-button">
+                            <div class="title"></div>
+                            <div class="date"></div>
+                        </div>
+                    </template>
+                </div>
             </div>
-            <div class="start-button g-button">Start</div>
+            <div class="s-module-info">
+                <div class="name"></div>
+                <div class="description"></div>
+                <div class="start-button g-button">Start</div>
+            </div>
         </fieldset>
 
         <fieldset class="s-upload" data-tab-content>
@@ -98,7 +98,7 @@
             <!--Menu-->
             <fieldset class="s-menu">
                 <legend>Main Menu</legend>
-                <div class="g-vertical-menu-container">
+                <div class="s-container g-vertical-menu-container">
                     <div class="g-button" data-tab-target=".s-combat">Combat</div>
                     <div class="g-button" data-tab-target=".s-skills">Skills</div>
                     <div class="g-button" data-tab-target=".s-items">Items</div>

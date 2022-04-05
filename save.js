@@ -19,14 +19,11 @@ export function save() {
 	if (Global.env.SAVE_PATH === undefined) {
 		return;
 	}
-	const savedObj = {};
-	// for (const instance of saveInstances) {
-	// 	instance.callback(savedObj);
-	// }
-
 	try {
+        const savedObj = {};
         eventListener.invoke(eventListener.EventType.SAVE_GAME, savedObj);
 		localStorage.setItem(Global.env.SAVE_PATH, JSON.stringify(savedObj));
+        eventListener.invoke(eventListener.EventType.SAVE_GAME_DONE, savedObj);
 	} catch (e) {
 		console.error(e);
 	}
@@ -39,6 +36,7 @@ export async function load() {
 	const data = getSavedObj();
 	if (data) {
         eventListener.invoke(eventListener.EventType.LOAD_GAME, data);
+        eventListener.invoke(eventListener.EventType.LOAD_GAME_DONE, data);
 		console.log("data loaded", data);
 		// for (const instance of loadInstances) {
 		// 	instance.callback(data);

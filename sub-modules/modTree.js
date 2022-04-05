@@ -1,8 +1,8 @@
 import * as player from "../player.js";
 import * as eventListener from "../eventListener.js";
 import { parseModDescription } from "../helperFunctions.js";
-import { getStatModifierTemplate } from "../modTemplates.js";
-import { convertStatMods } from "../modDB.js";
+import { getModTemplate } from "../modTemplates.js";
+import { convertModToStatMods } from "../modDB.js";
 // import { registerSave, registerLoad } from "../save.js";
 
 /**
@@ -25,6 +25,20 @@ const pointsSpan = modTreeElement.querySelector(".points span");
 const nodeContainer = modTreeElement.querySelector(".s-list");
 const nodeTemplate = nodeContainer.querySelector("template");
 const nodeInfoContainer = modTreeElement.querySelector(".s-node-info");
+
+eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
+    updatePoints();
+    updateNodes();
+    selectNode(selectedNode);
+});
+
+eventListener.add(eventListener.EventType.ESSENCE_CHANGED, () => {
+    const unassignButton = nodeInfoContainer.querySelector(".unassign");
+    unassignButton.toggleAttribute('disabled', !validateUnassign(selectedNode));
+});
+
+eventListener.add(eventListener.EventType.SAVE_GAME, save);
+eventListener.add(eventListener.EventType.LOAD_GAME, load);
 
 /**@type {Node[]} */
 var nodes = [];
@@ -62,25 +76,11 @@ export async function init(data) {
 		createNodeElement(node);
 		nodes.push(node);
 	}
-
-	eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
-		console.log("player leveled up observed in modTree.js", level);
-		updatePoints();
-		updateNodes();
-		selectNode(selectedNode);
-	});
-
-    eventListener.add(eventListener.EventType.ESSENCE_CHANGED, () => {
-        const unassignButton = nodeInfoContainer.querySelector(".unassign");
-        unassignButton.toggleAttribute('disabled', !validateUnassign(selectedNode));
-    });
+    Object.seal(nodes);
 
 	selectNode(nodes[0]);
 
 	updateNodes();
-
-    eventListener.add(eventListener.EventType.SAVE_GAME, save);
-    eventListener.add(eventListener.EventType.LOAD_GAME, load);
 }
 
 function updatePoints() {
@@ -127,7 +127,7 @@ function setNodeInfo(node) {
 	var modsText = "";
 	node.mods.forEach((x) => {
 		var values = x.stats.map((x) => x.value);
-		var desc = getStatModifierTemplate(x.id).desc;
+		var desc = getModTemplate(x.id).desc;
 		desc = parseModDescription(desc, values);
 		modsText += `${desc}\n`;
 	});
@@ -198,21 +198,17 @@ function unallocate(node) {
 function updateStatMods(node) {
 	player.removeModifiersBySource(node);
 
-	const tempStatMods = [];
+    //we need to modify the stats value here
+    //so we make a copy of the mods to prevent
+    const modCopies = [];
 	for (const mod of node.mods) {
-		const modTemplate = getStatModifierTemplate(mod.id);
-		if (mod.stats.length !== modTemplate.stats.length) {
-			console.error("@modTree - node stats array length does not match mod template stats array length", "id:", mod.id);
-			continue;
-		}
-		for (let i = 0; i < mod.stats.length; i++) {
-			const statValue = mod.stats[i].value * node.curPoints;
-			modTemplate.stats[i].value = statValue;
-			tempStatMods.push(modTemplate.stats[i]);
-		}
+        const modCopy = JSON.parse(JSON.stringify(mod));
+        for (const statMod of modCopy.stats) {
+            statMod.value *= node.curPoints;
+        }
+        modCopies.push(modCopy);
 	}
-
-	const statMods = convertStatMods(tempStatMods, node);
+    const statMods = convertModToStatMods(modCopies, node);
 	player.addStatModifier(statMods);
 }
 
