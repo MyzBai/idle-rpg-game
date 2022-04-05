@@ -149,8 +149,8 @@ div.hide,
     display: block;
     text-align: left;
 }
-.p-home .s-module-list .module-button.filter-hidden{
-    display: none;
+.p-home .s-module-list .module-button[data-hidden]{
+    display: none !important;
 }
 
 .p-home .s-module-info{

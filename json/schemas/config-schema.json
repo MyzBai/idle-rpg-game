@@ -10,6 +10,13 @@
 		"exclude": {
 			"type": "array",
 			"items": { "type": "string" }
-		}
+		},
+        "name": {
+            "type": "string",
+            "minLength": 3
+        },
+        "id": {
+            "type": ["number", "string"]
+        }
 	}
 }

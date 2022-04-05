@@ -7,15 +7,9 @@ import * as save from './save.js';
 /**
  * @typedef ModuleConfig
  * @property {string} name
+ * @property {string} src - is set before module starting
+ * @property {any} id - can be either name or unique id from repository
  * @property {string} [description]
- * @property {any} [id]
- * @property {string} [src]
- */
-
-/**
- * @typedef ModuleFile
- * @property {string} filename
- * @property {ModuleFileContent} content
  */
 
 /**
@@ -42,7 +36,7 @@ const moduleNames = ["config", "default-mods", "enemies", "skills", "items", "mo
 const homePage = document.querySelector("body > .p-home");
 const tabs = homePage.querySelectorAll(".s-buttons [data-tab-target]");
 registerTabs(tabs);
-tabs[1].click();
+tabs[0].click();
 
 const ajv = new ajv7({ allowUnionTypes: true });
 var ajvValidator = undefined;
@@ -50,10 +44,27 @@ var ajvValidator = undefined;
 export async function init() {
 	await loadSchemas();
 
-    var startModuleCallback = undefined;
+    //new module
 	{
+        let startModuleCallback = undefined;
         const moduleListContainer = homePage.querySelector(".s-new-modules .s-module-list .s-container");
 		const moduleInfoContainer = homePage.querySelector(".s-new-modules .s-module-info");
+        /**@type {HTMLInputElement} */
+        const filterInput = homePage.querySelector('.s-new-modules .s-module-list .s-filter input');
+        filterInput.addEventListener('input', e => {
+        	if (!e.target.delayUpdate) {
+                e.target.delayUpdate = true;
+                setTimeout(() => {
+                    const filter = e.target.value;
+                    e.target.delayUpdate = false;
+                    moduleListContainer.querySelectorAll('.module-button').forEach(x => {
+                        const hide = !x.innerText.toLowerCase().startsWith(filter) && filter.length > 0 && !x.classList.contains('active');
+                        x.toggleAttribute('data-hidden', hide);
+                    });
+                }, 500);
+            }
+            
+        });
 		const moduleInfos = [];
 
         { //Local Modules
@@ -91,7 +102,7 @@ export async function init() {
             }
     
         }
-
+       
         for (const moduleInfo of moduleInfos) {
             const btn = document.createElement('div');
             btn.classList.add('module-button', 'g-button');
@@ -107,10 +118,21 @@ export async function init() {
                         printErrors(errors);
                         return;
                     }
+                    if(moduleInfo.src === 'local'){
+                        save.setSaveKey(`${moduleInfo.name}`);
+                    } else{
+                        save.setSaveKey(`${moduleInfo.name}-${moduleInfo.id}`);
+                    }
+                    if(save.hasSave()){
+                        if(!confirm('This will overwrite an existing save. Are you sure you want to proceed?')){
+                            return;
+                        }
+                        save.reset();
+                    }
                     module.config.name = moduleInfo.name;
                     module.config.src = moduleInfo.src;
                     module.config.id = moduleInfo.id;
-                    startModule(module, true);
+                    startModule(module);
                 };
                 moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
                 moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
@@ -123,13 +145,14 @@ export async function init() {
 		moduleListContainer.firstElementChild.click();
 	}
 
+    //load module
     {
+        let startModuleCallback = undefined;
         const moduleListContainer = homePage.querySelector(".s-load-modules .s-module-list .s-container");
 		const moduleInfoContainer = homePage.querySelector(".s-load-modules .s-module-info");
         const buttonTemplate = moduleListContainer.querySelector("template");
 
-        const saves = save.getAllSaves();
-        console.log(saves);
+        const saves = save.getAllSaves().sort((a,b) => {return b.config.lastSave - a.config.lastSave});
         for (const save of saves) {
             const {name, description, src, id, lastSave} = save.config;
             const btn = buttonTemplate.content.cloneNode(true).firstElementChild;
@@ -164,7 +187,8 @@ export async function init() {
                 module.config.name = name;
                 module.config.src = src;
                 module.config.id = id;
-                startModule(module, false);
+                save.setSaveKey(`${name}-${id}`);
+                startModule(module, 'load');
             };
             btn.addEventListener('click', () => {
                 moduleInfoContainer.querySelector(".name").innerText = name;
@@ -180,17 +204,43 @@ export async function init() {
             moduleListContainer.appendChild(btn);
         }
     }
+
+    //upload module
+    {
+        const input = homePage.querySelector('.s-upload input');
+        const startButton = homePage.querySelector('.s-upload .start-button');
+        let startCallback = undefined;
+        input.addEventListener('change', async e => {
+            let content = undefined;
+            try{
+                content = JSON.parse(await e.target.files[0].text());
+            } catch(e){
+                console.error(e);
+            } 
+            const errors = validateModule(content);
+            startButton.toggleAttribute('disabled', errors !== null);
+            if(errors){
+                alert(`Errors detected.\nCheck the console in devtools for more info`);
+                console.error(errors);
+                return;
+            }
+            startCallback = async () => {
+                /**@type {Module} */
+                const module = content;
+                module.config.id = module.config.id || module.config.name || 'upload';
+                module.config.src = 'upload';
+                save.setSaveKey('temp');
+                startModule(module);
+            };
+            startButton.removeEventListener('click', startCallback);
+            startButton.addEventListener('click', startCallback);
+        });
+    }
 }
 
 /**@param {Module} module*/
-function startModule(module, isNew) {
-    save.setSaveKey(`${module.config.src}-${module.config.id}`);
-    if(isNew && save.hasSave()){
-        if(!confirm('This will overwrite an existing save. Are you sure you want to proceed?')){
-            return;
-        }
-        save.reset();
-    }
+function startModule(module) {
+
 	subModulesInit(module);
 
 	const btn = document.querySelector(".p-home .go-to-game-button");
@@ -206,6 +256,7 @@ async function loadSchemas() {
 			const { default: data } = await import(`./json/schemas/${schemaFilename}`, { assert: { type: "json" } });
 			ajv.addSchema(data, schemaFilename);
 		}
+        console.log('test');
 		ajvValidator = ajv.getSchema("module-schema.json");
 	} catch (e) {
 		console.log(e);
@@ -235,48 +286,11 @@ async function getGithubModule(id) {
 	}
 }
 
-/**
- * @param {ModuleFile} files
- * @returns {Promise<Module>}
- */
-async function getModuleData(files) {
-	const missingRequiredFiles = getMissingRequiredFilenames(files.map((x) => x.name));
-	if (missingRequiredFiles.length !== 0) {
-		console.error("Missing files", missingRequiredFiles);
-		return;
-	}
-	const moduleData = {};
-	for (const file of files) {
-		const { name: filename, content: fileContent } = file;
-		const errors = await validateFile(filename, fileContent);
-		if (errors) {
-			printErrors(errors);
-			continue;
-		}
-
-		const propertyName = filenameToCamelCase(filename);
-		moduleData[propertyName] = fileContent.data || fileContent;
-	}
-
-	if (!moduleData.defaultMods) {
-		console.error("defaultMods.json is missing");
-		return;
-	}
-	if (!moduleData.enemy) {
-		console.error("enemy.json is missing");
-		return;
-	}
-	if (!moduleData.skills) {
-		console.error("skills.json is missing");
-		return;
-	}
-	return moduleData;
-}
-
+/**@returns {any[] | null} */
 function validateModule(content) {
 	try {
 		ajvValidator(content);
-		return ajvValidator.errors;
+        return ajvValidator.errors;
 	} catch (e) {
 		console.error(e);
 	}
