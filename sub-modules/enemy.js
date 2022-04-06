@@ -1,5 +1,4 @@
 import { getLevel as getPlayerLevel } from "../player.js";
-// import { registerSave, registerLoad } from '../save.js';
 import * as eventListener from "../eventListener.js";
 
 /**@type {HTMLElement} */
@@ -28,12 +27,7 @@ export async function init(data) {
 }
 
 /**@param {number} damage */
-export function takeDamage(damage) {
-	if (Number.isNaN(damage)) {
-		console.log(damage);
-		console.error("An invalid argument has been passed into enemy.js/takeDamage(damage: number)");
-		return;
-	}
+export function takeAttackDamage(damage) {
 	curHealth -= damage;
 
 	updateHealthbar();
@@ -43,11 +37,23 @@ export function takeDamage(damage) {
 	}
 }
 
+/**@param {{type: string, damage: number}} */
+export function takeDamageOverTime(instance){
+
+    curHealth -= instance.damage;
+    updateHealthbar();
+
+    if(curHealth <= 0){
+        curHealth = 0;
+    }
+}
+
 export function getCurHealth() {
 	return curHealth;
 }
 
 export function die() {
+    eventListener.invoke(eventListener.EventType.ENEMY_KILLED);
 	let index = getPlayerLevel() - 1;
 	if (index >= healthList.length) {
 		index = healthList.length - 1;
@@ -69,12 +75,11 @@ function save(savedObj) {
 	};
 }
 
-function load(savedObj) {
-	const { enemy } = savedObj;
-	if (!enemy) {
-		return;
-	}
+function load(obj) {
+    if(!obj.enemies){
+        return;
+    }
 	maxHealth = healthList[getPlayerLevel() - 1];
-	curHealth = maxHealth * enemy.healthRatio;
+	curHealth = maxHealth * obj.enemy?.healthRatio;
 	updateHealthbar();
 }

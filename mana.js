@@ -1,4 +1,3 @@
-import { calcModTotal, calcModIncMore, calcModSum } from "./damageCalc.js";
 import * as player from './player.js';
 import * as gameLoop from './gameLoop.js';
 
@@ -8,8 +7,6 @@ var curMana = 0;
 var maxMana = 0;
 var manaRegen = 0;
 
-gameLoop.subscribe(regenerateMana);
-
 export function init() {
     console.log('init mana');
 
@@ -17,6 +14,8 @@ export function init() {
     manaRegen = player.getModCache().manaRegen;
     curMana = maxMana;
     updateManaBar();
+
+    gameLoop.subscribe(regenerateMana);
 }
 
 export function update(){

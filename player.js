@@ -7,7 +7,6 @@ import * as eventListener from "./eventListener.js";
 import * as gameLoop from "./gameLoop.js";
 
 /**
- * @typedef {import('./type-definitions.js').StatMod} StatMod
  * @typedef {import('./sub-modules/skills.js').AttackSkill} AttackSkill
  */
 
@@ -28,6 +27,12 @@ const essenceSpan = document.querySelector(".s-essence span");
 var level = 1;
 var essence = 0;
 
+eventListener.add(eventListener.EventType.ENEMY_KILLED, () => {
+    setLevel(++level);
+});
+eventListener.add(eventListener.EventType.SAVE_GAME, save);
+eventListener.add(eventListener.EventType.LOAD_GAME, load);
+
 var modList = [];
 /**@type {AttackSkill} */
 var attackSkill = undefined;
@@ -43,6 +48,7 @@ var conversionTable = undefined;
 
 export const listeners = [];
 
+/**@param {{defaultMods: Mod[]}} */
 export async function init(data) {
 	console.log("init player");
 
@@ -60,26 +66,17 @@ export async function init(data) {
 	updateModList();
 	mana.init();
 
-	eventListener.add(eventListener.EventType.ENEMY_KILLED, () => {
-		setLevel(++level);
-	});
-	setLevel(level, false);
 
+    setEssenceAmount(1);
+	setLevel(1);
+
+    console.warn('Subscribe essence');
 	gameLoop.subscribe(
 		(dt) => {
-			essence++;
-			eventListener.invoke(eventListener.EventType.ESSENCE_CHANGED, essence);
+            setEssenceAmount(++essence);
 		},
 		{ intervalMS: 1000 }
 	);
-
-	eventListener.add(eventListener.EventType.ESSENCE_CHANGED, () => {
-		essenceSpan.textContent = essence;
-	});
-	essenceSpan.textContent = essence;
-
-	eventListener.add(eventListener.EventType.SAVE_GAME, save);
-	eventListener.add(eventListener.EventType.LOAD_GAME, load);
 }
 
 export function getModCache() {
@@ -102,18 +99,17 @@ export function getEssenceAmount() {
 	return essence;
 }
 
-export function changeEssenceAmount(value) {
-	if (!value || Number.isNaN(value)) return;
-	essence += value;
-	eventListener.invoke(eventListener.EventType.ESSENCE_CHANGED);
+/**@param {number} value */
+export function setEssenceAmount(value) {
+	essence = value;
+    essenceSpan.innerText = value;
+	eventListener.invoke(eventListener.EventType.ESSENCE_CHANGED, essence);
 }
 
-function setLevel(newLevel, invokeEvent = true) {
+function setLevel(newLevel) {
 	level = Math.min(100, Math.max(0, newLevel));
 	levelSpan.textContent = level;
-	if (invokeEvent) {
-		eventListener.invoke(eventListener.EventType.LEVEL_UP, level);
-	}
+    eventListener.invoke(eventListener.EventType.LEVEL_UP, level);
 }
 
 /**@param {...StatMod} statModifiers */
@@ -175,6 +171,8 @@ function updateModCache() {
 	modCache.manaRegen = calcModTotal(modList, "manaRegen");
 	modCache.maxMana = calcModTotal(modList, "mana");
 
+    modCache.maxBleedCount = calcModTotal(modList, 'maxBleedCount');
+
 	modCache.attackCost = mana.calcAttackCost();
 
 	deepFreeze(modCache);
@@ -193,7 +191,8 @@ function load(savedObj) {
 		return;
 	}
 	const level = player.level;
-	setLevel(level, false);
-	changeEssenceAmount(player.essence);
+	setLevel(level);
+	setEssenceAmount(player.essence);
+    updateModList();
 	console.log("loaded player");
 }

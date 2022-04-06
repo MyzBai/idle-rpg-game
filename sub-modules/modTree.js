@@ -25,6 +25,7 @@ const pointsSpan = modTreeElement.querySelector(".points span");
 const nodeContainer = modTreeElement.querySelector(".s-list");
 const nodeTemplate = nodeContainer.querySelector("template");
 const nodeInfoContainer = modTreeElement.querySelector(".s-node-info");
+const unassignButton = nodeInfoContainer.querySelector('.unassign');
 
 eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
     updatePoints();
@@ -32,8 +33,7 @@ eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
     selectNode(selectedNode);
 });
 
-eventListener.add(eventListener.EventType.ESSENCE_CHANGED, () => {
-    const unassignButton = nodeInfoContainer.querySelector(".unassign");
+eventListener.add(eventListener.EventType.ESSENCE_CHANGED, amount => {
     unassignButton.toggleAttribute('disabled', !validateUnassign(selectedNode));
 });
 
@@ -141,7 +141,7 @@ function setNodeInfo(node) {
 	};
 	unassignClickEvent = () => {
 		unallocate(node);
-        player.changeEssenceAmount(-unassignCost);
+        player.setEssenceAmount(player.getEssenceAmount() - unassignCost);
 	};
 	assignButton.toggleAttribute("disabled", !validateAssign(node));
 	unassignButton.toggleAttribute("disabled", !validateUnassign(node));
@@ -165,11 +165,17 @@ function getRemainingPoints() {
 
 /** @param {Node} node */
 function validateAssign(node) {
+    if(!node){
+        return false;
+    }
 	return node.curPoints < node.maxPoints && getRemainingPoints() > 0;
 }
 
 /** @param {Node} node */
 function validateUnassign(node) {
+    if(!node){
+        return false;
+    }
 	return node.curPoints > 0 && player.getEssenceAmount() >= unassignCost;
 }
 
@@ -231,8 +237,8 @@ function save(savedObj) {
     });
 }
 
-function load(savedObj) {
-	if (!savedObj.modTree) {
+function load(obj) {
+	if (!obj.modTree) {
 		return;
 	}
 
@@ -243,7 +249,7 @@ function load(savedObj) {
     });
     updateNodes();
 
-	for (const node of savedObj.modTree.nodes) {
+	for (const node of obj.modTree.nodes) {
 		for (let i = 0; i < node.value; i++) {
 			allocate(node.name);
 		}

@@ -32,16 +32,18 @@ export function save() {
  */
 export async function load() {
 	const data = getSavedObj();
-	if (data) {
-        eventListener.invoke(eventListener.EventType.LOAD_GAME, data);
-        eventListener.invoke(eventListener.EventType.LOAD_GAME_DONE, data);
-		console.log("data loaded", data);
-	}
+    eventListener.invoke(eventListener.EventType.LOAD_GAME, data);
+    eventListener.invoke(eventListener.EventType.LOAD_GAME_DONE, data);
+    console.log("data loaded", data);
 }
 
+/**
+ * Removes saves and loads with an empty save object
+ */
 export function reset() {
 	try {
 		localStorage.removeItem(saveKey);
+        load();
 	} catch (e) {
 		console.error(e);
 	}
@@ -50,12 +52,13 @@ export function reset() {
 export function getSavedObj() {
 	try {
 		const data = localStorage.getItem(saveKey);
-		if (data) {
-			return JSON.parse(data);
-		}
+        if(data){
+            return JSON.parse(data);
+        }
 	} catch (e) {
 		console.error(e);
 	}
+    return {};
 }
 
 /**@param {string} key */
@@ -68,9 +71,19 @@ export function getSaveItem(key) {
 	} catch (e) {
 		console.error(e);
 	}
+    return {};
 }
 
-export function removeSaveItem(key) {
+/**Removes with current save key*/
+export function removeItem(){
+    try {
+        localStorage.removeItem(saveKey);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+export function removeWithKey(key) {
 	try {
 		localStorage.removeItem(key.toLowerCase());
 	} catch (e) {

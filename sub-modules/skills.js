@@ -332,12 +332,11 @@ function save(obj) {
 	};
 }
 
-function load(savedObj) {
-	const { skills: savedSkills } = savedObj;
-	if (!savedSkills) {
+function load(obj) {
+	if (!obj.skills) {
 		return;
 	}
-	const { attackSkill } = savedSkills;
+	const { attackSkill } = obj.skills;
 
 	setActiveAttackSkill(attackSkill.name);
 

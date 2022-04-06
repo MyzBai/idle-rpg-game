@@ -8,7 +8,7 @@
         },
         "data": {
             "type": "object",
-            "required": ["items", "crafting", "mods"],
+            "required": ["items", "crafting", "modTables"],
             "properties": {
                 "maxMods": {
                     "type": "integer"
@@ -91,20 +91,16 @@
                         }
                     }
                 },
-                "mods": {
+                "modTables": {
                     "type": "array",
                     "items": {
                         "type": "object",
-                        "additionalProperties": false,
-                        "required": ["id", "table"],
+                        "required": ["id", "mods"],
                         "properties": {
                             "id": {
                                 "type": "string"
                             },
-                            "desc": {
-                                "type": "string"
-                            },
-                            "table": {
+                            "mods": {
                                 "type": "array",
                                 "items": {
                                     "type": "object",
