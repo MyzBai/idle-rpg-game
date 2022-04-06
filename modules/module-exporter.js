@@ -15,19 +15,9 @@ export function getLocalModulesInfo(){
  * @returns {Promise<Module>} */
 export async function getLocalModule(name) {
 	try {
-		const { default: data } = await import(`./${name}/module.json`, { assert: { type: "json" } });
+		const { default: data } = await import(`./${name.toLowerCase()}/module.json`, { assert: { type: "json" } });
         return data;
 	} catch (e) {
         console.error(e);
-	}
-}
-
-/**@returns {Promise<ModuleConfig} */
-async function loadConfig(name) {
-	try {
-		const { default: data } = await import(`./${name}/config.json`, { assert: { type: "json" } });
-		return data;
-	} catch (e) {
-		console.error(e);
 	}
 }
