@@ -257,7 +257,7 @@ async function loadSchemas() {
 	try {
 		for (const name of names) {
 			const schemaFilename = name + "-schema.json";
-			const { default: data } = await import(`./json/schemas/${schemaFilename}`, { assert: { type: "json" } });
+			const { default: data } = await import(`./json/schemas/${schemaFilename.toLowerCase()}`, { assert: { type: "json" } });
 			ajv.addSchema(data, schemaFilename);
 		}
 		ajvValidator = ajv.getSchema("module-schema.json");
