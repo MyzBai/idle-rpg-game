@@ -4,7 +4,6 @@ import * as enemy from './sub-modules/enemy.js';
 import { calcAttack } from './damageCalc.js';
 import * as ailments from './ailments.js';
 import * as gameLoop from './gameLoop.js';
-import * as eventListener from './eventListener.js';
 
 /**
  * @typedef EnemyData
@@ -12,11 +11,6 @@ import * as eventListener from './eventListener.js';
  */
 
 var attackLoopId = undefined;
-
-document.querySelector('.kill-enemy').addEventListener('click', e => {
-    eventListener.invoke(eventListener.EventType.ENEMY_KILLED);
-    enemy.die();
-});
 
 export async function init() {
     console.log("init combat");
@@ -65,7 +59,7 @@ function performAttack() {
         console.log(`you dealt ${result.totalDamage.toFixed()} to the enemy`);
     }
 
-    enemy.takeDamage(result.totalDamage);
+    enemy.takeAttackDamage(result.totalDamage);
 
     if (result.wasCrit) {
         var healthbarBackground = document.querySelector('.g-progress-bar-background');
@@ -83,7 +77,6 @@ function performAttack() {
     }
 
     if(enemy.getCurHealth() <= 0){
-        eventListener.invoke(eventListener.EventType.ENEMY_KILLED);
         enemy.die();
     }
 }

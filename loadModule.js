@@ -121,6 +121,7 @@ export async function init() {
 						if (!confirm("This will overwrite an existing save. Are you sure you want to proceed?")) {
 							return;
 						}
+						save.removeItem();
 					}
 					module.config.name = moduleInfo.name;
 					module.config.src = moduleInfo.src;

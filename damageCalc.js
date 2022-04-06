@@ -1,7 +1,6 @@
 import { avg, randomRange } from './helperFunctions.js'
 
 
-/**@typedef {import('./type-definitions.js').StatMod} StatMod */
 /**@typedef {import('./sub-modules/skills.js').AttackSkill} AttackSkill */
 /**@typedef {import('./player.js').ModCache} ModCache */
 
@@ -60,7 +59,7 @@ import { avg, randomRange } from './helperFunctions.js'
  * @property {number} totalDamage
  * @property {boolean} wasHit
  * @property {boolean} wasCrit
- * @property {{type: string, baseDamage: number, duration: number}[]} ailments
+ * @property {import('./ailments.js').Instance[]} ailments
  */
 
 /**
@@ -269,18 +268,6 @@ function calcBaseDamage(modList, conversionTable, config) {
     output.totalBaseDamage = totalBaseDamage;
     return output;
 }
-
-/**
- * @param {Player} player 
- */
-function calcAttributes(player) {
-    let attributes = {};
-    attributes.strength = calcModTotal(player.modList, ['strength']);
-    attributes.dexterity = calcModTotal(player.modList, ['dexterity']);
-    attributes.intelligence = calcModTotal(player.modList, ['intelligence']);
-    return attributes;
-}
-
 /**
  * @param {StatMod[]} modList 
  * @param {ConversionTable} conversionTable 

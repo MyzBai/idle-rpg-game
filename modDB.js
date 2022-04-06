@@ -2,7 +2,6 @@ import { ModFlags, Conditions } from "./damageCalc.js";
 import { getModTemplate } from "./modTemplates.js";
 
 /**
- * @typedef {import('./type-definitions.js').StatMod} StatMod
  * @typedef {import('./modTemplates.js').ModTemplate} ModTemplate
  */
 

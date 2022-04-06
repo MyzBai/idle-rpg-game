@@ -2,39 +2,8 @@ import { randomRange, parseModDescription, weightedRandom, deepFreeze } from "..
 import { getModTemplate, getModTemplateList } from "../modTemplates.js";
 import * as player from "../player.js";
 import { convertModToStatMods } from "../modDB.js";
-// import { registerSave, registerLoad } from '../save.js';
 import * as eventListener from "../eventListener.js";
 
-/**@typedef {import('../type-definitions.js').RawStatMod} RawStatModifier */
-
-/**
- * @typedef ConfigItems
- * @property {string} name
- * @property {number} levelReq
- */
-
-/**
- * @typedef Config
- * @property {ConfigItems} items
- * @property {object} [basic]
- */
-
-/**
- * @typedef ItemsJson
- * @property {Config} config
- * @property {Mods} mods
- */
-
-/**
- * @typedef ItemModifier
- * @property {string} id
- * @property {string} desc
- * @property {number} levelReq
- * @property {number} weight
- * @property {number} tableIndex
- * @property {number} tableSize
- * @property {{min: number, max: number}[]} stats
- */
 
 const itemList = document.querySelector(".s-items .s-item-list");
 const craftingContainer = document.querySelector(".s-items .s-item-options");
@@ -51,22 +20,22 @@ var modCollection = [];
 
 var maxMods = 6;
 
-export async function init(data) {
-	if (!data) {
+/**@param {import('./items').ItemsModule} module */
+export async function init(module) {
+	if (!module) {
 		return;
 	}
-
 	console.log("init items");
 
-	maxMods = data.maxMods;
+	maxMods = module.maxMods;
 
 	modCollection = [];
 	modCollection.push(
-		...data.mods.reduce((a, c) => {
-			const { id, table } = c;
-			const tableSize = table.length;
+		...module.modTables.reduce((a, c) => {
+			const { id, mods } = c;
+			const tableSize = mods.length;
 			let tableIndex = 0;
-			for (const mod of table) {
+			for (const mod of mods) {
 				let { levelReq, weight, stats } = mod;
 				levelReq = levelReq || 1;
 				const modTemplate = getModTemplate(id);
@@ -87,13 +56,13 @@ export async function init(data) {
 	);
 	deepFreeze(modCollection);
 
-	createItems(data.items);
+	createItems(module.items);
 
 	selectedItem = undefined;
 	showItem(items[0]);
 
-	if (data.crafting.basic) {
-		setupBasicCrafting(data.crafting.basic);
+	if (module.crafting.basic) {
+		setupBasicCrafting(module.crafting.basic);
 	}
 
 	eventListener.add(eventListener.EventType.ITEM_CHANGED, (item) => {
@@ -172,7 +141,7 @@ function setupBasicCrafting(basicCraftings) {
 		craftButton.addEventListener("click", (e) => {
 			rollModifiers(selectedItem, weights, tierTarget);
 			showItem(selectedItem);
-			player.changeEssenceAmount(-cost);
+			player.setEssenceAmount(player.getEssenceAmount() - cost);
 		});
 
 		const validateCraft = () => {
@@ -211,7 +180,7 @@ function setupBasicCrafting(basicCraftings) {
 		craftButton.addEventListener("click", (e) => {
 			addModifier(selectedItem, tierTarget);
 			showItem(selectedItem);
-			player.changeEssenceAmount(-cost);
+			player.setEssenceAmount(player.getEssenceAmount() - cost);
 		});
 
 		const validateCraft = () => {
@@ -240,7 +209,7 @@ function setupBasicCrafting(basicCraftings) {
 		craftButton.addEventListener("click", (e) => {
 			rollValues(selectedItem);
 			showItem(selectedItem);
-			player.changeEssenceAmount(-cost);
+			player.setEssenceAmount(player.getEssenceAmount() - cost);
 		});
 
 		const validateCraft = () => {
@@ -267,7 +236,7 @@ function setupBasicCrafting(basicCraftings) {
 		craftButton.addEventListener("click", (e) => {
 			removeRandom(selectedItem);
 			showItem(selectedItem);
-			player.changeEssenceAmount(-cost);
+			player.setEssenceAmount(player.getEssenceAmount() - cost);
 		});
 		const validateCraft = () => {
 			const hasMods = selectedItem.getMods().length != 0;

@@ -6,9 +6,20 @@
     "properties": {
         "$schema": { "type": "string" },
         "data": {
-            "type": "array",
-            "items": {
-                "$ref": "mods-schema.json#/definitions/mod"
+            "type": "object",
+            "properties": {
+                "player": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "mods-schema.json#/definitions/mod"
+                    }
+                },
+                "enemies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "mods-schema.json#/definitions/mod"
+                    }
+                }
             }
         }
     }

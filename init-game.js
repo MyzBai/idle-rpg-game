@@ -11,45 +11,44 @@ import * as gameLoop from "./gameLoop.js";
 
 initMenu();
 var saveGameEventId = undefined;
-/**
- * @param {import('./loadModule.js').ModuleData} data
- */
-export function init(data) {
+
+ /** @type {Module} */
+var cachedModule = undefined;
+eventListener.add(eventListener.EventType.SAVE_GAME, savedObj => {
+    savedObj.config = {
+        name: cachedModule.config.name,
+        src: cachedModule.config.src,
+        id: cachedModule.config.id,
+        lastSave: new Date().getTime()
+    };
+});
+
+ /** @param {Module} module */
+export function init(module) {
+    if(!module){
+        module = JSON.parse(JSON.stringify(cachedModule));
+    } else{
+        cachedModule = JSON.parse(JSON.stringify(module));
+    }
+    
 	console.log("init sub modules");
 
 	gameLoop.clear();
 	gameLoop.stop();
-	//make sure we copy the data before distributing it to all the sub-modules
-	data = JSON.parse(JSON.stringify(data));
 
-	//player must be initialized first because it has no dependencies
-	//without default statmods,
-	player.init({ defaultMods: data.defaultMods });
+	player.init({ defaultMods: module.defaultMods.player });
 
-	enemy.init(data.enemies);
-	skills.init(data.skills);
-	items.init(data.items);
-	modTree.init(data.modTree);
+	enemy.init(module.enemies);
+	skills.init(module.skills);
+	items.init(module.items);
+	modTree.init(module.modTree);
 	combat.init();
     
-    eventListener.remove(saveGameEventId);
-    saveGameEventId = eventListener.add(eventListener.EventType.SAVE_GAME, savedObj => {
-        savedObj.config = {
-            name: data.config.name,
-            src: data.config.src,
-            id: data.config.id,
-            lastSave: new Date().getTime()
-		};
-    });
-
 	save.load();
 
 	const isProduction = Global.env.ENV_TYPE === "production";
-	document.querySelector(".p-game .s-dev-tools").classList.toggle("hide", isProduction);
-	gameLoop.stop();
 	if (isProduction) {
 		gameLoop.start();
-
         //auto save
 		gameLoop.subscribe(
 			() => {

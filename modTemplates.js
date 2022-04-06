@@ -1,5 +1,3 @@
-/**@typedef {import('./type-definitions.js').StatMod} StatMod */
-
 /**
  * @typedef ModTemplate
  * @property {string} id
@@ -75,6 +73,7 @@ templates.push({ id: "incBleedDamage", desc: "#% Increased Bleed Damage", stats:
 templates.push({ id: "moreBleedDamage", desc: "#% More Bleed Damage", stats: [{ name: "damage", valueType: "more", flags: ["bleed"] }] });
 templates.push({ id: "baseBleedDuration", desc: "Base Bleed Duration Is # Seconds", stats: [{ name: "duration", valueType: "base", flags: ["bleed"] }] });
 templates.push({ id: "incBleedDuration", desc: "+#% To Bleed Duration", stats: [{ name: "duration", valueType: "inc", flags: ["bleed"] }] });
+templates.push({ id: "maxBleedCount", stats: [{ name: "maxBleedCount", valueType: "base" }] });
 
 //Attack Speed
 templates.push({ id: "baseAttackSpeed", stats: [{ name: "attackSpeed", valueType: "base" }] });
@@ -97,3 +96,7 @@ templates.push({ id: "incDexterity", desc: "+#% Increased Dexterity", stats: [{ 
 
 templates.push({ id: "baseIntelligence", desc: "+# To Intelligence", stats: [{ name: "intelligence", valueType: "base" }] });
 templates.push({ id: "incIntelligence", desc: "+#% Increased Intelligence", stats: [{ name: "intelligence", valueType: "inc" }] });
+
+
+
+

@@ -4,17 +4,23 @@
     "exclude": ["items", "modTree"],
     "description": "This demo is a proof of concept.\nIt's quite short and simple\nEnjoy!"
   },
-  "defaultMods": [
-    {"id": "basePhysicalDamage", "stats": [{"value": 1}, {"value": 3}]},
-    {"id": "baseCritMulti", "stats": [{"value": 150}]},
-    {"id": "baseBleedDuration", "stats": [{"value": 6}]},
-    {"id": "baseMana", "stats": [{"value": 50}]},
-    {"id": "baseManaRegen", "stats": [{"value": 1}]},
-    {"id": "baseStrength", "stats": [{"value": 100}]},
-    {"id": "incStrength", "stats": [{"value": 100}]},
-    {"id": "baseDexterity", "stats": [{"value": 100}]},
-    {"id": "baseIntelligence", "stats": [{"value": 100}]}
-  ],
+  "defaultMods": {
+      "player": [
+        {"id": "basePhysicalDamage", "stats": [{"value": 1}, {"value": 3}]},
+        {"id": "baseCritMulti", "stats": [{"value": 150}]},
+        {"id": "baseBleedDuration", "stats": [{"value": 6}]},
+        {"id": "baseMana", "stats": [{"value": 50}]},
+        {"id": "baseManaRegen", "stats": [{"value": 1}]},
+        {"id": "baseStrength", "stats": [{"value": 100}]},
+        {"id": "incStrength", "stats": [{"value": 100}]},
+        {"id": "baseDexterity", "stats": [{"value": 100}]},
+        {"id": "baseIntelligence", "stats": [{"value": 100}]},
+        {"id": "maxBleedCount", "stats": [{"value": 1}]}
+      ],
+      "enemy": [
+          
+      ]
+  },
   "enemies": {
     "healths": [
       {"health": 200},
@@ -143,10 +149,10 @@
         }
       }
     },
-    "mods": [
+    "modTables": [
       {
         "id": "basePhysicalDamage",
-        "table": [
+        "mods": [
           {
             "levelReq": 1,
             "weight": 100,
@@ -171,7 +177,7 @@
       },
       {
         "id": "incPhysicalDamage",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 80, "stats": [{"min": 20, "max": 30}]},
           {"levelReq": 5, "weight": 80, "stats": [{"min": 30, "max": 40}]},
           {"levelReq": 10, "weight": 80, "stats": [{"min": 40, "max": 50}]}
@@ -179,7 +185,7 @@
       },
       {
         "id": "baseHitChance",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 100, "stats": [{"min": 5, "max": 10}]},
           {"levelReq": 5, "weight": 100, "stats": [{"min": 10, "max": 15}]},
           {"levelReq": 10, "weight": 100, "stats": [{"min": 15, "max": 20}]}
@@ -187,7 +193,7 @@
       },
       {
         "id": "incAttackSpeed",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 80, "stats": [{"min": 20, "max": 30}]},
           {"levelReq": 5, "weight": 80, "stats": [{"min": 30, "max": 40}]},
           {"levelReq": 10, "weight": 80, "stats": [{"min": 40, "max": 50}]}
@@ -195,7 +201,7 @@
       },
       {
         "id": "baseCritChance",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 60, "stats": [{"min": 5, "max": 9}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 10, "max": 15}]},
           {"levelReq": 20, "weight": 50, "stats": [{"min": 16, "max": 20}]}
@@ -203,7 +209,7 @@
       },
       {
         "id": "baseCritMulti",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 60, "stats": [{"min": 24, "max": 29}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 30, "max": 44}]},
           {"levelReq": 20, "weight": 50, "stats": [{"min": 45, "max": 60}]}
@@ -211,7 +217,7 @@
       },
       {
         "id": "baseBleedChance",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 70, "stats": [{"min": 3, "max": 6}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 7, "max": 11}]},
           {"levelReq": 20, "weight": 50, "stats": [{"min": 12, "max": 15}]}
@@ -219,7 +225,7 @@
       },
       {
         "id": "incBleedDamage",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 70, "stats": [{"min": 16, "max": 22}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 23, "max": 31}]},
           {"levelReq": 20, "weight": 50, "stats": [{"min": 32, "max": 38}]}
@@ -227,7 +233,7 @@
       },
       {
         "id": "incManaRegen",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 70, "stats": [{"min": 20, "max": 30}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 31, "max": 40}]},
           {"levelReq": 20, "weight": 50, "stats": [{"min": 41, "max": 50}]}
@@ -235,7 +241,7 @@
       },
       {
         "id": "incMana",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 70, "stats": [{"min": 20, "max": 30}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 31, "max": 40}]},
           {"levelReq": 20, "weight": 50, "stats": [{"min": 41, "max": 50}]}
@@ -243,7 +249,7 @@
       },
       {
         "id": "baseMana",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 70, "stats": [{"min": 20, "max": 30}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 31, "max": 40}]},
           {"levelReq": 20, "weight": 50, "stats": [{"min": 41, "max": 50}]}
@@ -251,7 +257,7 @@
       },
       {
         "id": "baseStrength",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 70, "stats": [{"min": 5, "max": 10}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 11, "max": 15}]},
           {"levelReq": 15, "weight": 60, "stats": [{"min": 16, "max": 20}]},
@@ -260,7 +266,7 @@
       },
       {
         "id": "baseDexterity",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 70, "stats": [{"min": 5, "max": 10}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 11, "max": 15}]},
           {"levelReq": 15, "weight": 60, "stats": [{"min": 16, "max": 20}]},
@@ -269,7 +275,7 @@
       },
       {
         "id": "baseIntelligence",
-        "table": [
+        "mods": [
           {"levelReq": 1, "weight": 70, "stats": [{"min": 5, "max": 10}]},
           {"levelReq": 10, "weight": 60, "stats": [{"min": 11, "max": 15}]},
           {"levelReq": 15, "weight": 60, "stats": [{"min": 16, "max": 20}]},
