@@ -50,7 +50,7 @@ export function unsubscribe(id) {
 		console.error("expected a string as id");
 		return;
 	}
-	instances.splice((x) => x.id === id);
+    instances = instances.filter(x => x.id !== id);
 }
 
 export function start() {
