@@ -70,7 +70,6 @@ export async function init(data) {
     setEssenceAmount(1);
 	setLevel(1);
 
-    console.warn('Subscribe essence');
 	gameLoop.subscribe(
 		(dt) => {
             setEssenceAmount(++essence);
