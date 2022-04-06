@@ -49,8 +49,6 @@ function createDevTools() {
 		})
 	);
 	fieldset.appendChild(frag);
-	console.log(fieldset.children);
-
 	return fieldset;
 }
 
