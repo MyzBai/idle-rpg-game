@@ -3,7 +3,18 @@ import * as enemy from "./sub-modules/enemy.js";
 import * as save from "./save.js";
 import * as gameLoop from "./gameLoop.js";
 import { init as initGame } from "./init-game.js";
+import * as player from './player.js';
+// import * as sim from './sim.js';
 export {};
+
+
+//@ts-ignore
+window.dev = {
+    /**@param {number} amount */
+    setEssence(amount){
+        player.setEssenceAmount(amount);
+    }
+}
 
 //inject the dev tools in p-game
 const devTools = createDevTools();
@@ -40,7 +51,7 @@ function createDevTools() {
 		createButton("Reset", () => {
 			save.removeItem();
 			eventListener.invoke(eventListener.EventType.RESET);
-			initGame();
+			initGame(undefined);
 		})
 	);
 	content.appendChild(
@@ -54,7 +65,7 @@ function createDevTools() {
 
 function createButton(title, callback, classList) {
 	const element = document.createElement("div");
-	element.innerText = title;
+	element.textContent = title;
 	element.classList.add("g-button", classList);
 	element.addEventListener("click", callback);
 	return element;
@@ -63,9 +74,11 @@ function createButton(title, callback, classList) {
 function setStatus(status) {
 	switch (status) {
 		case "start":
+            devTools.querySelector('.start-game-loop-btn').classList.add('active');
             devTools.querySelector(".start-game-loop-btn").classList.add("active");
             devTools.querySelector(".stop-game-loop-btn").classList.remove("active");
             devTools.querySelector(".status span").innerHTML = "running";
+            //@ts-ignore
             devTools.querySelector(".status span").style.color = "green";
             gameLoop.start();
 			break;
@@ -73,6 +86,7 @@ function setStatus(status) {
             devTools.querySelector(".start-game-loop-btn").classList.remove("active");
             devTools.querySelector(".stop-game-loop-btn").classList.add("active");
             devTools.querySelector(".status span").innerHTML = "stopped";
+            //@ts-ignore
             devTools.querySelector(".status span").style.color = "red";
             gameLoop.stop();
 			break;
