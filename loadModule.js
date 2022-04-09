@@ -4,40 +4,27 @@ import { init as subModulesInit } from "./init-game.js";
 import Global from "./global.js";
 import * as save from "./save.js";
 
-/**
- * @typedef ModuleConfig
- * @property {string} name
- * @property {string} src - is set before module starting
- * @property {any} id - can be either name or unique id from repository
- * @property {string} [description]
- */
-
-/**
- * @typedef Module
- * @property {ModuleConfig} config
- * @property {object} defaultMods
- * @property {object} enemy
- * @property {object} skills
- * @property {object} [items]
- * @property {object} [modTree]
- */
+/** import ('./types') */
 
 /**
  * @typedef Repository
+ * @property {string} name
+ * @property {number} id
  * @property {string} full_name username/repo
- * @property {string} description about
+ * @property {string} description
  * @property {string} url api path to repo
+ * @property {{login: string}} owner
  */
 
-// const moduleFilenames = ["config.json", "default-stat-mods.json", "enemy.json", "skills.json", "items.json", "mod-tree.json"];
-// const requiredModuleFilenames = ["config.json", "default-stat-mods.json", "enemy.json", "skills.json"];
-const moduleNames = ["config", "default-mods", "enemies", "skills", "items", "mod-tree"];
+const moduleNames = ["config", "player", "enemies", "skills", "items", "mod-tree"];
 
 const homePage = document.querySelector("body > .p-home");
+/**@type {NodeListOf<HTMLElement>} */
 const tabs = homePage.querySelectorAll(".s-buttons [data-tab-target]");
 registerTabs(tabs);
 tabs[0].click();
 
+//@ts-ignore
 const ajv = new ajv7({ allowUnionTypes: true });
 var ajvValidator = undefined;
 
@@ -49,7 +36,6 @@ export async function init() {
 		let startModuleCallback = undefined;
 		const moduleListContainer = homePage.querySelector(".s-new-modules .s-module-list .s-container");
 		const moduleInfoContainer = homePage.querySelector(".s-new-modules .s-module-info");
-		/**@type {HTMLInputElement} */
 		const filterInput = homePage.querySelector(".s-new-modules .s-module-list .s-filter input");
 		filterInput.addEventListener("input", (e) => {
 			if (!e.target.delayUpdate) {
@@ -57,8 +43,10 @@ export async function init() {
 				setTimeout(() => {
 					const filter = e.target.value;
 					e.target.delayUpdate = false;
-					moduleListContainer.querySelectorAll(".module-button").forEach((x) => {
-						const hide = !x.innerText.toLowerCase().startsWith(filter) && filter.length > 0 && !x.classList.contains("active");
+                    /**@type {NodeListOf<HTMLElement>} */
+                    const moduleButtons = moduleListContainer.querySelectorAll(".module-button");
+					moduleButtons.forEach((x) => {
+						const hide = !x.textContent.toLowerCase().startsWith(filter) && filter.length > 0 && !x.classList.contains("active");
 						x.toggleAttribute("data-hidden", hide);
 					});
 				}, 500);
@@ -105,10 +93,10 @@ export async function init() {
 		for (const moduleInfo of moduleInfos) {
 			const btn = document.createElement("div");
 			btn.classList.add("module-button", "g-button");
-			btn.innerText = moduleInfo.name;
+			btn.textContent = moduleInfo.name;
 			btn.addEventListener("click", () => {
-				moduleInfoContainer.querySelector(".name").innerText = moduleInfo.name;
-				moduleInfoContainer.querySelector(".description").innerText = moduleInfo.description;
+				moduleInfoContainer.querySelector(".name").textContent = moduleInfo.name;
+				moduleInfoContainer.querySelector(".description").textContent = moduleInfo.description;
 				moduleInfoContainer.querySelector(".start-button").removeEventListener("click", startModuleCallback);
 				startModuleCallback = async () => {
 					const module = await moduleInfo.getModuleCallback();
@@ -135,7 +123,7 @@ export async function init() {
 			});
 			moduleListContainer.appendChild(btn);
 		}
-
+        //@ts-ignore
 		moduleListContainer.firstElementChild.click();
 	}
 
@@ -143,6 +131,7 @@ export async function init() {
 	{
 		let startModuleCallback = undefined;
 		const moduleListContainer = homePage.querySelector(".s-load-modules .s-module-list .s-container");
+        /**@type {HTMLElement} */
 		const moduleInfoContainer = homePage.querySelector(".s-load-modules .s-module-info");
 		const buttonTemplate = moduleListContainer.querySelector("template");
 
@@ -151,8 +140,10 @@ export async function init() {
 		});
 		for (const savedModule of saves) {
 			const { name, description, src, id, lastSave } = savedModule.config;
+            //@ts-expect-error
 			const btn = buttonTemplate.content.cloneNode(true).firstElementChild;
-			btn.querySelector(".title").innerText = name;
+			btn.querySelector(".title").textContent = name;
+            /**@type {Intl.DateTimeFormatOptions} */
 			const dateOptions = {
 				year: "numeric",
 				month: "short",
@@ -166,7 +157,7 @@ export async function init() {
 				.format(new Date(lastSave || Date.now()))
 				.split(",")
 				.join(" ");
-			btn.querySelector(".date").innerText = date;
+			btn.querySelector(".date").textContent = date;
 
 			const startCallback = async () => {
 				let module = undefined;
@@ -186,8 +177,8 @@ export async function init() {
 				startModule(module);
 			};
 			btn.addEventListener("click", () => {
-				moduleInfoContainer.querySelector(".name").innerText = name;
-				moduleInfoContainer.querySelector(".description").innerText = description;
+				moduleInfoContainer.querySelector(".name").textContent = name;
+				moduleInfoContainer.querySelector(".description").textContent = description;
 				moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
 				startModuleCallback = startCallback;
 				moduleInfoContainer.querySelector(".start-button").addEventListener("click", startModuleCallback);
@@ -220,7 +211,7 @@ export async function init() {
 				return;
 			}
 			startCallback = async () => {
-				/**@type {Module} */
+				/**@type {module.} */
 				const module = content;
 				module.config.id = module.config.id || module.config.name || "upload";
 				module.config.src = "upload";
@@ -232,7 +223,7 @@ export async function init() {
 	}
 }
 
-/**@param {Module} module*/
+/**@param {Modules.ModuleCollection} module*/
 function startModule(module) {
 	switch (module.config.src) {
 		case "local":
@@ -249,6 +240,7 @@ function startModule(module) {
 
 	const btn = document.querySelector(".p-home .go-to-game-button");
 	btn.classList.remove("hide");
+    //@ts-ignore
 	btn.click();
 }
 
@@ -273,8 +265,8 @@ function printErrors(errors) {
 }
 
 /**
- * @param {string} url
- * @returns {Promise<Module>}
+ * @param {number} id
+ * @returns {Promise<Modules.ModuleCollection>}
  */
 async function getGithubModule(id) {
 	try {

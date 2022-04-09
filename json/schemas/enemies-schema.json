@@ -9,11 +9,16 @@
 		},
 		"data": {
             "type": "object",
+            "required": ["enemyList"],
 			"properties": {
-				"health": {
+				"enemyList": {
 					"type": "array",
 					"items": {
-						"type": "number"
+						"type": "object",
+                        "required": ["health"],
+                        "properties": {
+                            "health": {"type": "number"}
+                        }
 					}
 				}
 			}

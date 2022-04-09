@@ -4,25 +4,21 @@
     "exclude": ["items", "modTree"],
     "description": "This demo is a proof of concept.\nIt's quite short and simple\nEnjoy!"
   },
-  "defaultMods": {
-      "player": [
-        {"id": "basePhysicalDamage", "stats": [{"value": 1}, {"value": 3}]},
-        {"id": "baseCritMulti", "stats": [{"value": 150}]},
-        {"id": "baseBleedDuration", "stats": [{"value": 6}]},
-        {"id": "baseMana", "stats": [{"value": 50}]},
-        {"id": "baseManaRegen", "stats": [{"value": 1}]},
-        {"id": "baseStrength", "stats": [{"value": 100}]},
-        {"id": "incStrength", "stats": [{"value": 100}]},
-        {"id": "baseDexterity", "stats": [{"value": 100}]},
-        {"id": "baseIntelligence", "stats": [{"value": 100}]},
-        {"id": "maxBleedCount", "stats": [{"value": 1}]}
-      ],
-      "enemy": [
-          
+  "player":{
+      "defaultMods": [
+          {"id": "basePhysicalDamage", "stats": [{"name": "minPhysicalDamage", "value": 1}, {"name": "maxPhysicalDamage", "value": 3}]},
+          {"id": "baseCritMulti", "stats": [{"name": "critMulti", "value": 150}]},
+          {"id": "baseBleedDuration", "stats": [{"name": "duration", "value": 6}]},
+          {"id": "baseBleedCount", "stats": [{"name": "bleedCount", "value": 1}]},
+          {"id": "baseMana", "stats": [{"name": "mana", "value": 100}]},
+          {"id": "baseManaRegen", "stats": [{"name": "manaRegen", "value": 1}]},
+          {"id": "baseStrength", "stats": [{"name": "strength", "value": 100}]},
+          {"id": "baseDexterity", "stats": [{"name": "dexterity", "value": 100}]},
+          {"id": "baseIntelligence", "stats": [{"name": "intelligence", "value": 100}]}
       ]
   },
   "enemies": {
-    "healths": [
+    "enemyList": [
       {"health": 200},
       {"health": 200},
       {"health": 300},
@@ -40,19 +36,22 @@
     "attacks": [
       {
         "name": "Default Attack",
-        "attackSpeed": 1,
-        "manaCost": 0,
-        "baseDamageMultiplier": 100,
+        "stats": {
+            "attackSpeed": 1,
+            "manaCost": 0,
+            "baseDamageMultiplier": 100
+        },
         "mods": [
-          {"id": "baseHitChance", "stats": [{"value": 100}]},
-          {"id": "basePhysicalDamage", "stats": [{"value": 1}, {"value": 3}]}
+          {"id": "baseHitChance", "stats": [{"value": 100}]}
         ]
       },
       {
         "name": "Physical Attack",
-        "attackSpeed": 1,
-        "manaCost": 5,
-        "baseDamageMultiplier": 100,
+        "stats": {
+            "attackSpeed": 1,
+            "manaCost": 5,
+            "baseDamageMultiplier": 100
+        },
         "mods": [
           {"id": "baseHitChance", "stats": [{"value": 80}]},
           {"id": "incPhysicalDamage", "stats": [{"value": 50}]}
@@ -60,9 +59,11 @@
       },
       {
         "name": "Elemental Attack",
-        "attackSpeed": 1,
-        "manaCost": 5,
-        "baseDamageMultiplier": 100,
+        "stats": {
+            "attackSpeed": 1,
+            "manaCost": 0,
+            "baseDamageMultiplier": 100
+        },
         "mods": [
           {"id": "baseHitChance", "stats": [{"value": 80}]},
           {"id": "incElementalDamage", "stats": [{"value": 50}]}
@@ -70,9 +71,11 @@
       },
       {
         "name": "Chaos Attack",
-        "attackSpeed": 1,
-        "manaCost": 5,
-        "baseDamageMultiplier": 100,
+        "stats": {
+            "attackSpeed": 1,
+            "manaCost": 0,
+            "baseDamageMultiplier": 100
+        },
         "mods": [
           {"id": "baseHitChance", "stats": [{"value": 80}]},
           {"id": "incChaosDamage", "stats": [{"value": 50}]}
@@ -82,37 +85,51 @@
     "supports": [
       {
         "name": "Damage",
-        "manaMultiplier": 120,
+        "stats": {
+            "manaMultiplier": 120
+        },
         "mods": [{"id": "moreDamage", "stats": [{"value": 100}]}]
       },
       {
         "name": "Attack Speed",
-        "manaMultiplier": 130,
+        "stats": {
+            "manaMultiplier": 120
+        },
         "mods": [{"id": "moreAttackSpeed", "stats": [{"value": 10}]}]
       },
       {
         "name": "Hit Chance",
-        "manaMultiplier": 110,
+        "stats": {
+            "manaMultiplier": 120
+        },
         "mods": [{"id": "baseHitChance", "stats": [{"value": 10}]}]
       },
       {
         "name": "Crit Chance",
-        "manaMultiplier": 150,
+        "stats": {
+            "manaMultiplier": 120
+        },
         "mods": [{"id": "baseCritChance", "stats": [{"value": 30}]}]
       },
       {
         "name": "Crit Multiplier",
-        "manaMultiplier": 200,
+        "stats": {
+            "manaMultiplier": 120
+        },
         "mods": [{"id": "baseCritMulti", "stats": [{"value": 200}]}]
       },
       {
         "name": "Chance to Bleed",
-        "manaMultiplier": 200,
+        "stats": {
+            "manaMultiplier": 120
+        },
         "mods": [{"id": "baseBleedChance", "stats": [{"value": 50}]}]
       },
       {
         "name": "Bleed Damage",
-        "manaMultiplier": 200,
+        "stats": {
+            "manaMultiplier": 120
+        },
         "mods": [{"id": "moreBleedDamage", "stats": [{"value": 50}]}]
       }
     ]

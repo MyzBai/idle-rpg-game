@@ -12,48 +12,55 @@ import * as gameLoop from "./gameLoop.js";
 initMenu();
 var saveGameEventId = undefined;
 
- /** @type {Module} */
+/** @type {Modules.ModuleCollection} */
 var cachedModule = undefined;
-eventListener.add(eventListener.EventType.SAVE_GAME, savedObj => {
-    savedObj.config = {
-        name: cachedModule.config.name,
-        src: cachedModule.config.src,
-        id: cachedModule.config.id,
-        lastSave: new Date().getTime()
-    };
+/**@returns {Modules.ModuleCollection} */
+export function getCachedModule() {
+    if(!cachedModule){
+        return;
+    }
+	return JSON.parse(JSON.stringify(cachedModule));
+}
+eventListener.add(eventListener.EventType.SAVE_GAME, (savedObj) => {
+	savedObj.config = {
+		name: cachedModule.config.name,
+		src: cachedModule.config.src,
+		id: cachedModule.config.id,
+		lastSave: new Date().getTime(),
+	};
 });
 
- /** @param {Module} module */
+/** @param {Modules.ModuleCollection} module */
 export function init(module) {
-    if(!module){
-        module = JSON.parse(JSON.stringify(cachedModule));
-    } else{
-        cachedModule = JSON.parse(JSON.stringify(module));
-    }
-    
+	if (!module) {
+		module = JSON.parse(JSON.stringify(cachedModule));
+	} else {
+		cachedModule = JSON.parse(JSON.stringify(module));
+	}
+
 	console.log("init sub modules");
 
 	gameLoop.clear();
 	gameLoop.stop();
 
-	player.init({ defaultMods: module.defaultMods.player });
+	player.init(module.player);
 
 	enemy.init(module.enemies);
 	skills.init(module.skills);
 	items.init(module.items);
 	modTree.init(module.modTree);
 	combat.init();
-    
+
 	save.load();
 
 	const isProduction = Global.env.ENV_TYPE === "production";
 	if (isProduction) {
 		gameLoop.start();
-        //auto save
+		//auto save
 		gameLoop.subscribe(
 			() => {
 				save.save();
-                console.log('auto saved');
+				console.log("auto saved");
 			},
 			{ intervalMS: 10 * 1000 }
 		);
@@ -61,6 +68,7 @@ export function init(module) {
 }
 
 function initMenu() {
+	/**@type {NodeListOf<HTMLElement>} */
 	const tabs = document.querySelectorAll("body .p-game .s-menu [data-tab-target]");
 	for (const tab of tabs) {
 		tab.addEventListener("click", (e) => {

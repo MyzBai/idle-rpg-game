@@ -16,51 +16,66 @@
                 },
                 "attacks": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "required": ["name", "attackSpeed", "baseDamageMultiplier", "mods"],
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "attackSpeed": {
-                                "type": "number"
-                            },
-                            "baseDamageMultiplier": {
-                                "type": "number"
-                            },
-                            "manaCost": {
-                                "type": "number"
-                            },
-                            "mods": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "mods-schema.json#/definitions/mod"
-                                }
-                            }
-                        }
+                        "$ref": "#/definitions/attackSkill"
                     }
                 },
                 "supports": {
                     "type": "array",
                     "items": {
-                        "type": "object",
-                        "required": ["name", "manaMultiplier", "mods"],
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "manaMultiplier": {
-                                "type": "number"
-                            },
-                            "mods": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "mods-schema.json#/definitions/mod"
-                                }
-                            }
+                        "$ref": "#/definitions/support"
+               
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "attackSkill": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "minLength": 3,
+                    "pattern": "^[A-Za-z0-9 ]+$"
+                },
+                "stats": {
+                    "type": "object",
+                    "properties": {
+                        "attackSpeed": {"type": "number"},
+                        "baseDamageMultiplier": {"type": "number"},
+                        "manaCost": {"type": "number"}
+                    }
+   
+                },
+                "mods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "mods-schema.json#/definitions/mod"
+                    }
+                }
+            }
+        },
+        "support": {
+            "type": "object",
+            "required": ["name", "stats", "mods"],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "stats":{
+                    "type": "object",
+                    "properties": {
+                        "manaMultiplier": {
+                            "type": "number"
                         }
+                    }
+                },
+                "mods": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "mods-schema.json#/definitions/mod"
                     }
                 }
             }

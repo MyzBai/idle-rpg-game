@@ -1,7 +1,7 @@
 
 class Global{
     constructor(){
-        /**@type {Environment} */
+        /**@type {env.Environment} */
         this.env = undefined;
     }
 }

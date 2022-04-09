@@ -1,19 +1,9 @@
-import { ModFlags, Conditions } from "./damageCalc.js";
 import { getModTemplate } from "./modTemplates.js";
-
+import { ModFlags, Conditions } from "./damageCalc.js";
 /**
- * @typedef {import('./modTemplates.js').ModTemplate} ModTemplate
- */
-
-/**
- * @typedef Mod
- * @property {string} id
- * @property {{value: number}[]} stats
- */
-
-/**
- * @param {Mod | Mod[]} mods
- * @returns {StatMod[]}
+ * @param {Modifiers.Mod | Modifiers.Mod[]} mods
+ * @param {any} source
+ * @returns {Modifiers.StatMod[]}
  */
 export function convertModToStatMods(mods, source = undefined) {
 
@@ -38,7 +28,9 @@ export function convertModToStatMods(mods, source = undefined) {
 		const statMod = template.stats[i];
 		statMod.value = statValue;
 		statMod.source = source;
+        //@ts-expect-error
 		statMod.flags = statMod.flags ? statMod.flags.reduce((a, c) => a | ModFlags[c], 0) : 0;
+        //@ts-expect-error
 		statMod.conditions = statMod.flags ? statMod.flags.reduce((a, c) => a | Conditions[c], 0) : 0;
 		Object.freeze(statMod);
 		statMods.push(statMod);
@@ -48,18 +40,18 @@ export function convertModToStatMods(mods, source = undefined) {
 
 export class ModDB {
 	constructor() {
+        /**@type {Modifiers.StatMod[]} */
 		let modList = [];
 
-		/**@param {StatMod | StatMod[]} statModifiers */
-		this.add = function (statModifiers) {
-			if (!Array.isArray(statModifiers)) {
-				statModifiers = [statModifiers];
-			}
+		/**@param {...Modifiers.StatMod} statModifiers */
+		this.add = function (...statModifiers) {
 			modList.push(...statModifiers);
 		};
 
 		this.removeBySource = function (source) {
-			modList = modList.filter((x) => x.source !== source);
+            if(source){
+                modList = modList.filter((x) => x.source !== source);
+            }
 		};
 
 		this.getModList = function () {

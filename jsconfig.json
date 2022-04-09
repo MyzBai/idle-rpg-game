@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
-      "checkJs": false,
-      "module": "ES6",
-      "target": "es2019"
+      "checkJs": true,
+      "module": "ESNext",
+      "target": "ESNext"
     }
   }

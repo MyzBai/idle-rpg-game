@@ -1,6 +1,7 @@
 import * as player from './player.js';
 import * as gameLoop from './gameLoop.js';
 
+/**@type {HTMLElement} */
 const manaBar = document.querySelector('.g-progress-bar-foreground.mana-bar');
 
 var curMana = 0;
@@ -40,22 +41,6 @@ export function addMana(amount) {
 export function subtractMana(amount) {
     let newMana = curMana - amount;
     setCurMana(newMana);
-}
-
-export function calcAttackCost() {
-    // let modList = player.getModList();
-    let attackSkill = player.getAttackSkill();
-    if(!attackSkill){
-        // console.error('cannot calc attack cost. player must have an attack skill');
-        return Math.max;
-    }
-    let baseCost = attackSkill.getManaCost();
-    let costMultiplier = 1;
-    for (const support of attackSkill.getSupports()) {
-        costMultiplier += support ? (1 - support.manaMultiplier) : 0;
-    }
-    // let incCost = calcModSum(modList, 'inc', 'manaCost');
-    return baseCost * costMultiplier;
 }
 
 function setCurMana(mana) {

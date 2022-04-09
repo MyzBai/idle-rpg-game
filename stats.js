@@ -5,18 +5,7 @@ const statsContainer = document.querySelector('body .p-game .s-stats .s-stats-co
 const statFieldTemplate = statsContainer.querySelector('template');
 
 export function update() {
-
-    const attackSkill = player.getAttackSkill();
-    if (!attackSkill)
-        return;
-
-    const playerObj = {
-        attackSkill: attackSkill,
-        modList: player.getModList(),
-        conversionTable: player.getConversionTable(),
-        modCache: player.getModCache()
-    }
-    var result = damageCalc.calcStats(playerObj);
+    var result = damageCalc.calcStats({modList: player.getModList(), modCache: player.getModCache(), conversionTable: player.getConversionTable()});
 
     statsContainer.replaceChildren();
 
@@ -58,11 +47,16 @@ export function update() {
     createStatLabel('Intelligence:', `${result.intelligence.toFixed()}`);
 }
 
-
+/**
+ * @param {string} text
+ * @param {string} valueText
+ */
 function createStatLabel(text, valueText) {
-    /**@type {HTMLElement} */
+    
     const fieldElement = statFieldTemplate.content.cloneNode(true);
+    //@ts-expect-error
     fieldElement.firstElementChild.children[0].textContent = text;
+    //@ts-expect-error
     fieldElement.firstElementChild.children[1].textContent = valueText;
     statsContainer.appendChild(fieldElement);
 }

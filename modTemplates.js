@@ -1,13 +1,7 @@
-/**
- * @typedef ModTemplate
- * @property {string} id
- * @property {string} desc
- * @property {StatMod[]} stats
- */
 
 /**
  * @param {string} id
- * @returns {ModTemplate}
+ * @returns {Modifiers.ModTemplate}
  */
 export function getModTemplate(id) {
 	const template = templates.find((x) => x.id === id);
@@ -19,13 +13,13 @@ export function getModTemplate(id) {
 }
 
 /**
- * @returns {ModTemplate[]}
+ * @returns {Modifiers.ModTemplate[]}
  */
 export function getModTemplateList() {
 	return JSON.parse(JSON.stringify(templates));
 }
 
-/**@type {StatMod[]} */
+/**@type {Modifiers.ModTemplate[]} */
 const templates = [];
 
 //Damage
@@ -72,8 +66,8 @@ templates.push({ id: "baseBleedChance", desc: "+#% To Bleed Chance", stats: [{ n
 templates.push({ id: "incBleedDamage", desc: "#% Increased Bleed Damage", stats: [{ name: "damage", valueType: "inc", flags: ["bleed"] }] });
 templates.push({ id: "moreBleedDamage", desc: "#% More Bleed Damage", stats: [{ name: "damage", valueType: "more", flags: ["bleed"] }] });
 templates.push({ id: "baseBleedDuration", desc: "Base Bleed Duration Is # Seconds", stats: [{ name: "duration", valueType: "base", flags: ["bleed"] }] });
-templates.push({ id: "incBleedDuration", desc: "+#% To Bleed Duration", stats: [{ name: "duration", valueType: "inc", flags: ["bleed"] }] });
-templates.push({ id: "maxBleedCount", stats: [{ name: "maxBleedCount", valueType: "base" }] });
+templates.push({ id: "incBleedDuration", desc: "+#% Increased Bleed Duration", stats: [{ name: "duration", valueType: "inc", flags: ["bleed"] }] });
+templates.push({ id: "baseBleedCount", desc: "+# To Bleed Duration", stats: [{ name: "bleedCount", valueType: "base" }] });
 
 //Attack Speed
 templates.push({ id: "baseAttackSpeed", stats: [{ name: "attackSpeed", valueType: "base" }] });
@@ -96,7 +90,3 @@ templates.push({ id: "incDexterity", desc: "+#% Increased Dexterity", stats: [{ 
 
 templates.push({ id: "baseIntelligence", desc: "+# To Intelligence", stats: [{ name: "intelligence", valueType: "base" }] });
 templates.push({ id: "incIntelligence", desc: "+#% Increased Intelligence", stats: [{ name: "intelligence", valueType: "inc" }] });
-
-
-
-

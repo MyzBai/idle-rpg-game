@@ -1,8 +1,4 @@
 
-/**
- * @typedef {import('../loadModule.js').Module} Module
- */
-
 /**@returns {{name: string, description: string}[]} */
 export function getLocalModulesInfo(){
     const localModules = [];
@@ -12,7 +8,9 @@ export function getLocalModulesInfo(){
 
 
 /**
- * @returns {Promise<Module>} */
+ * @param {string} name
+ * @returns {Promise<Modules.ModuleCollection>} 
+ */
 export async function getLocalModule(name) {
 	try {
 		const { default: data } = await import(`./${name.toLowerCase()}/module.json`, { assert: { type: "json" } });

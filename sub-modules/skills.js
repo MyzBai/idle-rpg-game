@@ -2,165 +2,180 @@ import * as player from "../player.js";
 import { convertModToStatMods } from "../modDB.js";
 import { parseModDescription, deepFreeze } from "../helperFunctions.js";
 import { getModTemplate } from "../modTemplates.js";
-import * as eventListener from '../eventListener.js';
+import * as eventListener from "../eventListener.js";
+import { calcModTotal, ModFlags } from "../damageCalc.js";
+
+eventListener.add(eventListener.EventType.SAVE_GAME, save);
+eventListener.add(eventListener.EventType.LOAD_GAME, load);
 
 /**
- * @typedef SkillMod
- * @property {string} id
- * @property {Stat[]} stats
- */
-/**
- * @typedef SkillsAttack
- * @property {string} name
- * @property {number} attackSpeed
- * @property {number} manaCost
- * @property {number} baseDamageMultiplier
- * @property {SkillMod[]} mods
+ * @typedef SaveObj
+ * @property {string} attackSkill
+ * @property {string[]} supports
  */
 
-/**
- * @typedef SkillsSupport
- * @property {string} name
- * @property {number} manaMultiplier
- * @property {SkillMod[]} mods
- */
 
-/**
- * @typedef Skills
- * @property {number} maxSupports
- * @property {SkillsAttack} attacks
- * @property {SkillsSupport} supports
- */
 
+/**@type {HTMLElement} */
 const skillView = document.querySelector(".s-skills .s-skill-info");
+/**@type {HTMLElement} */
 const attackSkillContainer = document.querySelector(".s-skills .s-attack-skills");
+/**@type {HTMLElement} */
 const supportSkillContainer = document.querySelector(".s-skills .s-supports");
 
 var skillViewButtonCallback = undefined;
 
 var maxSupports = undefined;
 
-/**@type {SkillsAttack[]} */
+/**@type {Skills.AttackSkill} */
+var attackSkill = undefined;
+
+/**@type {Skills.SupportSkill[]} */
+var supports = [];
+
+/**@type {Skills.AttackSkill[]} */
 export var attackSkillsCollection = [];
 
-/**@type {SkillsSupport[]} */
+/**@type {Skills.SupportSkill[]} */
 export var supportsCollection = [];
 
-/**@param {Skills} data */
-export async function init(data = {}) {
+/**@param {Modules.Skills} data */
+export async function init(data) {
 	console.log("init skills");
 
 	attackSkillContainer.replaceChildren();
 	supportSkillContainer.replaceChildren();
 
 	maxSupports = data.maxSupports || 0;
-
-	const attackSkills = data.attacks || [];
-	attackSkillsCollection = [...attackSkills];
-	if (new Set(attackSkillsCollection.map((x) => x.name)).size !== attackSkillsCollection.length) {
-		console.error("duplicated skill names were found");
-		return;
+    supports = new Array(maxSupports).fill();
+    Object.seal(supports);
+	//set and validate attack skills
+	{
+		attackSkillsCollection = data.attacks || [];
+		const duplicates = new Set();
+		attackSkillsCollection.every((x) => {
+			if (duplicates.has(x.name)) {
+				console.error(`The attack skill ${x.name} already exists. Two skills of the same type cannot have the same name.`);
+				return false;
+			}
+			duplicates.add(x.name);
+		});
+		deepFreeze(attackSkillsCollection);
 	}
-	Object.freeze(attackSkillsCollection);
-	const supportSkills = data.supports || [];
-	supportsCollection = [...supportSkills];
-	Object.freeze(supportsCollection);
 
-	for (const data of attackSkillsCollection) {
-		createSkillButton(data.name, "attack");
+	//set and validate support skills
+	{
+		supportsCollection = data.supports || [];
+		const duplicates = new Set();
+		supportsCollection.every((x) => {
+			if (duplicates.has(x.name)) {
+				console.error(`The support skill ${x.name} already exists. Two skills of the same type cannot have the same name.`);
+				return false;
+			}
+			duplicates.add(x.name);
+		});
+		deepFreeze(supportsCollection);
 	}
-	if (supportsCollection) {
-		for (const data of supportsCollection) {
-			createSkillButton(data.name, "support");
+
+	//create attack skill buttons
+	{
+		const frag = document.createDocumentFragment();
+		for (const attackSkill of attackSkillsCollection) {
+			const btn = createSkillButton(attackSkill, 'attack');
+			frag.appendChild(btn);
 		}
-	} else {
-		supportSkillContainer.style.display = "none";
+		attackSkillContainer.appendChild(frag);
 	}
 
-    const defaultAttackSkill = attackSkillsCollection[0];
-    if(defaultAttackSkill){
-        setActiveAttackSkill(defaultAttackSkill.name);
-    }
-	viewSkill(defaultAttackSkill.name, "attack");
-	updateSkillButtons();
+	//create support skill buttons
+	{
+		if (supportsCollection) {
+			const frag = document.createDocumentFragment();
+			for (const support of supportsCollection) {
+				const btn = createSkillButton(support, 'support');
+				frag.appendChild(btn);
+			}
+			supportSkillContainer.appendChild(frag);
+		} else {
+			supportSkillContainer.style.display = "none";
+		}
+	}
 
-    eventListener.add(eventListener.EventType.SAVE_GAME, save);
-    eventListener.add(eventListener.EventType.LOAD_GAME, load);
+	const defaultAttackSkill = attackSkillsCollection[0];
+	if (defaultAttackSkill) {
+		setAttackSkill(defaultAttackSkill);
+	}
+	showSkill(attackSkillsCollection[0], "attack");
 }
 
-/**@param {string} name skill name */
-function setActiveAttackSkill(name) {
-	var data = attackSkillsCollection.find((x) => x.name === name);
-	if (!data) {
-		window.alert(
-			`could not find attack skill with name ${name}. please contact the developer if you suspect this to be a bug`
-		);
-		return;
-	}
-	var attackSkill = new AttackSkill(JSON.parse(JSON.stringify(data)));
-	Object.freeze(attackSkill);
-	player.setAttackSkill(attackSkill);
-	viewSkill(name, "attack");
+/** @param {Skills.AttackSkill} skill */
+function setAttackSkill(skill) {
+	player.removeModifiersBySource(attackSkill);
+	attackSkill = skill;
+
+    const attackSpeedMod = {name: 'attackSpeed', valueType: 'base', value: skill.stats.attackSpeed, source: attackSkill};
+
+    let manaCost = attackSkill.stats.manaCost;
+    {
+        const multiplier = supports.reduce((a, c) => a += c?.stats.manaMultiplier || 0, 0);
+        manaCost *= 1 + multiplier/100;
+    }
+	const manaCostMod = { name: "manaCost", valueType: "base", value: manaCost, flags: ModFlags.Attack, source: attackSkill };
+
+	player.addStatModifier(...convertModToStatMods(skill.mods, attackSkill), manaCostMod, attackSpeedMod);
+    [...attackSkillContainer.children].forEach(x => x.classList.toggle('active', x.textContent === attackSkill.name));
+	showSkill(attackSkill, "attack");
+}
+
+/** @param {Skills.SupportSkill} skill */
+function toggleSupport(skill) {
+    for(let i = 0; i < supports.length; i++){
+        if(!supports[i]){
+            supports[i] = skill;
+            player.addStatModifier(...convertModToStatMods(skill.mods, skill));
+            break;
+        } else if(supports[i].name === skill.name){
+            supports[i] = undefined;
+            player.removeModifiersBySource(skill);
+            break;
+        }
+    }
+    [...supportSkillContainer.children].forEach(x => x.classList.toggle('active', supports.some(y => y?.name === x.textContent)));
 }
 
 /**
- * @param {string} name support name
- */
-function toggleSupport(name) {
-	var attackSkill = player.getAttackSkill();
-	if (!attackSkill) {
-		return;
-	}
-	var supports = attackSkill.getSupports();
-	var remove = supports.some((x) => x && x.name === name);
-	if (remove) {
-		attackSkill.removeSupports(name);
-	} else {
-		attackSkill.addSupports(name);
-	}
-	player.updateModList();
-
-	updateSkillButtons();
-}
-
-//UI
-
-/**@param {string} name */
-function createSkillButton(name, type) {
+ * @param {Skills.AbstractSkill} skill
+ * */
+function createSkillButton(skill, type) {
 	var btn = document.createElement("div");
-	btn.textContent = name;
-	btn.classList.add(`${type}-skill`, 'skill-button', 'g-button');
+	btn.textContent = skill.name;
+	btn.classList.add(`${type}-skill`, "skill-button", "g-button");
 	btn.addEventListener("click", (e) => {
-		viewSkill(name, type);
+		showSkill(skill, type);
 	});
-
-	const skillContainer = type === "attack" ? attackSkillContainer : supportSkillContainer;
-	skillContainer.appendChild(btn);
+	return btn;
 }
 
-/** @param {string} name */
-function viewSkill(name, type) {
-	/**@type {SkillsAttack} skill */
-	let skill =
-		type === "attack"
-			? attackSkillsCollection.find((x) => x.name === name)
-			: supportsCollection.find((x) => x.name === name);
-	if (!skill) {
-		console.error(`Could not find skill by name ${name}`);
-		return;
-	}
-	//Name
-	skillView.querySelector(".name").textContent = name;
+/**
+ * @param {Skills.AbstractSkill} skill
+ * @param {string} type
+ */
+function showSkill(skill, type) {
+	skillView.querySelector(".name").textContent = skill.name;
 
 	//Stats
 	let statsText = "";
 	if (type === "attack") {
-		statsText += `Attack Speed: ${skill.attackSpeed} sec\n`;
-		statsText += `Mana Cost: ${skill.manaCost}\n`;
-		statsText += `Base Damage Multiplier: ${skill.baseDamageMultiplier}%`;
+		/**@type {Skills.AttackSkillStats} */
+		const stats = skill.stats;
+		statsText += `Attack Speed: ${stats.attackSpeed} sec\n`;
+		statsText += `Mana Cost: ${stats.manaCost}\n`;
+		statsText += `Base Damage Multiplier: ${stats.baseDamageMultiplier}%`;
 		skillView.querySelector(".s-stats").textContent = statsText;
 	} else {
-		statsText += `Mana Multiplier: ${skill.manaMultiplier}%\n`;
+		/**@type {Skills.SupportSkillStats} */
+		const stats = skill.stats;
+		statsText += `Mana Multiplier: ${stats.manaMultiplier}%\n`;
 	}
 
 	//Mods
@@ -174,15 +189,15 @@ function viewSkill(name, type) {
 	modsText = modsText.substring(0, modsText.length - 1);
 	skillView.querySelector(".s-mods").textContent = modsText;
 
-	//button
+	//activate/deactive button
 	let button = skillView.querySelector(".g-button");
 	let isActive = false;
 	if (type === "attack") {
-		isActive = isAttackSkillActive(name);
+		isActive = isAttackSkillActive(skill);
 		button.textContent = "Activate";
 		button.classList.toggle("active", isActive);
-	} else {
-		isActive = isSupportActive(name);
+	} else if (type === "support") {
+		isActive = isSupportActive(skill);
 		button.textContent = isActive ? "Deactivate" : "Activate";
 		button.classList.toggle("active", isActive);
 	}
@@ -190,164 +205,56 @@ function viewSkill(name, type) {
 	button.removeEventListener("click", skillViewButtonCallback);
 	skillViewButtonCallback = () => {
 		if (!isActive && type === "attack") {
-			setActiveAttackSkill(name);
+			setAttackSkill(skill);
 		} else {
-			toggleSupport(name);
+			toggleSupport(skill);
 		}
-		viewSkill(name, type);
+		showSkill(skill, type);
 	};
 	if (!isActive || type === "support") {
 		button.addEventListener("click", skillViewButtonCallback);
 	}
 	[...attackSkillContainer.children, ...supportSkillContainer.children].forEach((x) => {
-		let active = x.textContent === name;
+		let active = x.textContent === skill.name;
 		x.classList.toggle("viewing", active);
 	});
-	updateSkillButtons();
 }
 
-function updateSkillButtons() {
-	[...attackSkillContainer.children].forEach((x) => {
-		let isActive = isAttackSkillActive(x.textContent);
-		x.classList.toggle("active", isActive);
-	});
-
-	[...supportSkillContainer.children].forEach((x) => {
-		let isActive = isSupportActive(x.textContent);
-		x.classList.toggle("active", isActive);
-	});
+/**@param {Skills.AbstractSkill} skill */
+function isAttackSkillActive(skill) {
+	return attackSkill ? attackSkill.name === skill.name : false;
 }
 
-function isAttackSkillActive(name) {
-	const attackSkill = player.getAttackSkill();
-	return attackSkill ? attackSkill.getName() === name : false;
-}
-function isSupportActive(name) {
-	const attackSkill = player.getAttackSkill();
-	if (!attackSkill) {
-		return false;
-	}
-	const supports = attackSkill.getSupports();
-	return supports.some((x) => x && x.name === name);
+/**@param {Skills.SupportSkill} support */
+function isSupportActive(support) {
+	return supports.some((x) => x?.name === support.name);
 }
 
-export class AttackSkill {
-	/**@param {SkillsAttack} skillJson */
-	constructor(skillJson) {
-		const { name, mods, manaCost, attackSpeed, baseDamageMultiplier } = skillJson;
-		const supports = Array.from({ length: maxSupports });
-		Object.seal(supports);
-
-		var modList = [];
-
-		this.getName = () => name;
-		this.getManaCost = () => manaCost;
-		this.getAttackSpeed = () => attackSpeed;
-		this.getBaseDamageMultiplier = () => baseDamageMultiplier;
-
-		this.getSupports = () => {
-			return supports.filter((x) => x);
-		};
-		this.clearSupports = () => {
-			for (let i = 0; i < supports.length; i++) {
-				supports[i] = undefined;
-			}
-		};
-
-		this.getModList = () => {
-			return [...modList];
-		};
-
-		const rebuildModList = () => {
-			modList = [];
-
-            for (const mod of mods) {
-                const statMods = convertModToStatMods(mod, this);
-                modList.push(...statMods);
-            }
-
-			for (const support of supports) {
-                if(!support){
-                    continue;
-                }
-                for (const mod of support.mods) {
-                    const statMods = convertModToStatMods(mod, this);
-                    modList.push(...statMods);
-                }
-			}
-		};
-
-		/**@param {string | string[]} names */
-		this.addSupports = (names) => {
-			if (Array.isArray(names)) {
-				for (const name of names) {
-					this.addSupports(name);
-				}
-				return;
-			}
-
-			const slotIndex = supports.findIndex((x) => x === undefined);
-			if (slotIndex !== -1) {
-				let supportData = supportsCollection.find((x) => x.name === names);
-				if (supportData) {
-					const support = JSON.parse(JSON.stringify(supportData));
-					deepFreeze(support);
-					supports[slotIndex] = support;
-				}
-			}
-			rebuildModList();
-		};
-
-		this.removeSupports = (names) => {
-			if (Array.isArray(names)) {
-				for (const name of names) {
-					this.removeSupports(name);
-				}
-				return;
-			}
-
-			const index = supports.filter((x) => x).findIndex((x) => x.name === names);
-			if (index !== -1) {
-				supports[index] = undefined;
-			}
-
-			rebuildModList();
-		};
-
-		rebuildModList();
-	}
-}
-
+/**@param {{skills: SaveObj}} obj*/
 function save(obj) {
-	let attackSkill = player.getAttackSkill();
-	let supportNames = attackSkill
-		.getSupports()
-		.filter((x) => x)
-		.map((x) => x.name);
 	obj.skills = {
-		attackSkill: {
-			name: attackSkill.getName(),
-			supportNames,
-		},
+		attackSkill: attackSkill.name,
+		supports: supports.map((x) => x?.name),
 	};
 }
 
+/**@param {{skills: SaveObj}} obj*/
 function load(obj) {
 	if (!obj.skills) {
 		return;
 	}
-	const { attackSkill } = obj.skills;
 
-	setActiveAttackSkill(attackSkill.name);
+	const skill = attackSkillsCollection.find((x) => x.name === obj.skills.attackSkill);
+	setAttackSkill(skill);
+	showSkill(skill, "attack");
 
-	const supportNames = attackSkill.supportNames;
-	player.getAttackSkill().clearSupports();
-	if (supportNames) {
-		for (const supportName of supportNames) {
-			toggleSupport(supportName);
-		}
+	supports = [];
+	const supportNames = obj.skills.supports || [];
+	for (let i = 0; i < supportNames.length; i++) {
+		const support = supportsCollection.find((x) => x.name === supportNames[i]);
+		toggleSupport(support);
 	}
 
-	viewSkill(attackSkill.name, "attack");
-	updateSkillButtons();
+	//@ts-expect-error
+	attackSkillContainer.firstElementChild.click();
 }

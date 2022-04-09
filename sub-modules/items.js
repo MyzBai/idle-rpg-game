@@ -4,6 +4,8 @@ import * as player from "../player.js";
 import { convertModToStatMods } from "../modDB.js";
 import * as eventListener from "../eventListener.js";
 
+eventListener.add(eventListener.EventType.SAVE_GAME, save);
+eventListener.add(eventListener.EventType.LOAD_GAME, load);
 
 const itemList = document.querySelector(".s-items .s-item-list");
 const craftingContainer = document.querySelector(".s-items .s-item-options");
@@ -15,12 +17,12 @@ var items = [];
 /**@type {Item} */
 var selectedItem = undefined;
 
-/**@type {ItemModifier[]} */
+/**@type {Items.ItemModifier[]} */
 var modCollection = [];
 
 var maxMods = 6;
 
-/**@param {import('./items').ItemsModule} module */
+/**@param {Modules.Items} module */
 export async function init(module) {
 	if (!module) {
 		return;
@@ -69,8 +71,7 @@ export async function init(module) {
 		applyItemModifiers(item);
 	});
 
-	eventListener.add(eventListener.EventType.SAVE_GAME, save);
-	eventListener.add(eventListener.EventType.LOAD_GAME, load);
+
 }
 
 function createItems(itemsFromjson) {
@@ -102,13 +103,22 @@ function showItem(item) {
 	selectedItem = item;
 
 	itemElement.replaceChildren();
+    const frag = document.createDocumentFragment();
+    const playerLevel = player.getLevel();
 	for (const mod of item.getMods()) {
-		const el = document.createElement("label");
-		el.textContent = parseModDescription(
-			mod.desc,
-			mod.stats.map((x) => x.value)
-		);
-		itemElement.appendChild(el);
+		const element = document.createElement("div");
+        let tier = -1;
+        mod.table.filter(x => x.levelReq < playerLevel).every((x, i, array) => {
+            tier = array.length - i;
+            if(x.levelReq > mod.tableIndex){
+                return false;
+            }
+            return true;
+        });
+        const parsedDesc = parseModDescription(mod.desc, mod.stats.map(x => x.value));;
+        const modElement = document.createElement('div');
+        modElement.innerHTML = `<div class='s-modifier'><div class='tier'>${tier}</div><div class='desc'>${parsedDesc}</div></div>`;
+        frag.appendChild(element);
 	}
 	eventListener.invoke(eventListener.EventType.ITEM_CHANGED, item);
 }
@@ -338,12 +348,12 @@ function removeRandom(item) {
  * @param {number} level
  * @param {number} amount
  * @param {string} tierTarget
- * @param {ItemModifier[]} existingMods
+ * @param {Modifiers.ItemModifier[]} existingMods
  * */
 function generateModifiers(level, amount, tierTarget, existingMods = []) {
 	const out = [];
 	for (let i = 0; i < amount; i++) {
-		/**@type {ItemModifier[]} */
+		/**@type {Items.ItemModifier[]} */
 		let validMods = [];
 		validMods.push(...modCollection.filter((x) => x.levelReq <= level && !out.some((y) => y.id === x.id) && !existingMods.some((y) => y.id === x.id)));
 
@@ -387,17 +397,17 @@ function generateModifiers(level, amount, tierTarget, existingMods = []) {
 function applyItemModifiers(item) {
 	player.removeModifiersBySource(item);
     const statMods = convertModToStatMods(item.getMods(), item);
-	player.addStatModifier(statMods);
+	player.addStatModifier(...statMods);
 }
 
 class Item {
 	constructor(name) {
-		/**@type {ItemModifier} */
+		/**@type {Modifiers.ItemModifier[]} */
 		const mods = [];
 
 		this.name = name;
 
-		/**@returns {ItemModifier[]} */
+		/**@returns {Modifiers.ItemModifier[]} */
 		this.getMods = function () {
 			return [...mods];
 		};

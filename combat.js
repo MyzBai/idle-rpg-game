@@ -19,16 +19,12 @@ export async function init() {
 
 function autoAttackLoop() {
     var deltaTotal = 0;
-    var attackSkill = player.getAttackSkill();
 
     if(attackLoopId){
         gameLoop.unsubscribe(attackLoopId);
     }
+
     attackLoopId = gameLoop.subscribe((dt) => {
-        if (player.getAttackSkill() !== attackSkill) {
-            attackSkill = player.getAttackSkill();
-            deltaTotal = 0;
-        }
         var attackSpeed = player.getModCache().attackSpeed;
         deltaTotal += (dt) * (1 / attackSpeed);
         if (deltaTotal >= attackSpeed) {
@@ -44,13 +40,7 @@ function autoAttackLoop() {
 
 function performAttack() {
     
-    var playerObj = { 
-        attackSkill: player.getAttackSkill(),
-        conversionTable: player.getConversionTable(),
-        modList: player.getModList() 
-    };
-
-    var result = calcAttack(playerObj);
+    var result = calcAttack({modList: player.getModList(), modCache: player.getModCache(), conversionTable: player.getConversionTable()});
 
     if(!result.wasHit){
         console.log('Attack missed');

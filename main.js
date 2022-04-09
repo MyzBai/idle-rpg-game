@@ -7,6 +7,7 @@ const homeButton = document.querySelector("body .p-game .go-to-home-button");
 const gameButton = document.querySelector("body .p-home .go-to-game-button");
 const tabs = [homeButton, gameButton];
 registerTabs(tabs);
+//@ts-expect-error
 tabs[0].click();
 
 init();

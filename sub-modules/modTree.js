@@ -3,22 +3,7 @@ import * as eventListener from "../eventListener.js";
 import { parseModDescription } from "../helperFunctions.js";
 import { getModTemplate } from "../modTemplates.js";
 import { convertModToStatMods } from "../modDB.js";
-// import { registerSave, registerLoad } from "../save.js";
 
-/**
- * @typedef NodeMod
- * @property {number} id
- * @property {{value: number}[]} stats
- */
-
-/**
- * @typedef Node
- * @property {string} name
- * @property {number} curPoints
- * @property {number} maxPoints
- * @property {NodeMod[]} mods
- * @property {HTMLElement} element
- */
 
 const modTreeElement = document.querySelector(".p-game .s-mod-tree");
 const pointsSpan = modTreeElement.querySelector(".points span");
@@ -26,6 +11,9 @@ const nodeContainer = modTreeElement.querySelector(".s-list");
 const nodeTemplate = nodeContainer.querySelector("template");
 const nodeInfoContainer = modTreeElement.querySelector(".s-node-info");
 const unassignButton = nodeInfoContainer.querySelector('.unassign');
+
+eventListener.add(eventListener.EventType.SAVE_GAME, save);
+eventListener.add(eventListener.EventType.LOAD_GAME, load);
 
 eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
     updatePoints();
@@ -37,10 +25,9 @@ eventListener.add(eventListener.EventType.ESSENCE_CHANGED, amount => {
     unassignButton.toggleAttribute('disabled', !validateUnassign(selectedNode));
 });
 
-eventListener.add(eventListener.EventType.SAVE_GAME, save);
-eventListener.add(eventListener.EventType.LOAD_GAME, load);
 
-/**@type {Node[]} */
+
+/**@type {ModTree.Node[]} */
 var nodes = [];
 
 var selectedNode = undefined;
@@ -57,6 +44,7 @@ export async function init(data) {
 	numPointsPerLevel = data.numPointsPerLevel || 0;
 
 	nodes = [];
+    //@ts-ignore
 	nodeContainer.replaceChildren([]);
 	for (const nodeData of data.nodes) {
 		const { name, maxPoints, reqLevel, mods } = nodeData;
@@ -90,7 +78,7 @@ function updatePoints() {
 	pointsSpan.textContent = points.toString();
 }
 
-/**@param {Node} node */
+/**@param {ModTree.Node} node */
 function selectNode(node) {
 	if (!node) {
 		return;
@@ -108,10 +96,10 @@ function updateNodes() {
 }
 
 /**
- * @param {Node} node
- * @returns {HTMLElement} container
+ * @param {ModTree.Node} node
  */
 function createNodeElement(node) {
+    //@ts-expect-error
 	node.element = nodeTemplate.content.cloneNode(true).firstElementChild;
 	node.element.querySelector(".name").textContent = node.name;
 	node.curPoints = 0;
@@ -145,7 +133,7 @@ function setNodeInfo(node) {
 	};
 	assignButton.toggleAttribute("disabled", !validateAssign(node));
 	unassignButton.toggleAttribute("disabled", !validateUnassign(node));
-	unassignButton.querySelector("span").innerText = unassignCost;
+	unassignButton.querySelector("span").textContent = unassignCost;
 	assignButton.addEventListener("click", assignClickEvent);
 	unassignButton.addEventListener("click", unassignClickEvent);
 }
@@ -163,7 +151,7 @@ function getRemainingPoints() {
 	return getMaxPoints() - spentPoints;
 }
 
-/** @param {Node} node */
+/** @param {ModTree.Node} node */
 function validateAssign(node) {
     if(!node){
         return false;
@@ -171,7 +159,7 @@ function validateAssign(node) {
 	return node.curPoints < node.maxPoints && getRemainingPoints() > 0;
 }
 
-/** @param {Node} node */
+/** @param {ModTree.Node} node */
 function validateUnassign(node) {
     if(!node){
         return false;
@@ -179,7 +167,7 @@ function validateUnassign(node) {
 	return node.curPoints > 0 && player.getEssenceAmount() >= unassignCost;
 }
 
-/** @param {Node} node */
+/** @param {ModTree.Node} node */
 function allocate(node) {
 	node.curPoints++;
 	setNodePoints(node);
@@ -190,7 +178,7 @@ function allocate(node) {
 	updateStatMods(node);
 }
 
-/** @param {Node} node */
+/** @param {ModTree.Node} node */
 function unallocate(node) {
 	node.curPoints--;
 	setNodePoints(node);
@@ -200,7 +188,7 @@ function unallocate(node) {
 	updateStatMods(node);
 }
 
-/**@param {Node} node */
+/**@param {ModTree.Node} node */
 function updateStatMods(node) {
 	player.removeModifiersBySource(node);
 
@@ -214,8 +202,7 @@ function updateStatMods(node) {
         }
         modCopies.push(modCopy);
 	}
-    const statMods = convertModToStatMods(modCopies, node);
-	player.addStatModifier(statMods);
+	player.addStatModifier(...convertModToStatMods(modCopies, node));
 }
 
 function setNodePoints(node) {

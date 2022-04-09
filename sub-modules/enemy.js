@@ -1,6 +1,9 @@
 import { getLevel as getPlayerLevel } from "../player.js";
 import * as eventListener from "../eventListener.js";
 
+eventListener.add(eventListener.EventType.SAVE_GAME, save);
+eventListener.add(eventListener.EventType.LOAD_GAME, load);
+
 /**@type {HTMLElement} */
 var healthbar = document.querySelector(".g-progress-bar-foreground.health-bar");
 
@@ -10,20 +13,19 @@ var healthList = undefined;
 var curHealth = 0;
 var maxHealth = 0;
 
+/**@param {Modules.Enemies} data */
 export async function init(data) {
 	if (!data) {
 		return;
 	}
 	console.log("init enemy");
 
-	healthList = data.healths.map((x) => x.health);
-	maxHealth = healthList[0];
+	maxHealth = data.enemyList[0].health;
 	curHealth = maxHealth;
 	console.log(`Enemy initialized with %c${maxHealth}%c max health`, "color: red", "color: default");
 	updateHealthbar();
 
-	eventListener.add(eventListener.EventType.SAVE_GAME, save);
-	eventListener.add(eventListener.EventType.LOAD_GAME, load);
+
 }
 
 /**@param {number} damage */
@@ -37,10 +39,10 @@ export function takeAttackDamage(damage) {
 	}
 }
 
-/**@param {{type: string, damage: number}} */
-export function takeDamageOverTime(instance){
+/**@param {number} damage */
+export function takeDamageOverTime(damage){
 
-    curHealth -= instance.damage;
+    curHealth -= damage;
     updateHealthbar();
 
     if(curHealth <= 0){

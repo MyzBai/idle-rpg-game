@@ -7,8 +7,8 @@
         "config":{
             "$ref": "config-schema.json"
         },
-        "defaultMods": {
-            "$ref": "default-mods-schema.json#/properties/data"
+        "player": {
+            "$ref": "player-schema.json#/properties/data"
         },
         "enemies": {
             "$ref": "enemies-schema.json#/properties/data"

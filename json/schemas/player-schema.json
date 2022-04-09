@@ -1,17 +1,16 @@
 {
-    "$id": "default-mods.json",
+    "$id": "player.json",
     "type": "object",
     "additionalProperties": false,
-    "required": ["data"],
     "properties": {
-        "$schema": { "type": "string" },
+        "$schema": {"type": "string"},
         "data": {
             "type": "object",
             "properties": {
-                "player": {
+                "defaultMods": {
                     "type": "array",
                     "items": {
-                        "$ref": "mods-schema.json#/definitions/stat"
+                        "$ref":"mods-schema.json#/definitions/mod"
                     }
                 }
             }
