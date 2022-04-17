@@ -1,4 +1,4 @@
-import { avg, randomRange, toCamelCasePropertyName } from './helperFunctions.js';
+import { avg, randomRange, toCamelCasePropertyName } from "./helperFunctions.js";
 // import * as player from './player.js';
 
 /**
@@ -8,7 +8,7 @@ import { avg, randomRange, toCamelCasePropertyName } from './helperFunctions.js'
  * @property {DamageCalc.ConversionTable} conversionTable
  */
 
-export const DamageTypes = ['physical', 'elemental', 'chaos'];
+export const DamageTypes = ["physical", "elemental", "chaos"];
 
 export const DamageTypeFlags = {
 	physical: 1 << 0,
@@ -35,10 +35,10 @@ const damageNamesMetaTable = (() => {
 	const names = [];
 	const length = Object.values(DamageTypeFlags).reduce((a, v) => a + v);
 	for (let i = 0; i <= length; i++) {
-		const flagList = ['damage'];
+		const flagList = ["damage"];
 		for (const [type, flag] of Object.entries(DamageTypeFlags)) {
 			if (flag & i) {
-				flagList.push(toCamelCasePropertyName(type, 'damage'));
+				flagList.push(toCamelCasePropertyName(type, "damage"));
 			}
 		}
 		names.push(flagList);
@@ -68,7 +68,7 @@ export function calcAttack(player) {
 
 	var modList = player.modList;
 	var conversionTable = player.conversionTable;
-	var hitChance = calcModTotal(modList, 'hitChance', config) / 100;
+	var hitChance = calcModTotal(modList, "hitChance", config) / 100;
 
 	output.wasHit = randomRange(0, 1) < hitChance;
 	if (!output.wasHit) {
@@ -81,22 +81,22 @@ export function calcAttack(player) {
 	var totalBaseChaosDamage = baseDamageResult.chaos.value;
 	var totalBaseDamage = totalBasePhysicalDamage + totalBaseElementalDamage + totalBaseChaosDamage;
 
-	var critChance = calcModTotal(modList, 'critChance', config) / 100;
+	var critChance = calcModTotal(modList, "critChance", config) / 100;
 	if (randomRange(0, 1) < critChance) {
 		output.wasCrit = true;
-		let critMulti = 1 + calcModTotal(modList, 'critMulti') / 100;
+		let critMulti = 1 + calcModTotal(modList, "critMulti") / 100;
 		totalBaseDamage *= critMulti;
 	}
 
 	//Bleed
-	var bleedChance = calcModTotal(modList, 'bleedChance', config) / 100;
+	var bleedChance = calcModTotal(modList, "bleedChance", config) / 100;
 	if (randomRange(0, 1) < bleedChance) {
 		config.flags = ModFlags.Bleed;
 		const baseDamage = calcBleedDamage(player, config);
-		const duration = calcModTotal(modList, 'duration', config);
+		const duration = calcModTotal(modList, "duration", config);
 		/**@type {Ailments.Instance} */
 		const ailment = {
-			type: 'bleed',
+			type: "bleed",
 			damage: baseDamage,
 			duration,
 		};
@@ -128,13 +128,13 @@ export function calcStats(player) {
 	const output = {};
 
 	var modList = player.modList;
-	output.hitChance = calcModTotal(modList, 'hitChance', config) / 100;
+	output.hitChance = calcModTotal(modList, "hitChance", config) / 100;
 	output.hitChance = Math.min(100, Math.max(0, output.hitChance));
 	output.attackSpeed = config.modCache.attackSpeed;
 	output.maxMana = config.modCache.maxMana;
 	output.manaRegen = config.modCache.manaRegen;
-	output.critChance = calcModTotal(modList, 'critChance', config) / 100;
-	output.critMulti = calcModTotal(modList, 'critMulti') / 100;
+	output.critChance = calcModTotal(modList, "critChance", config) / 100;
+	output.critMulti = calcModTotal(modList, "critMulti") / 100;
 	output.strength = config.modCache.strength;
 	output.dexterity = config.modCache.dexterity;
 	output.intelligence = config.modCache.intelligence;
@@ -157,8 +157,8 @@ export function calcStats(player) {
 
 	{
 		config.flags = bleedFlags;
-		output.bleedChance = calcModTotal(modList, 'bleedChance', config) / 100;
-		var baseBleedDamage = calcAilmentBaseDamage(modList, player.conversionTable, 'physical', config);
+		output.bleedChance = calcModTotal(modList, "bleedChance", config) / 100;
+		var baseBleedDamage = calcAilmentBaseDamage(modList, player.conversionTable, "physical", config);
 		output.minBleedDamage = baseBleedDamage.min;
 		output.maxBleedDamage = baseBleedDamage.max;
 	}
@@ -180,10 +180,12 @@ function calcBaseDamage(modList, conversionTable, config) {
 		min *= convMulti;
 		max *= convMulti;
 
-        const baseDamage = config.calcMinMax(min, max);
+		const baseDamage = config.calcMinMax(min, max);
 		output[damageType] = {
-            min, max, value: baseDamage
-        };
+			min,
+			max,
+			value: baseDamage,
+		};
 	}
 	/**@type {DamageCalc.BaseDamageOutput} */
 	return output;
@@ -221,8 +223,8 @@ function calcDamage(modList, conversionTable, damageType, config, typeFlags = 0)
 		addMax = Math.ceil(addMax);
 	}
 
-	const baseMin = calcModSum(modList, 'base', toCamelCasePropertyName('min', damageType, 'damage'), config);
-	const baseMax = calcModSum(modList, 'base', toCamelCasePropertyName('max', damageType, 'damage'), config);
+	const baseMin = calcModSum(modList, "base", toCamelCasePropertyName("min", damageType, "damage"), config);
+	const baseMax = calcModSum(modList, "base", toCamelCasePropertyName("max", damageType, "damage"), config);
 
 	const modNames = damageNamesMetaTable[typeFlags];
 	const min = Math.round(calcModIncMore(modList, modNames, baseMin, config) + addMin);
@@ -254,7 +256,7 @@ function calcAilmentBaseDamage(modList, conversionTable, damageType, config, typ
 export function calcBleedDamage(player, config) {
 	config.flags &= ModFlags.Bleed & ModFlags.Ailment;
 	var modList = player.modList;
-	var { min, max } = calcAilmentBaseDamage(modList, player.conversionTable, 'physical', config, 0);
+	var { min, max } = calcAilmentBaseDamage(modList, player.conversionTable, "physical", config, 0);
 	var value = config.calcMinMax(min, max);
 	return value;
 }
@@ -275,11 +277,11 @@ export function createConversionTable(modList) {
 
 		for (let j = i + 1; j < DamageTypes.length; j++) {
 			const otherDamageType = DamageTypes[j];
-			globalConv[otherDamageType] = calcModSum(modList, 'base', toCamelCasePropertyName(damageType, 'converted-to', otherDamageType));
+			globalConv[otherDamageType] = calcModSum(modList, "base", toCamelCasePropertyName(damageType, "converted-to", otherDamageType));
 			globalTotal += globalConv[otherDamageType];
-			skillConv[otherDamageType] = calcModSum(modList, 'base', toCamelCasePropertyName('skill', damageType, 'converted-to', otherDamageType));
+			skillConv[otherDamageType] = calcModSum(modList, "base", toCamelCasePropertyName("skill", damageType, "converted-to", otherDamageType));
 			skillTotal += skillConv[otherDamageType];
-			add[otherDamageType] = calcModSum(modList, 'base', toCamelCasePropertyName(damageType, 'gain-as', otherDamageType));
+			add[otherDamageType] = calcModSum(modList, "base", toCamelCasePropertyName(damageType, "gain-as", otherDamageType));
 		}
 
 		if (skillTotal > 100) {
@@ -308,7 +310,7 @@ export function createConversionTable(modList) {
 		conversionValues.multi = multi;
 		conversionTable[damageType] = conversionValues;
 	}
-	conversionTable['chaos'] = { multi: 1 };
+	conversionTable["chaos"] = { multi: 1 };
 	return conversionTable;
 }
 
@@ -318,7 +320,7 @@ export function createConversionTable(modList) {
  * @param {DamageCalc.Configuration} [config]
  */
 export function calcModTotal(modList, modNames, config) {
-	var base = calcModSum(modList, 'base', modNames, config);
+	var base = calcModSum(modList, "base", modNames, config);
 	var total = calcModIncMore(modList, modNames, base, config);
 	return total;
 }
@@ -331,8 +333,8 @@ export function calcModTotal(modList, modNames, config) {
  */
 export function calcModIncMore(modList, modNames, baseValue, config) {
 	if (baseValue <= 0) return 0;
-	var inc = 1 + calcModSum(modList, 'inc', modNames, config) / 100; //divide by 100 because it's a multiplier, eg. 10% is 1 + 0.1 not 1 + 10
-	var more = calcModSum(modList, 'more', modNames, config);
+	var inc = 1 + calcModSum(modList, "inc", modNames, config) / 100; //divide by 100 because it's a multiplier, eg. 10% is 1 + 0.1 not 1 + 10
+	var more = calcModSum(modList, "more", modNames, config);
 	return baseValue * inc * more;
 }
 
@@ -345,7 +347,7 @@ export function calcModIncMore(modList, modNames, baseValue, config) {
 export function calcModSum(modList, valueType, modNames, config) {
 	config = config || {};
 	let flags = config.flags || 0;
-	let result = valueType === 'more' ? 1 : 0;
+	let result = valueType === "more" ? 1 : 0;
 
 	if (!Array.isArray(modNames)) {
 		modNames = [modNames];
@@ -360,7 +362,7 @@ export function calcModSum(modList, valueType, modNames, config) {
 			if (mod.valueType !== valueType) {
 				return false;
 			}
-			//@ts-expect-error
+
 			if ((modFlags & flags) !== modFlags) {
 				return false;
 			}
@@ -368,10 +370,10 @@ export function calcModSum(modList, valueType, modNames, config) {
 		});
 		for (const filteredMod of filteredModList) {
 			let value = filteredMod.value;
-			if (filteredMod.keywords && config.modCache) {
-				value = handleModKeywords(filteredMod, config);
+			if (filteredMod.keyword) {
+				value = handleModKeywords(filteredMod, modList, config);
 			}
-			if (valueType === 'more') {
+			if (valueType === "more") {
 				result *= 1 + value / 100;
 			} else {
 				result += value;
@@ -380,23 +382,26 @@ export function calcModSum(modList, valueType, modNames, config) {
 	}
 
 	if (Number.isNaN(result)) {
-		console.error('damageCalc.js/calcModSum returned a NAN. Expected a number', { valueType, modNames });
+		console.error("damageCalc.js/calcModSum returned a NAN. Expected a number", { valueType, modNames });
 		return 0;
 	}
 	return result;
 }
 
 /**
- * @param {Modifiers.StatMod} mod
+ * @param {Modifiers.StatMod} statMod
+ * @param {Modifiers.ModList} modList
  * @param {DamageCalc.Configuration} [config]
  */
-function handleModKeywords(mod, config) {
-	let keywords = mod.keywords;
-	for (const keyword of keywords) {
-		if (keyword.type === 'perStat') {
-			let statValue = config.modCache[keyword.name];
-			let value = statValue * mod.value;
-			return value;
-		}
+function handleModKeywords(statMod, modList, config) {
+    const keyword = statMod.keyword;
+	let value = 0;
+	let statValue = 0;
+	switch (statMod.keyword.type) {
+		case "perStat":
+			statValue = config.modCache[keyword.name] || calcModTotal(modList, keyword.name, config);
+			value = statMod.value * (1 / keyword.value * statValue);
+			break;
 	}
+	return value;
 }
