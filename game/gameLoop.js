@@ -1,18 +1,26 @@
-import { uuidv4 } from "./helperFunctions.js";
+import { uuidv4 } from "../helperFunctions.js";
 const FramesPerSecond = 25;
 const FrameTime = 1000 / FramesPerSecond;
 
 /**
+ * @callback Callback
+ * @param {number} dt
+ * @param {any} params
+ */
+
+/**
  * @typedef Instance
  * @property {string} id
- * @property {(dt: number) => any} callback
- * @property {Options} options
+ * @property {Callback} callback
+ * @property {Options} [options]
  * @property {number} time
  */
 
 /**
  * @typedef Options
- * @property {number} intervalMS
+ * @property {number} [intervalMS]
+ * @property {boolean} [once]
+ * @property {any} [params]
  */
 
 /**
@@ -20,18 +28,21 @@ const FrameTime = 1000 / FramesPerSecond;
  */
 var instances = [];
 
+var toRemove = [];
+
 var isRunning = false;
 var loopId = undefined;
 var now = undefined;
 var remainder = 0;
 
 /**
- * @param {Function} callback
+ * @param {Callback} callback
  * @param {Options} options
  * @returns {string} id
  */
 export function subscribe(callback, options = {}) {
 	var id = uuidv4();
+    /**@type {Instance} */
 	var instance = {
 		id,
 		callback,
@@ -81,11 +92,18 @@ function loop() {
                 instance.time += dt * 1000;
                 let intervalMS = instance.options.intervalMS || 0;
                 if(instance.time > intervalMS){
-                    instance.callback(dt);
+                    instance.callback(dt, instance?.options?.params);
                     instance.time = instance.time - (intervalMS || instance.time);
+                }
+
+                if(instance.options?.once){
+                    toRemove.push(instance);
                 }
 			}
 		}
+        for (const instance of toRemove) {
+            unsubscribe(instance.id);
+        }
 		remainder = diff;
 		loop();
 	}, FrameTime);

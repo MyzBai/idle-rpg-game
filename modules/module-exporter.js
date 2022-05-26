@@ -9,11 +9,12 @@ export function getLocalModulesInfo(){
 
 /**
  * @param {string} name
- * @returns {Promise<Modules.ModuleCollection>} 
+ * @returns {Promise<Modules.ModuleData>} 
  */
 export async function getLocalModule(name) {
 	try {
 		const { default: data } = await import(`./${name.toLowerCase()}/module.json`, { assert: { type: "json" } });
+        data.$schema = undefined;
         return data;
 	} catch (e) {
         console.error(e);

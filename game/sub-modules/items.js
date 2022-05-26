@@ -1,21 +1,24 @@
-import { randomRange, parseModDescription, weightedRandom, deepFreeze } from "../helperFunctions.js";
-import { getModTemplate, getModTemplateList } from "../modTemplates.js";
+import { randomRange, deepFreeze } from "../../helperFunctions.js";
+import { convertRawMods, modTemplateList, parseModDescription } from "../../mods.js";
 import * as player from "../player.js";
-import { convertModToStatMods } from "../modDB.js";
-import * as eventListener from "../eventListener.js";
+import * as eventListener from "../../eventListener.js";
+import { getLevel } from "../player.js";
 
 eventListener.add(eventListener.EventType.SAVE_GAME, save);
 eventListener.add(eventListener.EventType.LOAD_GAME, load);
 
 const itemList = document.querySelector(".s-items .s-item-list");
 const craftingContainer = document.querySelector(".s-items .s-item-options");
-const itemElement = document.querySelector(".s-items .s-item");
+const itemTable = document.querySelector(".s-items .s-item");
 
 /**@type {Item[]} */
 var items = [];
 
 /**@type {Item} */
 var selectedItem = undefined;
+
+/**@type {Items.ModTable[]} */
+var modTables = [];
 
 /**@type {Items.ItemModifier[]} */
 var modCollection = [];
@@ -31,32 +34,49 @@ export async function init(module) {
 
 	maxMods = module.maxMods;
 
+	modTables = module.modTables;
+
 	modCollection = [];
 	modCollection.push(
-		...module.modTables.reduce((a, c) => {
+		...modTables.reduce((a, c) => {
 			const { id, mods } = c;
 			const tableSize = mods.length;
-			let tableIndex = 0;
-			for (const mod of mods) {
-				let { levelReq, weight, stats } = mod;
-				levelReq = levelReq || 1;
-				const modTemplate = getModTemplate(id);
-				const itemMod = {
-					id,
-					desc: modTemplate.desc,
-					levelReq,
-					weight,
-					stats,
-					tableSize,
-					tableIndex,
-				};
-				a.push(itemMod);
-				tableIndex++;
+			for (let i = 0; i < tableSize; i++) {
+				const mod = mods[i];
+                const readonlyDescriptor = {
+                    writable: false
+                }
+				Object.defineProperties(mod, {
+					id: {
+						value: id,
+                        ...readonlyDescriptor
+					},
+					tableIndex: {
+						value: i,
+						...readonlyDescriptor
+					},
+                    levelReq: {
+                        ...readonlyDescriptor
+                    },
+                    weight: {
+                        ...readonlyDescriptor
+                    },
+                    tier: {
+                        get: function(){
+                            const index = i;
+                            const playerLevel = getLevel();
+                            const size = c.mods.map(x => x.levelReq).filter(x => x <= playerLevel).length;
+                            return size - index;
+                        }
+                    }
+				});
+                convertRawMods(mod);
+				a.push(mod);
 			}
 			return a;
 		}, [])
 	);
-	deepFreeze(modCollection);
+	Object.freeze(modCollection);
 
 	createItems(module.items);
 
@@ -70,8 +90,6 @@ export async function init(module) {
 	eventListener.add(eventListener.EventType.ITEM_CHANGED, (item) => {
 		applyItemModifiers(item);
 	});
-
-
 }
 
 function createItems(itemsFromjson) {
@@ -102,54 +120,34 @@ function showItem(item) {
 	});
 	selectedItem = item;
 
-	itemElement.replaceChildren();
-    const frag = document.createDocumentFragment();
-    const playerLevel = player.getLevel();
+	itemTable.replaceChildren();
+	const frag = document.createDocumentFragment();
 	for (const mod of item.getMods()) {
-		const element = document.createElement("div");
-        let tier = -1;
-        mod.table.filter(x => x.levelReq < playerLevel).every((x, i, array) => {
-            tier = array.length - i;
-            if(x.levelReq > mod.tableIndex){
-                return false;
-            }
-            return true;
-        });
-        const parsedDesc = parseModDescription(mod.desc, mod.stats.map(x => x.value));;
-        const modElement = document.createElement('div');
-        modElement.innerHTML = `<div class='s-modifier'><div class='tier'>${tier}</div><div class='desc'>${parsedDesc}</div></div>`;
-        frag.appendChild(element);
+		let tier = mod.tier;
+		const parsedDesc = parseModDescription(mod.description, mod.stats);
+		const tr = document.createElement("tr");
+		tr.insertAdjacentHTML("beforeend", `<td>T${tier}</td><td class="description">${parsedDesc}</td><td style="visibility: hidden">T${tier}</td>`);
+		frag.appendChild(tr);
 	}
+	itemTable.appendChild(frag);
 	eventListener.invoke(eventListener.EventType.ITEM_CHANGED, item);
 }
 
-//Crafting
+/**@param {Items.Crafting.Basic} basicCraftings */
 function setupBasicCrafting(basicCraftings) {
-	const { config, actions } = basicCraftings;
+	const { actions } = basicCraftings;
 	const basicCraftingElement = craftingContainer.querySelector(".s-basic");
 	basicCraftingElement.classList.add("active");
 
 	if (actions.rollMods) {
-		const { weights, tierTargets } = actions.rollMods;
 		const element = basicCraftingElement.querySelector(".s-roll-mods");
 		element.classList.add("active");
-
-		const tierSelectElement = element.querySelector(".tier");
-		const tierTargetOptions = createTierTargetOptions(tierTargets, tierSelectElement);
-		let tierTarget = tierTargetOptions[0].name;
-		let cost = tierTargetOptions[0].cost;
 		const costSpan = element.querySelector(".cost span");
-		costSpan.textContent = cost;
-		tierSelectElement.addEventListener("change", (e) => {
-			const selectedIndex = e.target.selectedIndex;
-			cost = tierTargetOptions[selectedIndex].cost;
-			costSpan.textContent = cost;
-			tierTarget = tierTargetOptions[selectedIndex].name;
-			craftButton.toggleAttribute("disabled", player.getEssenceAmount() < cost);
-		});
+		const cost = actions.rollMods.cost || 0;
+		costSpan.textContent = cost.toFixed(2);
 		const craftButton = element.querySelector(".craft-button");
 		craftButton.addEventListener("click", (e) => {
-			rollModifiers(selectedItem, weights, tierTarget);
+			rollModifiers(selectedItem);
 			showItem(selectedItem);
 			player.setEssenceAmount(player.getEssenceAmount() - cost);
 		});
@@ -167,28 +165,15 @@ function setupBasicCrafting(basicCraftings) {
 		});
 	}
 	if (actions.addMod) {
-		const { tierTargets } = actions.addMod;
 		const element = basicCraftingElement.querySelector(".s-add-mod");
 		element.classList.add("active");
-
-		const tierSelectElement = element.querySelector(".tier");
-		const tierTargetOptions = createTierTargetOptions(tierTargets, tierSelectElement);
-		let tierTarget = tierTargetOptions[0].name;
 		const costSpan = element.querySelector(".cost span");
-		let cost = tierTargetOptions[0].cost;
-		costSpan.textContent = cost;
-		tierSelectElement.addEventListener("change", (e) => {
-			const selectedIndex = e.target.selectedIndex;
-			cost = tierTargetOptions[selectedIndex].cost;
-			costSpan.textContent = cost;
-			tierTarget = tierTargetOptions[selectedIndex].name;
-			craftButton.toggleAttribute("disabled", player.getEssenceAmount() < cost);
-		});
-
+		let cost = actions.addMod.cost || 0;
+		costSpan.textContent = cost.toFixed(2);
 		const craftButton = element.querySelector(".craft-button");
 
 		craftButton.addEventListener("click", (e) => {
-			addModifier(selectedItem, tierTarget);
+			addModifier(selectedItem);
 			showItem(selectedItem);
 			player.setEssenceAmount(player.getEssenceAmount() - cost);
 		});
@@ -209,11 +194,9 @@ function setupBasicCrafting(basicCraftings) {
 	if (actions.rollValues) {
 		const element = basicCraftingElement.querySelector(".s-roll-values");
 		element.classList.add("active");
-
 		const costSpan = element.querySelector(".cost span");
-		let cost = actions.rollValues.cost;
-		costSpan.textContent = cost;
-
+		let cost = actions.rollValues.cost || 0;
+		costSpan.textContent = cost.toFixed(2);
 		const craftButton = element.querySelector(".craft-button");
 
 		craftButton.addEventListener("click", (e) => {
@@ -236,11 +219,9 @@ function setupBasicCrafting(basicCraftings) {
 	if (actions.remove) {
 		const element = basicCraftingElement.querySelector(".s-remove");
 		element.classList.add("active");
-
 		const costSpan = element.querySelector(".cost span");
-		let cost = actions.rollValues.cost;
-		costSpan.textContent = cost;
-
+		let cost = actions.rollValues.cost || 0;
+		costSpan.textContent = cost.toFixed(2);
 		const craftButton = element.querySelector(".craft-button");
 
 		craftButton.addEventListener("click", (e) => {
@@ -263,60 +244,30 @@ function setupBasicCrafting(basicCraftings) {
 	}
 }
 
-function createTierTargetOptions(tierTargets, element) {
-	const tierTargetOptions = [];
-	if (tierTargets.random) {
-		tierTargetOptions.push({ name: "random", cost: tierTargets.random.cost });
-		const option = document.createElement("option");
-		option.textContent = "Random Tier";
-		element.appendChild(option);
-	}
-	if (tierTargets.lucky) {
-		tierTargetOptions.push({ name: "lucky", cost: tierTargets.lucky.cost });
-		const option = document.createElement("option");
-		option.textContent = "Lucky Tier";
-		element.appendChild(option);
-	}
-	if (tierTargets.max) {
-		tierTargetOptions.push({ name: "max", cost: tierTargets.max.cost });
-		const option = document.createElement("option");
-		option.textContent = "Max Tier";
-		element.appendChild(option);
-	}
-	return tierTargetOptions;
-}
-
 /**
  * @param {Item} item
- * @param {number[]} weights
- * @param {string} tierTarget
  */
-function rollModifiers(item, weights, tierTarget) {
+function rollModifiers(item) {
 	let mods = item.getMods();
 	for (const mod of mods) {
 		item.removeModifier(mod);
 	}
 
-	if (weights.length != maxMods) {
-		console.error("weights.length not equal to max mods");
-		return;
-	}
-	let numMods = weightedRandom(weights) + 1;
+	let numMods = Math.floor(randomRange(0, maxMods) + 1);
 	for (let i = 0; i < numMods; i++) {
-		addModifier(item, tierTarget);
+		addModifier(item);
 	}
 }
 /**
  * @param {Item} item
- * @param {string} tierTarget
  */
-function addModifier(item, tierTarget) {
+function addModifier(item) {
 	if (item.getMods().length >= maxMods) {
 		console.error("item already at max mods");
 		return;
 	}
 	const level = player.getLevel();
-	const mod = generateModifiers(level, 1, tierTarget, item.getMods())[0];
+	const mod = generateModifiers(level, 1, item.getMods())[0];
 	if (!mod) {
 		console.error("No modifier available");
 		return;
@@ -347,44 +298,20 @@ function removeRandom(item) {
 /**
  * @param {number} level
  * @param {number} amount
- * @param {string} tierTarget
- * @param {Modifiers.ItemModifier[]} existingMods
+ * @param {Items.ItemModifier[]} existingMods
  * */
-function generateModifiers(level, amount, tierTarget, existingMods = []) {
+function generateModifiers(level, amount, existingMods = []) {
 	const out = [];
 	for (let i = 0; i < amount; i++) {
-		/**@type {Items.ItemModifier[]} */
 		let validMods = [];
 		validMods.push(...modCollection.filter((x) => x.levelReq <= level && !out.some((y) => y.id === x.id) && !existingMods.some((y) => y.id === x.id)));
 
-		if (tierTarget === "maxTier") {
-			const highestTierMods = validMods.reduce((a, c) => {
-				a[c.id] = a[c.id] && a[c.id] > c.tableIndex ? a[c.id] : c;
-				return a;
-			}, {});
-			validMods = [];
-			for (const key in highestTierMods) {
-				if (Object.hasOwnProperty.call(highestTierMods, key)) {
-					const element = highestTierMods[key];
-					validMods.push(element);
-				}
-			}
-		}
+		const mod = validMods.splice(Math.floor(randomRange(0, validMods.length)), 1)[0];
 
-		let mod = validMods.splice(Math.floor(randomRange(0, validMods.length)), 1)[0];
-		if (tierTarget === "lucky") {
-			let luckyMod = validMods.splice(Math.floor(randomRange(0, validMods.length)), 1)[0];
-			if (luckyMod) {
-				if (luckyMod.tableIndex > mod.tableIndex) {
-					mod = luckyMod;
-				}
-			}
-		}
 		if (!mod) {
 			break;
 		}
 
-		mod = JSON.parse(JSON.stringify(mod));
 		for (const stat of mod.stats) {
 			stat.value = randomRange(stat.min, stat.max);
 		}
@@ -395,25 +322,26 @@ function generateModifiers(level, amount, tierTarget, existingMods = []) {
 
 /**@param {Item} item */
 function applyItemModifiers(item) {
-	player.removeModifiersBySource(item);
-    const statMods = convertModToStatMods(item.getMods(), item);
-	player.addStatModifier(...statMods);
+	player.removeStatMods(item);
+    const statMods = item.getMods().flatMap(x => x.stats);
+	player.addStatMods(statMods, item);
 }
 
 class Item {
 	constructor(name) {
-		/**@type {Modifiers.ItemModifier[]} */
+		/**@type {Items.ItemModifier[]} */
 		const mods = [];
 
 		this.name = name;
 
-		/**@returns {Modifiers.ItemModifier[]} */
+		/**@returns {Items.ItemModifier[]} */
 		this.getMods = function () {
 			return [...mods];
 		};
+        /**@param {Items.ItemModifier} mod */
 		this.addModifier = function (mod) {
 			mods.push(mod);
-			let modTemplates = getModTemplateList();
+			let modTemplates = modTemplateList;
 			mods.sort((a, b) => {
 				let i0 = modTemplates.findIndex((x) => x.id === a.id);
 				let i1 = modTemplates.findIndex((x) => x.id === b.id);
@@ -477,7 +405,6 @@ function load(obj) {
 			const { id, values: savedValues } = savedMod;
 			let mod = modCollection.find((x) => x.id === id);
 			if (mod) {
-				mod = JSON.parse(JSON.stringify(mod));
 				for (let j = 0; j < mod.stats.length; j++) {
 					const stat = mod.stats[j];
 					stat.value = savedValues[j];

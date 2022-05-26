@@ -2,15 +2,16 @@ import { uuidv4 } from "./helperFunctions.js";
 
 var instances = [];
 export const EventType = {
-	LEVEL_UP: 1,
-	ENEMY_KILLED: 2,
-	ESSENCE_CHANGED: 3,
-	ITEM_CHANGED: 4,
-    SAVE_GAME: 5,
-    SAVE_GAME_DONE: 6,
-    LOAD_GAME: 7,
-    LOAD_GAME_DONE: 8,
-    RESET: 9
+	LEVEL_UP: 'LEVEL_UP',
+	ENEMY_KILLED: 'ENEMY_KILLED',
+	ESSENCE_CHANGED: 'ESSENCE_CHANGED',
+	ITEM_CHANGED: 'ITEM_CHANGED',
+    MODULE_CHANGED: 'MODULE_CHANGED',
+    SAVE_GAME: 'SAVE_GAME',
+    SAVE_GAME_DONE: 'SAVE_GAME_DONE',
+    LOAD_GAME: 'LOAD_GAME',
+    LOAD_GAME_DONE: 'LOAD_GAME_DONE',
+    RESET: 'RESET',
 };
 Object.freeze(EventType);
 

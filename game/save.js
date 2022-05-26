@@ -1,5 +1,4 @@
-import Global from "./global.js";
-import * as eventListener from "./eventListener.js";
+import * as eventListener from "../eventListener.js";
 
 var saveKey = `g-temp`;
 export function setSaveKey(name){
@@ -27,9 +26,6 @@ export function save() {
 	}
 }
 
-/**
- * @param {object} key
- */
 export async function load() {
 	const data = getSavedObj();
     eventListener.invoke(eventListener.EventType.LOAD_GAME, data);

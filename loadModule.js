@@ -1,8 +1,7 @@
 import { registerTabs } from "./helperFunctions.js";
 import { getLocalModule, getLocalModulesInfo } from "./modules/module-exporter.js";
-import { init as subModulesInit } from "./init-game.js";
 import Global from "./global.js";
-import * as save from "./save.js";
+import * as save from "./game/save.js";
 
 /** import ('./types') */
 
@@ -16,7 +15,6 @@ import * as save from "./save.js";
  * @property {{login: string}} owner
  */
 
-const moduleNames = ["config", "player", "enemies", "skills", "items", "mod-tree"];
 
 const homePage = document.querySelector("body > .p-home");
 /**@type {NodeListOf<HTMLElement>} */
@@ -29,7 +27,9 @@ const ajv = new ajv7({ allowUnionTypes: true });
 var ajvValidator = undefined;
 
 export async function init() {
-	await loadSchemas();
+	//@ts-expect-error
+	const { default: schema } = await import("./modules/module-schema.json", { assert: { type: "json" } });
+	ajvValidator = ajv.compile(schema);
 
 	//new module
 	{
@@ -43,8 +43,8 @@ export async function init() {
 				setTimeout(() => {
 					const filter = e.target.value;
 					e.target.delayUpdate = false;
-                    /**@type {NodeListOf<HTMLElement>} */
-                    const moduleButtons = moduleListContainer.querySelectorAll(".module-button");
+					/**@type {NodeListOf<HTMLElement>} */
+					const moduleButtons = moduleListContainer.querySelectorAll(".module-button");
 					moduleButtons.forEach((x) => {
 						const hide = !x.textContent.toLowerCase().startsWith(filter) && filter.length > 0 && !x.classList.contains("active");
 						x.toggleAttribute("data-hidden", hide);
@@ -123,7 +123,7 @@ export async function init() {
 			});
 			moduleListContainer.appendChild(btn);
 		}
-        //@ts-ignore
+		//@ts-ignore
 		moduleListContainer.firstElementChild.click();
 	}
 
@@ -131,7 +131,7 @@ export async function init() {
 	{
 		let startModuleCallback = undefined;
 		const moduleListContainer = homePage.querySelector(".s-load-modules .s-module-list .s-container");
-        /**@type {HTMLElement} */
+		/**@type {HTMLElement} */
 		const moduleInfoContainer = homePage.querySelector(".s-load-modules .s-module-info");
 		const buttonTemplate = moduleListContainer.querySelector("template");
 
@@ -140,10 +140,10 @@ export async function init() {
 		});
 		for (const savedModule of saves) {
 			const { name, description, src, id, lastSave } = savedModule.config;
-            //@ts-expect-error
+			//@ts-expect-error
 			const btn = buttonTemplate.content.cloneNode(true).firstElementChild;
 			btn.querySelector(".title").textContent = name;
-            /**@type {Intl.DateTimeFormatOptions} */
+			/**@type {Intl.DateTimeFormatOptions} */
 			const dateOptions = {
 				year: "numeric",
 				month: "short",
@@ -193,38 +193,38 @@ export async function init() {
 
 	//upload module
 	{
-		const input = homePage.querySelector(".s-upload input");
-		const startButton = homePage.querySelector(".s-upload .start-button");
-		let startCallback = undefined;
-		input.addEventListener("change", async (e) => {
-			let content = undefined;
-			try {
-				content = JSON.parse(await e.target.files[0].text());
-			} catch (e) {
-				console.error(e);
-			}
-			const errors = validateModule(content);
-			startButton.toggleAttribute("disabled", errors !== null);
-			if (errors) {
-				alert(`Errors detected.\nCheck the console in devtools for more info`);
-				console.error(errors);
-				return;
-			}
-			startCallback = async () => {
-				/**@type {module.} */
-				const module = content;
-				module.config.id = module.config.id || module.config.name || "upload";
-				module.config.src = "upload";
-				startModule(module);
-			};
-			startButton.removeEventListener("click", startCallback);
-			startButton.addEventListener("click", startCallback);
-		});
+		// const input = homePage.querySelector(".s-upload input");
+		// const startButton = homePage.querySelector(".s-upload .start-button");
+		// let startCallback = undefined;
+		// input.addEventListener("change", async (e) => {
+		// 	let content = undefined;
+		// 	try {
+		// 		content = JSON.parse(await e.target.files[0].text());
+		// 	} catch (e) {
+		// 		console.error(e);
+		// 	}
+		// 	const errors = validateModule(content);
+		// 	startButton.toggleAttribute("disabled", errors !== null);
+		// 	if (errors) {
+		// 		alert(`Errors detected.\nCheck the console in devtools for more info`);
+		// 		console.error(errors);
+		// 		return;
+		// 	}
+		// 	startCallback = async () => {
+		// 		/**@type {module.} */
+		// 		const module = content;
+		// 		module.config.id = module.config.id || module.config.name || "upload";
+		// 		module.config.src = "upload";
+		// 		startModule(module);
+		// 	};
+		// 	startButton.removeEventListener("click", startCallback);
+		// 	startButton.addEventListener("click", startCallback);
+		// });
 	}
 }
 
-/**@param {Modules.ModuleCollection} module*/
-function startModule(module) {
+/**@param {Modules.ModuleData} module*/
+async function startModule(module) {
 	switch (module.config.src) {
 		case "local":
 			save.setSaveKey(`local-${module.config.name}`);
@@ -236,26 +236,22 @@ function startModule(module) {
 			save.setSaveKey(`temp`); //temp save
 			break;
 	}
-	subModulesInit(module);
 
-	const btn = document.querySelector(".p-home .go-to-game-button");
+    if(!document.querySelector('#game-page')){
+        const response = await fetch('./game/game.html');
+        const result = await response.text();
+        const doc = new DOMParser().parseFromString(result, 'text/html');
+        const gamePage = doc.querySelector('#game-page');
+        homePage.insertAdjacentElement('afterend', gamePage);
+    }
+
+    const game = await import('./game/game.js');
+	game.init(module);
+
+	const btn = document.querySelector(".p-home .game-btn");
 	btn.classList.remove("hide");
-    //@ts-ignore
+	//@ts-ignore
 	btn.click();
-}
-
-async function loadSchemas() {
-	const names = moduleNames.concat("mods", "module");
-	try {
-		for (const name of names) {
-			const schemaFilename = name + "-schema.json";
-			const { default: data } = await import(`./json/schemas/${schemaFilename.toLowerCase()}`, { assert: { type: "json" } });
-			ajv.addSchema(data, schemaFilename);
-		}
-		ajvValidator = ajv.getSchema("module-schema.json");
-	} catch (e) {
-		console.log(e);
-	}
 }
 
 function printErrors(errors) {
@@ -266,7 +262,7 @@ function printErrors(errors) {
 
 /**
  * @param {number} id
- * @returns {Promise<Modules.ModuleCollection>}
+ * @returns {Promise<Modules.ModuleData>}
  */
 async function getGithubModule(id) {
 	try {

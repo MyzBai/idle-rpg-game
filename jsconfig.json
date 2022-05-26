@@ -2,6 +2,10 @@
     "compilerOptions": {
       "checkJs": true,
       "module": "ESNext",
-      "target": "ESNext"
-    }
+      "target": "ESNext",
+      "skipLibCheck": true,
+      "lib": ["dom", "dom.iterable", "esnext"],
+      "allowSyntheticDefaultImports": true,
+    },
+    "exclude": ["libs"]
   }

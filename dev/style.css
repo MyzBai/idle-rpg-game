@@ -1,0 +1,69 @@
+
+.s-top{
+    display: flex;
+}
+
+/*#region Editor*/
+.p-editor.active{
+    min-height: 0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.p-editor .s-editor-container{
+    flex: 1;
+    position: relative;
+}
+
+.p-editor .text-editor{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+/*#region Sim*/
+.p-sim.active{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+
+}
+.p-sim .s-progress-bar{
+    display: none;
+}
+.p-sim .s-progress-bar.active{
+    display: block;
+    text-align: center;
+    position: relative;
+
+}
+.p-sim .progress-bar{
+    position: absolute;
+    width: 100px;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: -1;
+}
+.p-sim #chart svg{
+    height: 300px;
+}
+
+.p-sim .p-configs .s-mod-table th{
+    background-color: bisque;
+}
+.p-sim .s-mod-table-container table{
+    width: 100%;
+}
+.p-sim .s-mod-table-container table th{
+    text-align: left;
+    font-weight: 100;
+}
+.p-sim .s-mod-table-container table tr.hide{
+    display: none;
+}
+/*#endregion*/

@@ -1,4 +1,4 @@
-/**@type {Environment} */
+/**@type {env.Environment} */
 const environment = {
     ENV_TYPE: 'production',
     features: {

@@ -1,31 +1,27 @@
 import * as player from "../player.js";
-import * as eventListener from "../eventListener.js";
-import { parseModDescription } from "../helperFunctions.js";
-import { getModTemplate } from "../modTemplates.js";
-import { convertModToStatMods } from "../modDB.js";
-
+import * as eventListener from "../../eventListener.js";
+import { convertRawMods, parseModDescription } from "../../mods.js";
+import { jsonCopy } from "../../helperFunctions.js";
 
 const modTreeElement = document.querySelector(".p-game .s-mod-tree");
 const pointsSpan = modTreeElement.querySelector(".points span");
 const nodeContainer = modTreeElement.querySelector(".s-list");
 const nodeTemplate = nodeContainer.querySelector("template");
 const nodeInfoContainer = modTreeElement.querySelector(".s-node-info");
-const unassignButton = nodeInfoContainer.querySelector('.unassign');
+const unassignButton = nodeInfoContainer.querySelector(".unassign");
 
 eventListener.add(eventListener.EventType.SAVE_GAME, save);
 eventListener.add(eventListener.EventType.LOAD_GAME, load);
 
 eventListener.add(eventListener.EventType.LEVEL_UP, (level) => {
-    updatePoints();
-    updateNodes();
-    selectNode(selectedNode);
+	updatePoints();
+	updateNodes();
+	selectNode(selectedNode);
 });
 
-eventListener.add(eventListener.EventType.ESSENCE_CHANGED, amount => {
-    unassignButton.toggleAttribute('disabled', !validateUnassign(selectedNode));
+eventListener.add(eventListener.EventType.ESSENCE_CHANGED, (amount) => {
+	unassignButton.toggleAttribute("disabled", !validateUnassign(selectedNode));
 });
-
-
 
 /**@type {ModTree.Node[]} */
 var nodes = [];
@@ -33,10 +29,10 @@ var nodes = [];
 var selectedNode = undefined;
 var assignClickEvent = undefined;
 var unassignClickEvent = undefined;
-var levelUpEvtId = undefined;
 var numPointsPerLevel = undefined;
 var unassignCost = undefined;
 
+/**@param {Modules.ModTree} data */
 export async function init(data) {
 	console.log("init mod-tree");
 
@@ -44,27 +40,16 @@ export async function init(data) {
 	numPointsPerLevel = data.numPointsPerLevel || 0;
 
 	nodes = [];
-    //@ts-ignore
-	nodeContainer.replaceChildren([]);
+	nodeContainer.replaceChildren();
 	for (const nodeData of data.nodes) {
-		const { name, maxPoints, reqLevel, mods } = nodeData;
-		const node = {
-			name,
-			maxPoints,
-			reqLevel: reqLevel || 0,
-			mods: mods.map((x) => {
-				return {
-					id: x.id,
-					stats: x.stats.map((y) => {
-						return { value: y.value };
-					}),
-				};
-			}),
-		};
+		const { name, maxPoints, levelReq } = nodeData;
+
+		const mods = convertRawMods(nodeData.mods);
+		const node = Object.assign({ ...nodeData }, { mods, levelReq: levelReq || 0 });
 		createNodeElement(node);
 		nodes.push(node);
 	}
-    Object.seal(nodes);
+	Object.seal(nodes);
 
 	selectNode(nodes[0]);
 
@@ -99,7 +84,7 @@ function updateNodes() {
  * @param {ModTree.Node} node
  */
 function createNodeElement(node) {
-    //@ts-expect-error
+	//@ts-expect-error
 	node.element = nodeTemplate.content.cloneNode(true).firstElementChild;
 	node.element.querySelector(".name").textContent = node.name;
 	node.curPoints = 0;
@@ -110,14 +95,13 @@ function createNodeElement(node) {
 	nodeContainer.appendChild(node.element);
 }
 
+/**@param {ModTree.Node} node */
 function setNodeInfo(node) {
 	nodeInfoContainer.querySelector(".name").textContent = node.name;
 	var modsText = "";
 	node.mods.forEach((x) => {
-		var values = x.stats.map((x) => x.value);
-		var desc = getModTemplate(x.id).desc;
-		desc = parseModDescription(desc, values);
-		modsText += `${desc}\n`;
+		const description = parseModDescription(x.description, x.stats);
+		modsText += `${description}\n`;
 	});
 	nodeInfoContainer.querySelector(".content").textContent = modsText;
 	const assignButton = nodeInfoContainer.querySelector(".assign");
@@ -129,7 +113,7 @@ function setNodeInfo(node) {
 	};
 	unassignClickEvent = () => {
 		unallocate(node);
-        player.setEssenceAmount(player.getEssenceAmount() - unassignCost);
+		player.setEssenceAmount(player.getEssenceAmount() - unassignCost);
 	};
 	assignButton.toggleAttribute("disabled", !validateAssign(node));
 	unassignButton.toggleAttribute("disabled", !validateUnassign(node));
@@ -153,17 +137,17 @@ function getRemainingPoints() {
 
 /** @param {ModTree.Node} node */
 function validateAssign(node) {
-    if(!node){
-        return false;
-    }
+	if (!node) {
+		return false;
+	}
 	return node.curPoints < node.maxPoints && getRemainingPoints() > 0;
 }
 
 /** @param {ModTree.Node} node */
 function validateUnassign(node) {
-    if(!node){
-        return false;
-    }
+	if (!node) {
+		return false;
+	}
 	return node.curPoints > 0 && player.getEssenceAmount() >= unassignCost;
 }
 
@@ -190,19 +174,16 @@ function unallocate(node) {
 
 /**@param {ModTree.Node} node */
 function updateStatMods(node) {
-	player.removeModifiersBySource(node);
+	player.removeStatMods(node);
 
-    //we need to modify the stats value here
-    //so we make a copy of the mods to prevent
-    const modCopies = [];
-	for (const mod of node.mods) {
-        const modCopy = JSON.parse(JSON.stringify(mod));
-        for (const statMod of modCopy.stats) {
-            statMod.value *= node.curPoints;
+
+    for (const mod of node.mods) {
+        for (const stat of mod.stats) {
+            stat.value = stat.min * node.curPoints;
         }
-        modCopies.push(modCopy);
-	}
-	player.addStatModifier(...convertModToStatMods(modCopies, node));
+    }
+
+	player.addStatMods(node.mods.flatMap((x) => x.stats), node);
 }
 
 function setNodePoints(node) {
@@ -217,11 +198,11 @@ function save(savedObj) {
 	savedObj.modTree = {
 		nodes: [],
 	};
-    nodes.forEach(x => {
-        if(x.curPoints > 0){
-            savedObj.modTree.nodes.push({name: x.name, value: x.curPoints});
-        }
-    });
+	nodes.forEach((x) => {
+		if (x.curPoints > 0) {
+			savedObj.modTree.nodes.push({ name: x.name, value: x.curPoints });
+		}
+	});
 }
 
 function load(obj) {
@@ -229,12 +210,12 @@ function load(obj) {
 		return;
 	}
 
-    //reset nodes
-    nodes.forEach(x => {
-        player.removeModifiersBySource(x);
-        x.curPoints = 0;
-    });
-    updateNodes();
+	//reset nodes
+	nodes.forEach((x) => {
+		player.removeStatMods(x);
+		x.curPoints = 0;
+	});
+	updateNodes();
 
 	for (const node of obj.modTree.nodes) {
 		for (let i = 0; i < node.value; i++) {

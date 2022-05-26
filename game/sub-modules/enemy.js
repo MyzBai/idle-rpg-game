@@ -1,5 +1,5 @@
 import { getLevel as getPlayerLevel } from "../player.js";
-import * as eventListener from "../eventListener.js";
+import * as eventListener from "../../eventListener.js";
 
 eventListener.add(eventListener.EventType.SAVE_GAME, save);
 eventListener.add(eventListener.EventType.LOAD_GAME, load);
@@ -19,13 +19,12 @@ export async function init(data) {
 		return;
 	}
 	console.log("init enemy");
-
-	maxHealth = data.enemyList[0].health;
+    healthList = data.enemyList.map(x => x.health);
+    Object.freeze(healthList);
+	maxHealth = healthList[0];
 	curHealth = maxHealth;
 	console.log(`Enemy initialized with %c${maxHealth}%c max health`, "color: red", "color: default");
 	updateHealthbar();
-
-
 }
 
 /**@param {number} damage */

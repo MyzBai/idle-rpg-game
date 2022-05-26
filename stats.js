@@ -1,62 +1,44 @@
-import * as damageCalc from './damageCalc.js';
-import * as player from './player.js';
 
-const statsContainer = document.querySelector('body .p-game .s-stats .s-stats-container');
-const statFieldTemplate = statsContainer.querySelector('template');
-
-export function update() {
-    var result = damageCalc.calcStats({modList: player.getModList(), modCache: player.getModCache(), conversionTable: player.getConversionTable()});
-
-    statsContainer.replaceChildren();
-
-    //dps
-    createStatLabel('Dps:', `${result.dps.toFixed(2)}`);
-    //chance to hit
-    createStatLabel('Hit Chance:', `${(result.hitChance * 100).toFixed()}%`);
-    //attacks per second
-    createStatLabel('Attacks Per Second:', `${(result.attackSpeed).toFixed(2)}`);
-    //max regen
-    createStatLabel('Maximum Mana:', `${result.maxMana.toFixed()}`);
-    //mana regen
-    createStatLabel('Mana Regeneration Per Second:', `${(result.manaRegen).toFixed(1)}`);
-    //total combined damage
-    createStatLabel('Total Combined Damage:', `${result.minTotalCombinedDamage.toFixed()} - ${result.maxTotalCombinedDamage.toFixed()}`);
-    //physical
-    createStatLabel('Physical Damage:', `${result.minPhysicalDamage.toFixed()} - ${result.maxPhysicalDamage.toFixed()}`);
-    //elemental
-    if (result.minElementalDamage + result.maxElementalDamage > 0) {
-        createStatLabel('Elemental Damage:', `${result.minElementalDamage.toFixed()} - ${result.maxElementalDamage.toFixed()}`);
-    }
-    //chaos
-    if (result.minChaosDamage + result.maxChaosDamage > 0) {
-        createStatLabel('Chaos Damage:', `${result.minChaosDamage.toFixed()} - ${result.maxChaosDamage.toFixed()}`);
-    }
-    //crit
-    if (result.critChance > 0) {
-        createStatLabel('Crit Chance:', `${(result.critChance * 100).toFixed()}%`);
-        createStatLabel('Crit Multi:', `${(result.critMulti * 100).toFixed()}%`);
-    }
-    //bleed
-    if (result.bleedChance > 0) {
-        createStatLabel('Bleed Chance:', `${(result.bleedChance * 100).toFixed()}%`);
-        createStatLabel('Bleed Damage:', `${result.minBleedDamage.toFixed()} - ${result.maxBleedDamage.toFixed()}`);
-    }
-
-    createStatLabel('Strength:', `${result.strength.toFixed()}`);
-    createStatLabel('Dexterity:', `${result.dexterity.toFixed()}`);
-    createStatLabel('Intelligence:', `${result.intelligence.toFixed()}`);
+/**
+ * @param {DamageCalc.StatsOutput} stats
+ * @returns {DocumentFragment}
+ */
+export function getFormattedTableFragment(stats) {
+	const formattedStats = getFormattedStats(stats);
+	const frag = document.createDocumentFragment();
+    const container = document.createElement('table');
+    container.classList.add('g-formatted-stats');
+    frag.appendChild(container);
+	for (const stat of Object.values(formattedStats)) {
+		const tr = document.createElement("tr");
+        /**@type {string[]} */
+        const split = stat.split(':');
+		tr.insertAdjacentHTML("beforeend", `<td>${split[0].trim()}</td><td>${split[1].trim()}</td>`);
+		container.appendChild(tr);
+	}
+	return frag;
 }
 
 /**
- * @param {string} text
- * @param {string} valueText
+ * @param {DamageCalc.StatsOutput} stats
+ * @returns {Stats.FormattedTextOutput}
  */
-function createStatLabel(text, valueText) {
-    
-    const fieldElement = statFieldTemplate.content.cloneNode(true);
-    //@ts-expect-error
-    fieldElement.firstElementChild.children[0].textContent = text;
-    //@ts-expect-error
-    fieldElement.firstElementChild.children[1].textContent = valueText;
-    statsContainer.appendChild(fieldElement);
+export function getFormattedStats(stats) {
+    return {
+        dps: `DPS :${(stats.dps).toFixed()}`,
+        hitChance: `Hit Chance: ${(stats.hitChance * 100).toFixed()}%`,
+        attackSpeed: `Attacks Per Second: ${stats.attackSpeed.toFixed(2)}`,
+        physicalAttackDps: `Physical Attack Dps: ${stats.physicalAttackDps.toFixed(2)}`,
+        physicalAttackDamage: `Physical Attack Damage: ${stats.minPhysicalAttackDamage.toFixed()}-${stats.maxPhysicalAttackDamage.toFixed()}`,
+        critChance: `Crit Chance: ${(stats.critChance * 100).toFixed()}%`,
+        critMulti: `Crit Multiplier: ${(stats.critMulti * 100).toFixed()}%`,
+        bleedDps: `Bleed Dps: ${stats.bleedDps.toFixed(2)}`,
+        bleedChance: `Bleed Chance: ${(stats.bleedChance * 100).toFixed()}%`,
+        bleedStacks: `Maximum Bleed Stacks: ${(stats.bleedCount).toFixed()}`,
+        mana: `Mana: ${stats.mana.toFixed()}`,
+        manaRegen: `Mana Regeneration: ${stats.manaRegen.toFixed(2)}`,
+        strength: `Strength: ${stats.strength.toFixed()}`,
+        dexterity: `Dexterity: ${stats.dexterity.toFixed()}`,
+        intelligence: `Intelligence: ${stats.intelligence.toFixed()}`,
+    }
 }

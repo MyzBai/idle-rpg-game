@@ -1,47 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta http-equiv='cache-control' content='no-cache'> 
-    <meta http-equiv='expires' content='0'> 
-    <meta http-equiv='pragma' content='no-cache'> -->
-    <title>Document</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/8.10.0/ajv7.min.js"></script>
+    <title>Document</title>
 </head>
+
 <body>
     <!--Home-->
-    <fieldset id="home-page" class="p-home" data-tab-content>
-        <legend>Home</legend>
-        <div class="go-to-game-button g-button hide" data-tab-target="body .p-game">Game</div>
+    <div id="home-page" class="p-home active" data-tab-content>
+        <!-- <legend>Home</legend> -->
+        <div class="game-btn g-button hide" data-tab-target="body .p-game">Game</div>
 
-        <fieldset>
-            <legend>Buttons</legend>
+        <header>
             <div class="s-buttons">
                 <div class="new-module-button g-button" data-tab-target=".s-new-modules">New</div>
                 <div class="load-module-button g-button" data-tab-target=".s-load-modules">Load</div>
-                <div class="custom-module-button g-button" data-tab-target=".s-upload">Custom</div>
+                <!-- <div class="custom-module-button g-button" data-tab-target=".s-upload">Custom</div> -->
             </div>
-        </fieldset>
+        </header>
 
-        <fieldset class="s-new-modules" data-tab-content>
-            <legend>New Module</legend>
-                <div class="s-module-list">
-                    <div class="s-filter">
-                        <input type="url">
-                    </div>
-                    <div class="s-container g-vertical-menu-container">
-            
-                    </div>
+        <main class="s-new-modules" data-tab-content>
+            <!-- <legend>New Module</legend> -->
+            <div class="s-module-list">
+                <div class="s-filter">
+                    <input type="url">
                 </div>
-                <div class="s-module-info">
-                    <p class="name"></p>
-                    <p class="description"></p>
-                    <div class="start-button g-button">Start</div>
+                <div class="s-container g-vertical-menu-container">
+
                 </div>
-        </fieldset>
+            </div>
+            <div class="s-module-info">
+                <p class="name"></p>
+                <p class="description"></p>
+                <div class="start-button g-button">Start</div>
+            </div>
+        </main>
 
         <fieldset class="s-load-modules" data-tab-content>
             <legend>Load Game</legend>
@@ -62,156 +60,21 @@
             </div>
         </fieldset>
 
-        <fieldset class="s-upload" data-tab-content>
+        <!-- <fieldset class="s-upload" data-tab-content>
             <legend>Upload File</legend>
             <div>
                 <input type="file" name="file" accept=".json">
             </div>
-            <div class="start-button g-button" disabled >Start</div>
-        </fieldset>
+            <div class="start-button g-button" disabled>Start</div>
+        </fieldset> -->
 
-    </fieldset>
-
-    <!--Game-->
-    <fieldset id="game-page" class="p-game" data-tab-content>
-        <legend>Game</legend>
-        <div class="s-top">
-            <div class="go-to-home-button g-button" data-tab-target="body .p-home">Home</div>
-            <div class="s-text" style="text-align: center;">
-                <label class="s-level">Level <span>1</span></label>
-                <label class="s-essence" style="display: block;">Essence <span>1</span></label>
-            </div>
-            <!-- <fieldset class="s-dev-tools">
-                <legend>Test</legend>
-                <label class="status-game">Status: <span>stopped</span></label>
-                <div style="display: flex;">
-                    <div class="save-btn g-button">Save</div>
-                    <div class="load-btn g-button">Load</div>
-                    <div class="start-game g-button">Start</div>
-                    <div class="stop-game g-button">Stop</div>
-                    <div class="reset-game g-button">Reset</div>
-                    <div class="kill-enemy g-button">Instant Kill</div>
-                </div>
-            </fieldset> -->
-        </div>
-
-        <div class="container">
-            <!--Menu-->
-            <fieldset class="s-menu">
-                <legend>Main Menu</legend>
-                <div class="s-container g-vertical-menu-container">
-                    <div class="g-button" data-tab-target=".s-combat">Combat</div>
-                    <div class="g-button" data-tab-target=".s-skills">Skills</div>
-                    <div class="g-button" data-tab-target=".s-items">Items</div>
-                    <div class="g-button" data-tab-target=".s-mod-tree">Mod Tree</div>
-                </div>
-            </fieldset>
-            <!--Main-->
-            <div class="s-main">
-                <fieldset class="s-combat active" data-tab-content>
-                    <legend>Combat</legend>
-                    <div class="g-progress-bar-background s-health-bar-background">
-                        <div class="g-progress-bar-foreground health-bar"></div>
-                    </div>
-                    <div>
-                        <div class="ailment bleed">Bleed: <span></span>s</div>
-                    </div>
-                    <div class="g-progress-bar-background s-mana-bar-background">
-                        <div class="g-progress-bar-foreground mana-bar"></div>
-                    </div>
-                </fieldset>
-                <fieldset class="s-skills" data-tab-content>
-                    <legend>Skills</legend>
-                    <div class="s-skill-list">
-                        <fieldset class="s-attack-skills list g-vertical-menu-container">
-                            <Legend>Attack Skills</Legend>
-                            <div class="g-button">Default Attack</div>
-                        </fieldset>
-                        <fieldset class="s-supports list g-vertical-menu-container">
-                            <Legend>Supports</Legend>
-                            <div class="g-button">Increased Damage</div>
-                        </fieldset>
-                    </div>
-                    <div class="s-skill-info">
-                        <div class="name">Test</div>
-                        <div class="g-separator"></div>
-                        <div class="s-stats"></div>
-                        <div class="g-separator"></div>
-                        <div class="s-mods"></div>
-                        <div class="g-button" style="margin-bottom: 3px">Enable</div>
-                    </div>
-                </fieldset>
-                <fieldset class="s-items" data-tab-content>
-                    <legend>Items</legend>
-                    <div class="s-item-list g-vertical-menu-container"></div>
-                    <div class="s-item"></div>
-                    <div class="s-item-options">
-                        <div class="s-basic">
-                            <div class="s-roll-mods s-craft-action">
-                                <div class="title">Roll Modifiers</div>
-                                <select class="tier"></select>
-                                <div class="cost">Cost <span>0</span></div>
-                                <div class="craft-button g-button">Craft</div>
-                            </div>
-                            <div class="s-add-mod s-craft-action">
-                                <div class="title">Add Modifier</div>
-                                <select class="tier"></select>
-                                <div class="cost">Cost <span>0</span></div>
-                                <div class="craft-button g-button">Craft</div>
-                            </div>
-                            <div class="s-roll-values s-craft-action">
-                                <div class="title">Roll Values</div>
-                                <div class="cost">Cost <span>0</span></div>
-                                <div class="craft-button g-button">Craft</div>
-                            </div>
-                            <div class="s-remove s-craft-action">
-                                <div class="title">Remove Random Modifier</div>
-                                <div class="cost">Cost <span>0</span></div>
-                                <div class="craft-button g-button">Craft</div>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-                <fieldset class="s-mod-tree" data-tab-content>
-                    <legend>Mod Tree</legend>
-                    <div class="s-top">
-                        <div class="points">Points: <span>0</span></div>
-                    </div>
-                    <div class="s-list g-vertical-menu-container">
-                        <template id="nodeTemplate">
-                            <div class="s-node g-button">
-                                <div class="name"></div>
-                                <div class="points"></div>
-                            </div>
-                        </template>
-                    </div>
-                    <div class="s-node-info">
-                        <div class="name"></div>
-                        <div class="content"></div>
-                        <div class="assign g-button">Assign</div>
-                        <div class="unassign g-button">Unassign <span></span></div>
-                    </div>
-                </fieldset>
-            </div>
-            <!--Stats-->
-            <fieldset class="s-stats">
-                <legend>Stats</legend>
-                <div class="s-stats-container">
-                    <template>
-                        <div class="s-stats-field">
-                            <div></div>
-                            <div></div>
-                        </div>
-                    </template>
-                </div>
-            </fieldset>
-        </div>
-    </fieldset>
-    <div class="footer">
-        <div>Footer</div>
     </div>
 
+    <footer class="footer">
+        <div>Footer</div>
+    </footer>
     <script type="module" src="./main.js"></script>
 
 </body>
+
 </html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.js"></script>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="import" href="./index.html">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0-dev.20220414/min/vs/loader.min.js">
+    </script>
+    <title>Dev</title>
+</head>
+
+<body>
+    <div class="s-top">
+        <div class="editor g-button" data-tab-target=".p-editor">Editor</div>
+        <div class="sim g-button" data-tab-target=".p-sim">Sim</div>
+        <div class="game g-button" data-tab-target=".p-game">Game</div>
+    </div>
+    <!--Editor-->
+    <div class="p-editor" data-tab-content>
+        <div class="s-options" style="display: flex;">
+            <input class="import" type="file" accept="json" style="display: none">
+            <div class="import-button g-button">Import</div>
+            <div class="compile-button g-button">Compile</div>
+        </div>
+        <div class="s-editor-container">
+            <div class="text-editor"></div>
+        </div>
+    </div>
+    <!--Sim-->
+    <div class="p-sim" data-tab-content>
+        <div class="s-tabs" style="display: flex;">
+            <div class="config g-button" data-tab-target=".p-sim .p-configs">Configurations</div>
+            <div class="sim g-button" data-tab-target=".p-sim .p-simulation">Simulation</div>
+            <div class="clear-cache g-button" style="margin-left: auto">Clear Cache</div>
+        </div>
+        <div class="p-configs" data-tab-content>
+            <div class="new-config g-button">Create New</div>
+            <div class="s-config" style="display: none; border: 1px solid black; padding: 3px; margin: 3px;">
+                <div class="s-tabs" style="margin-top: 3px;"></div>
+                <div class="s-options">
+                    <div class="remove g-button" style="display: block; width: fit-content;">Remove</div>
+                    <input class="name" type="text" spellcheck="false">
+                </div>
+                <div class="s-mod-table">
+                    <input class="table-filter" type="text" placeholder="Filter...">
+                    <div class="s-mod-table-container"></div>
+                </div>
+            </div>
+    
+        </div>
+        <div class="p-simulation" data-tab-content>
+            <table class="s-options">
+                <tr>
+                    <td>Iterations</td>
+                    <td class="iterations"><input type="number" value="1"></td>
+                </tr>
+                <tr>
+                    <td>Print To Console</td>
+                    <td class="print"><input type="checkbox"></td>
+                </tr>
+                <tr>
+                    <td>Min Level</td>
+                    <td class="min-level"><input type="number" value="1"></td>
+                </tr>
+                <tr>
+                    <td>Max Level</td>
+                    <td class="max-level"><input type="number"></td>
+                </tr>
+            </table>
+
+            <div class="start-sim g-button">Run Sim</div>
+
+            <div class="s-graph">
+                <div class="s-progress-bar">
+                    <div class="text">100%</div>
+                    <div class="progress-bar"></div>
+                </div>
+                <div id="chart"></div>
+                <div class="s-chart-stats">
+                    <div class="tabs"></div>
+                    <div class="content"></div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+    <!-- <script type="module" src="./sim.js"></script> -->
+    <!-- <script type="module" src="./jsonEditor.js"></script> -->
+
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

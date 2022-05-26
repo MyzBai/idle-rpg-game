@@ -1,9 +1,7 @@
 import * as player from "../player.js";
-import { convertModToStatMods } from "../modDB.js";
-import { parseModDescription, deepFreeze } from "../helperFunctions.js";
-import { getModTemplate } from "../modTemplates.js";
-import * as eventListener from "../eventListener.js";
-import { calcModTotal, ModFlags } from "../damageCalc.js";
+import { deepFreeze } from "../../helperFunctions.js";
+import { convertRawMods, createBaseStatMod, parseModDescription, statModNames } from "../../mods.js";
+import * as eventListener from "../../eventListener.js";
 
 eventListener.add(eventListener.EventType.SAVE_GAME, save);
 eventListener.add(eventListener.EventType.LOAD_GAME, load);
@@ -14,8 +12,6 @@ eventListener.add(eventListener.EventType.LOAD_GAME, load);
  * @property {string[]} supports
  */
 
-
-
 /**@type {HTMLElement} */
 const skillView = document.querySelector(".s-skills .s-skill-info");
 /**@type {HTMLElement} */
@@ -23,8 +19,12 @@ const attackSkillContainer = document.querySelector(".s-skills .s-attack-skills"
 /**@type {HTMLElement} */
 const supportSkillContainer = document.querySelector(".s-skills .s-supports");
 
+/**@type {Modules.Skills} data */
+var skillsModule = undefined;
+
 var skillViewButtonCallback = undefined;
 
+/**@type {number} */
 var maxSupports = undefined;
 
 /**@type {Skills.AttackSkill} */
@@ -45,13 +45,19 @@ export async function init(data) {
 
 	attackSkillContainer.replaceChildren();
 	supportSkillContainer.replaceChildren();
+	skillsModule = data;
 
-	maxSupports = data.maxSupports || 0;
-    supports = new Array(maxSupports).fill();
-    Object.seal(supports);
+	maxSupports = data.maxSupports;
+
+	supports = [];
 	//set and validate attack skills
 	{
-		attackSkillsCollection = data.attacks || [];
+		attackSkillsCollection = [...data.attackSkills];
+		for (const attackSkill of attackSkillsCollection) {
+			attackSkill.mods = convertRawMods(attackSkill.mods);
+			deepFreeze(attackSkill);
+		}
+
 		const duplicates = new Set();
 		attackSkillsCollection.every((x) => {
 			if (duplicates.has(x.name)) {
@@ -60,12 +66,26 @@ export async function init(data) {
 			}
 			duplicates.add(x.name);
 		});
-		deepFreeze(attackSkillsCollection);
+
+		//create attack skill buttons
+		const frag = document.createDocumentFragment();
+		for (const attackSkill of attackSkillsCollection) {
+			const btn = createSkillButton(attackSkill, "attack");
+			frag.appendChild(btn);
+		}
+		attackSkillContainer.appendChild(frag);
+
+		setAttackSkill(attackSkillsCollection[0]);
 	}
 
 	//set and validate support skills
 	{
-		supportsCollection = data.supports || [];
+		supportsCollection = [...data.supportSkills];
+		for (const support of supportsCollection) {
+			support.mods = convertRawMods(support.mods);
+		}
+
+		deepFreeze(supportsCollection);
 		const duplicates = new Set();
 		supportsCollection.every((x) => {
 			if (duplicates.has(x.name)) {
@@ -74,25 +94,12 @@ export async function init(data) {
 			}
 			duplicates.add(x.name);
 		});
-		deepFreeze(supportsCollection);
-	}
 
-	//create attack skill buttons
-	{
-		const frag = document.createDocumentFragment();
-		for (const attackSkill of attackSkillsCollection) {
-			const btn = createSkillButton(attackSkill, 'attack');
-			frag.appendChild(btn);
-		}
-		attackSkillContainer.appendChild(frag);
-	}
-
-	//create support skill buttons
-	{
+		//create support skill buttons
 		if (supportsCollection) {
 			const frag = document.createDocumentFragment();
 			for (const support of supportsCollection) {
-				const btn = createSkillButton(support, 'support');
+				const btn = createSkillButton(support, "support");
 				frag.appendChild(btn);
 			}
 			supportSkillContainer.appendChild(frag);
@@ -100,47 +107,45 @@ export async function init(data) {
 			supportSkillContainer.style.display = "none";
 		}
 	}
-
-	const defaultAttackSkill = attackSkillsCollection[0];
-	if (defaultAttackSkill) {
-		setAttackSkill(defaultAttackSkill);
-	}
-	showSkill(attackSkillsCollection[0], "attack");
 }
 
 /** @param {Skills.AttackSkill} skill */
 function setAttackSkill(skill) {
-	player.removeModifiersBySource(attackSkill);
+	player.removeStatMods(attackSkill);
 	attackSkill = skill;
 
-    const attackSpeedMod = {name: 'attackSpeed', valueType: 'base', value: skill.stats.attackSpeed, source: attackSkill};
+	const attackSpeedMod = createBaseStatMod(statModNames.attackSpeed, skill.stats.attackSpeed);
 
-    let manaCost = attackSkill.stats.manaCost;
-    {
-        const multiplier = supports.reduce((a, c) => a += c?.stats.manaMultiplier || 0, 0);
-        manaCost *= 1 + multiplier/100;
-    }
-	const manaCostMod = { name: "manaCost", valueType: "base", value: manaCost, flags: ModFlags.Attack, source: attackSkill };
-
-	player.addStatModifier(...convertModToStatMods(skill.mods, attackSkill), manaCostMod, attackSpeedMod);
-    [...attackSkillContainer.children].forEach(x => x.classList.toggle('active', x.textContent === attackSkill.name));
+	let manaCost = attackSkill.stats.manaCost || 0;
+	{
+		const multiplier = supports.reduce((a, c) => (a += c?.stats.manaMultiplier || 0), 0);
+		manaCost *= 1 + multiplier / 100;
+	}
+	const manaCostMod = createBaseStatMod(statModNames.manaCost, manaCost);
+	player.addStatMods([...skill.mods.flatMap((x) => x.stats), manaCostMod, attackSpeedMod], skill);
+	[...attackSkillContainer.children].forEach((x) => x.classList.toggle("active", x.textContent === attackSkill.name));
 	showSkill(attackSkill, "attack");
 }
 
 /** @param {Skills.SupportSkill} skill */
 function toggleSupport(skill) {
-    for(let i = 0; i < supports.length; i++){
-        if(!supports[i]){
-            supports[i] = skill;
-            player.addStatModifier(...convertModToStatMods(skill.mods, skill));
-            break;
-        } else if(supports[i].name === skill.name){
-            supports[i] = undefined;
-            player.removeModifiersBySource(skill);
-            break;
-        }
-    }
-    [...supportSkillContainer.children].forEach(x => x.classList.toggle('active', supports.some(y => y?.name === x.textContent)));
+	const index = supports.findIndex((x) => x === skill);
+	if (index !== -1) {
+		player.removeStatMods(skill);
+		supports.splice(index, 1);
+	} else {
+		supports.push(skill);
+		player.addStatMods(
+			skill.mods.flatMap((x) => x.stats),
+			skill
+		);
+	}
+	[...supportSkillContainer.children].forEach((x) =>
+		x.classList.toggle(
+			"active",
+			supports.some((y) => y?.name === x.textContent)
+		)
+	);
 }
 
 /**
@@ -169,7 +174,7 @@ function showSkill(skill, type) {
 		/**@type {Skills.AttackSkillStats} */
 		const stats = skill.stats;
 		statsText += `Attack Speed: ${stats.attackSpeed} sec\n`;
-		statsText += `Mana Cost: ${stats.manaCost}\n`;
+		statsText += `Mana Cost: ${stats.manaCost || 0}\n`;
 		statsText += `Base Damage Multiplier: ${stats.baseDamageMultiplier}%`;
 		skillView.querySelector(".s-stats").textContent = statsText;
 	} else {
@@ -181,10 +186,8 @@ function showSkill(skill, type) {
 	//Mods
 	let modsText = "";
 	skill.mods.forEach((x) => {
-		var values = x.stats.map((x) => x.value);
-		var desc = getModTemplate(x.id).desc;
-		desc = parseModDescription(desc, values);
-		modsText += `${desc}\n`;
+		const description = parseModDescription(x.description, x.stats);
+		modsText += `${description}\n`;
 	});
 	modsText = modsText.substring(0, modsText.length - 1);
 	skillView.querySelector(".s-mods").textContent = modsText;
@@ -258,3 +261,5 @@ function load(obj) {
 	//@ts-expect-error
 	attackSkillContainer.firstElementChild.click();
 }
+
+export { maxSupports, attackSkill, supports };

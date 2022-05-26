@@ -19,9 +19,8 @@
     --primary-color-button-hover: rgb(168, 168, 168);
     --primary-color-button-active: rgb(138, 138, 138);
     --primary-color-button-disabled: var(--primary-color-button-active);
-
-    
 }
+
 
 body{
     margin: 0;
@@ -30,11 +29,13 @@ body{
     height: 100vh;
     display: flex;
     flex-direction: column;
+    padding: 6px;
 }
 
 fieldset{
-    border: 1px solid black;
+    border: 1px solid #00000030;
     padding: 0px 6px 6px 12px;
+    /* display:inline-block; */
 }
 
 [data-tab-content]{
@@ -50,6 +51,16 @@ div.hide,
     display: block;
 }
 
+button {
+    all: unset;
+}
+
+input{
+    outline: 0;
+}
+
+
+/*#region Globals*/ 
 .g-button{
     display: inline-block;
     padding: 3px 6px;
@@ -57,7 +68,6 @@ div.hide,
     user-select: none;
     text-align: center;
 }
-
 
 .g-button:hover{
     cursor: default;
@@ -84,7 +94,6 @@ div.hide,
     border-bottom: 1px solid var(--primary-color-button-disabled);
 }
 
-
 .g-separator{
     content: '';
     margin: auto;
@@ -93,6 +102,7 @@ div.hide,
     /* background-color: rgb(77, 77, 77); */
     background: linear-gradient(90deg,transparent,rgb(77, 77, 77), transparent);
 }
+
 
 .g-progress-bar-background{
     position:relative;
@@ -104,19 +114,26 @@ div.hide,
     position: absolute;
 }
 
+.g-formatted-stats td:first-child{
+    padding-right: 24px;
+}
+.g-formatted-stats tr:nth-child(odd){
+    background-color: rgb(230, 230, 230);
+}
+
+/*#endregion*/
+
 /*#region Home Page*/
 
 .p-home.active{
     display: flex;
     flex-direction: column;
-    min-height: 0;
     flex: 1;
 }
 
-.p-home > .title{
-    text-align: center;
-    font-size: 1.5em;
-    font-weight: 1000;
+.p-home .game-btn{
+    display: block;
+    align-self: flex-start;
 }
 
 .p-home .s-buttons{
@@ -125,8 +142,11 @@ div.hide,
     margin-top: 6px;
 }
 
-.p-home .go-to-game-button{
-    align-self: start;
+.p-home .s-new-modules{
+    margin-top: 3px;
+    padding-top: 3px;
+    border: 1px solid #00000020;
+
 }
 
 .p-home .s-module-list{
@@ -226,40 +246,40 @@ div.hide,
 }
 /*#endregion*/
 
-/*Game Page*/
+/*#region Game Page*/
 
 .p-game.active{
     flex: 1;
-    display: flex;
-    flex-direction: column;
     min-height: 0px;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 
+    'top top top'
+    'menu main stats';
 }
 
-.p-game .container{
-    min-height: 0px;
+.p-game .s-top{
+    grid-area: top;
 }
 
-.p-game .go-to-home-button{
-    align-self: start;
-    grid-column: 1 / 4;
+.p-game .s-top .s-text{
+    text-align: center;
 }
 
 .p-game .s-menu{
     display: flex;
     min-width: 150px;
+    grid-area: menu;
 }
 .p-game .s-menu > .s-container{
     flex: 1;
 }
 
-.p-game .s-main {
+.p-game main {
     display: flex;
     flex: 1;
-    
-}
-
-.p-game .container{
-    display: flex;
+    grid-area: main;
 }
 
 /*Combat*/
@@ -268,25 +288,25 @@ div.hide,
     flex: 1;
 }
 
-.p-game .s-main .s-combat .s-health-bar-background{
+.p-game main .s-combat .s-health-bar-background{
     background-color: var(--health-bar-background-color);
 }
-.p-game .s-main .s-combat .health-bar{
+.p-game main .s-combat .health-bar{
     background-color: var(--health-bar-foreground-color);
 }
 
-.p-game .s-main .s-combat .s-mana-bar-background{
+.p-game main .s-combat .s-mana-bar-background{
     background-color: var(--mana-bar-background-color);
 }
-.p-game .s-main .s-combat .mana-bar{
+.p-game main .s-combat .mana-bar{
     background-color: var(--mana-bar-foreground-color);
 }
 
 
-.p-game .s-main .s-combat .ailment{
+.p-game main .s-combat .ailment{
     visibility: hidden;
 }
-.p-game .s-main .s-combat .ailment.visible{
+.p-game main .s-combat .ailment.visible{
     visibility:visible;
 }
 
@@ -305,17 +325,17 @@ div.hide,
 
 
 /*Skills*/
-.p-game .s-main .s-skills.active{
+.p-game main .s-skills.active{
     flex: 1;
     display: flex;
 }
 
-.p-game .s-main .s-skills .s-skill-list{
+.p-game main .s-skills .s-skill-list{
     flex: 1;
     display: flex;
 }
 
-.p-game .s-main .s-skills .s-skill-list .list{
+.p-game main .s-skills .s-skill-list .list{
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -325,49 +345,67 @@ div.hide,
     overflow-y: auto;
 }
 
-.p-game .s-main .s-skills .s-skill-list .viewing{
+.p-game main .s-skills .s-skill-list .viewing{
     border: 1px solid rgb(212, 176, 60);
 }
 
-.p-game .s-main .s-skills .s-skill-list .g-button{
+.p-game main .s-skills .s-skill-list .g-button{
     text-align: left;
 }
 
-.p-game .s-main .s-skills .s-skill-info{
+.p-game main .s-skills .s-skill-info{
     flex: 0.7;
     text-align: center;
     display: flex;
     flex-direction: column;
     padding: 3px;
 }
-.p-game .s-main .s-skills .s-skill-info .separator{
+.p-game main .s-skills .s-skill-info .separator{
     margin: 3px 0px;
 }
-.p-game .s-main .s-skills .s-skill-info .s-stats{
+.p-game main .s-skills .s-skill-info .s-stats{
     flex: 0;
 }
-.p-game .s-main .s-skills .s-skill-info .s-stats,
-.p-game .s-main .s-skills .s-skill-info .s-mods{
+.p-game main .s-skills .s-skill-info .s-stats,
+.p-game main .s-skills .s-skill-info .s-mods{
     white-space: pre;
     padding: 3px;
 }
 
-.p-game .s-main .s-skills .s-skill-info .s-mods{
+.p-game main .s-skills .s-skill-info .s-mods{
     overflow-y: auto;
     flex: 1;
 }
 
 /*Items*/
-.p-game .s-main .s-items.active{
+.p-game main .s-items.active{
     display: flex;
     flex: 1;
 }
 
-.p-game .s-main .s-items .s-item-list{
+.p-game main .s-items .s-item-list{
     flex: 0.3;
 }
 
-.p-game .s-main .s-items .s-item{
+.p-game main .s-items .s-item{
+    border-collapse: separate; ;
+    text-align: center;
+    flex: 1;
+    height: 0;
+    border-spacing: 0 0.2rem;
+}
+.p-game main .s-items .s-item tr{
+    width: 100%;
+    /* height: 0px; */
+}
+.p-game main .s-items .s-item td:first-child{
+    padding-right: 6px;
+}
+.p-game main .s-items .s-item td:last-child{
+    padding-left: 6px;
+}
+
+/* .p-game main .s-items .s-item{
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -378,38 +416,38 @@ div.hide,
     min-width: 200px;
     overflow-y: auto;
     white-space: pre;
-}
+} */
 
-.p-game .s-main .s-items .s-item-options{
+.p-game main .s-items .s-item-options{
     flex: 0.7;
     overflow-y: auto;
 }
 
 /*Craft action*/
-.p-game .s-main .s-items .s-item-options .s-basic .s-craft-action{
+.p-game main .s-items .s-item-options .s-basic .s-craft-action{
     display: none;
 }
-.p-game .s-main .s-items .s-item-options .s-basic .s-craft-action.active{
+.p-game main .s-items .s-item-options .s-basic .s-craft-action.active{
     display: block;
     background-color: bisque;
     padding: 3px 12px;
 }
-.p-game .s-main .s-items .s-item-options .s-basic .s-craft-action .title{
+.p-game main .s-items .s-item-options .s-basic .s-craft-action .title{
     text-align: center;
     font-weight: 800;
 }
-.p-game .s-main .s-items .s-item-options .s-basic .s-craft-action .tier{
+.p-game main .s-items .s-item-options .s-basic .s-craft-action .tier{
     width: 100%;
     outline: none;
 }
 
-.p-game .s-main .s-items .s-item-options .s-basic .s-craft-action button{
+.p-game main .s-items .s-item-options .s-basic .s-craft-action button{
     display: block;
     width: 100%;
 }
 
 /*Mod Tree*/
-.p-game .s-main .s-mod-tree.active{
+.p-game main .s-mod-tree.active{
     display: grid;
     grid-template-rows: auto 1fr;
     grid-template-columns: 1fr 0.7fr;
@@ -420,23 +458,23 @@ div.hide,
     flex: 1;
 }
 
-.p-game .s-main .s-mod-tree .s-top{
+.p-game main .s-mod-tree .s-top{
     grid-area: top;
 }
-.p-game .s-main .s-mod-tree > label{
+.p-game main .s-mod-tree > label{
     display: block;
 }
 
-.p-game .s-main .s-mod-tree .s-list{
+.p-game main .s-mod-tree .s-list{
     grid-area: list;
     overflow-y: auto;
 }
 
-.p-game .s-main .s-mod-tree .s-list .s-node{
+.p-game main .s-mod-tree .s-list .s-node{
     cursor: default;
     display: flex;
 }
-.p-game .s-main .s-mod-tree .s-list .s-node .name{
+.p-game main .s-mod-tree .s-list .s-node .name{
     cursor: default;
     text-align: left;
     flex: 1;
@@ -444,7 +482,7 @@ div.hide,
     margin-right: 6px;
 }
 
-.p-game .s-main .s-mod-tree .s-node-info{
+.p-game main .s-mod-tree .s-node-info{
     grid-area: info;
     background-color: rgb(177, 177, 177);
     padding: 6px;
@@ -454,31 +492,34 @@ div.hide,
     white-space: nowrap;
     min-height: 0px;
 }
-.p-game .s-main .s-mod-tree .s-node-info .name{
+.p-game main .s-mod-tree .s-node-info .name{
     font-weight: 600;
 }
-.p-game .s-main .s-mod-tree .s-node-info .content{
+.p-game main .s-mod-tree .s-node-info .content{
     flex: 1;
     white-space: pre-wrap;
     overflow-y: auto;
 }
 
 /*Stats*/
-.p-game .container > .s-stats{
+.p-game aside.s-stats{
     overflow-y: auto;
+    grid-area: stats;
+    padding: 6px;
 }
 
-.p-game .container .s-stats .s-stats-field{
-    display: flex;
+.p-game aside.s-stats table{
+    border-collapse: collapse;
 }
-.p-game .container .s-stats .s-stats-field div{
-    display: inline-block;
-    white-space: nowrap;
+.p-game aside.s-stats table td{
+    padding: 3px 6px;
 }
-.p-game .container .s-stats .s-stats-field div:first-child{
-    flex: 1;
+
+.p-game aside.s-stats td:first-child{
     padding-right: 24px;
 }
-.p-game .container .s-stats .s-stats-field:nth-child(even){
+.p-game aside.s-stats tr:nth-child(odd){
     background-color: rgb(230, 230, 230);
 }
+
+/*#endregion*/
