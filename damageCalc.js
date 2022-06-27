@@ -170,7 +170,7 @@ export function calcStats(input) {
 		};
 	})();
 
-    const dps = physicalDamage.physicalAttackDps;
+    const dps = physicalDamage.physicalAttackDps + bleed.bleedDps;
     
 	return {
 		dps,
@@ -293,7 +293,7 @@ export function calcBleedDamage(player, config) {
 }
 
 /**
- * @param {StatMod[]} modList
+ * @param {StatModList} modList
  * @returns {DamageCalc.ConversionTable}
  */
 export function createConversionTable(modList) {

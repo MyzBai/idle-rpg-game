@@ -1,6 +1,7 @@
 import * as player from "../player.js";
 import { deepFreeze } from "../../helperFunctions.js";
 import { convertRawMods, createBaseStatMod, parseModDescription, statModNames } from "../../mods.js";
+import * as modUtils from '../../modUtils.js';
 import * as eventListener from "../../eventListener.js";
 
 eventListener.add(eventListener.EventType.SAVE_GAME, save);
@@ -45,6 +46,7 @@ export async function init(data) {
 
 	attackSkillContainer.replaceChildren();
 	supportSkillContainer.replaceChildren();
+
 	skillsModule = data;
 
 	maxSupports = data.maxSupports;
@@ -53,11 +55,9 @@ export async function init(data) {
 	//set and validate attack skills
 	{
 		attackSkillsCollection = [...data.attackSkills];
-		for (const attackSkill of attackSkillsCollection) {
-			attackSkill.mods = convertRawMods(attackSkill.mods);
-			deepFreeze(attackSkill);
-		}
+        deepFreeze(attackSkillsCollection);
 
+        //check for duplicates
 		const duplicates = new Set();
 		attackSkillsCollection.every((x) => {
 			if (duplicates.has(x.name)) {
@@ -81,11 +81,8 @@ export async function init(data) {
 	//set and validate support skills
 	{
 		supportsCollection = [...data.supportSkills];
-		for (const support of supportsCollection) {
-			support.mods = convertRawMods(support.mods);
-		}
+        deepFreeze(supportsCollection)
 
-		deepFreeze(supportsCollection);
 		const duplicates = new Set();
 		supportsCollection.every((x) => {
 			if (duplicates.has(x.name)) {
@@ -114,15 +111,20 @@ function setAttackSkill(skill) {
 	player.removeStatMods(attackSkill);
 	attackSkill = skill;
 
-	const attackSpeedMod = createBaseStatMod(statModNames.attackSpeed, skill.stats.attackSpeed);
+    const statMods = modUtils.extractAttackSkillStats(attackSkill.stats);
+    player.addStatMods(statMods.attackSpeed, attackSkill);
 
 	let manaCost = attackSkill.stats.manaCost || 0;
 	{
 		const multiplier = supports.reduce((a, c) => (a += c?.stats.manaMultiplier || 0), 0);
 		manaCost *= 1 + multiplier / 100;
 	}
-	const manaCostMod = createBaseStatMod(statModNames.manaCost, manaCost);
-	player.addStatMods([...skill.mods.flatMap((x) => x.stats), manaCostMod, attackSpeedMod], skill);
+
+    statMods.manaCost.value = manaCost;
+    player.addStatMods(statMods.manaCost, attackSkill);
+
+    player.addStatMods(attackSkill.mods.flatMap(x => x.stats), attackSkill);
+
 	[...attackSkillContainer.children].forEach((x) => x.classList.toggle("active", x.textContent === attackSkill.name));
 	showSkill(attackSkill, "attack");
 }
@@ -186,7 +188,7 @@ function showSkill(skill, type) {
 	//Mods
 	let modsText = "";
 	skill.mods.forEach((x) => {
-		const description = parseModDescription(x.description, x.stats);
+		const description = parseModDescription(x.desc, x.stats);
 		modsText += `${description}\n`;
 	});
 	modsText = modsText.substring(0, modsText.length - 1);

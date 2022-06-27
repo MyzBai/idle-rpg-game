@@ -1,4 +1,1 @@
 .vscode
-dev/monaco.d.ts
-dev/google.visualization.d.ts
-libs/*

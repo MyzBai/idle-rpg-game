@@ -1,0 +1,86 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema",
+	"type": "object",
+	"additionalProperties": false,
+	"required": ["iterations"],
+	"properties": {
+		"iterations": {
+			"type": "number",
+			"minimum": 1
+		},
+		"configs": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"required": ["name"],
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"includes": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"enum": ["skills", "items", "modTree"]
+						}
+					},
+					"skills": {
+						"type": "object",
+						"properties": {
+							"attacks": {
+								"type": "array",
+								"items": {
+									"type": "string"
+								}
+							},
+							"supports": {
+								"type": "array",
+								"items": {
+									"type": "object",
+                                    "required": ["name"],
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "priority": {"type": "boolean"}
+                                    }
+								}
+							}
+						}
+					},
+					"items": {
+						"type": "object",
+						"properties": {
+							"modTables": {
+								"type": "array",
+								"items": {
+                                    "type": "object",
+                                    "required": ["name"],
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "priority": {"type": "boolean"}
+                                    }
+								}
+							}
+						}
+					},
+					"modTree": {
+						"type": "object",
+						"properties": {
+							"nodes": {
+								"type": "array",
+								"items": {
+                                    "type": "object",
+                                    "required": ["name"],
+                                    "properties": {
+                                        "name": {"type": "string"},
+                                        "priority": {"type": "boolean"}
+                                    }
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

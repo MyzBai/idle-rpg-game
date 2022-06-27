@@ -1,10 +1,11 @@
 {
+    "$id": "http://example.com/schemas/module-schema.json",
 	"$schema": "http://json-schema.org/draft-07/schema",
 	"type": "object",
-    "additionalProperties": false,
+	"additionalProperties": false,
 	"required": ["enemies", "skills"],
 	"properties": {
-        "$schema": {"type":"string"},
+		"$schema": { "type": "string" },
 		"config": {
 			"type": "object",
 			"properties": {
@@ -15,23 +16,23 @@
 		},
 		"player": {
 			"type": "object",
-            "additionalProperties": false,
+			"additionalProperties": false,
 			"properties": {
 				"defaultStatValues": {
 					"type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "minPhysicalDamage": {"type": "number"},
-                        "maxPhysicalDamage": {"type": "number"},
-                        "critMulti": {"type": "number"},
-                        "bleedDuration": {"type": "number"},
-                        "bleedCount": {"type": "number"},
-                        "mana": {"type": "number"},
-                        "manaRegen": {"type": "number"},
-                        "strength": {"type": "number"},
-                        "dexterity": {"type": "number"},
-                        "intelligence": {"type": "number"}
-                    }
+					"additionalProperties": false,
+					"properties": {
+						"minPhysicalDamage": { "type": "number" },
+						"maxPhysicalDamage": { "type": "number" },
+						"critMulti": { "type": "number" },
+						"bleedDuration": { "type": "number" },
+						"bleedCount": { "type": "number" },
+						"mana": { "type": "number" },
+						"manaRegen": { "type": "number" },
+						"strength": { "type": "number" },
+						"dexterity": { "type": "number" },
+						"intelligence": { "type": "number" }
+					}
 				}
 			}
 		},
@@ -56,14 +57,14 @@
 		},
 		"skills": {
 			"type": "object",
-            "required": ["attackSkills"],
+			"required": ["attackSkills"],
 			"properties": {
 				"maxSupports": {
 					"type": "integer"
 				},
 				"attackSkills": {
 					"type": "array",
-                    "minItems": 1,
+					"minItems": 1,
 					"items": {
 						"type": "object",
 						"required": ["name", "levelReq", "stats"],
@@ -103,12 +104,12 @@
 							},
 							"stats": {
 								"type": "object",
-                                "required": ["manaMultiplier"],
-                                "additionalProperties": false,
+								"required": ["manaMultiplier"],
+								"additionalProperties": false,
 								"properties": {
 									"manaMultiplier": {
 										"type": "number",
-                                        "minimum": 0
+										"minimum": 0
 									}
 								}
 							},
@@ -128,7 +129,7 @@
 					"type": "array",
 					"items": {
 						"type": "object",
-						"required": ["name"],
+						"required": ["name", "levelReq"],
 						"properties": {
 							"name": {
 								"$ref": "#/definitions/name"
@@ -195,31 +196,23 @@
 				"modTables": {
 					"type": "array",
 					"items": {
-						"type": "object",
-						"required": ["id", "mods"],
-						"properties": {
-							"id": {
-								"type": "string"
-							},
-							"mods": {
-								"type": "array",
-								"items": {
-									"type": "object",
-									"required": ["description"],
-									"properties": {
-										"description": { "$ref": "#/definitions/mod/properties/description" },
-										"levelReq": { "$ref": "#/definitions/levelReq" },
-										"weight": { "type": "number" }
-									}
-								}
-							}
-						}
+						"type": "array",
+                        "items": {
+                            "required": ["levelReq", "weight", "mod"],
+                            "properties": {
+                                "levelReq": { "$ref": "#/definitions/levelReq" },
+                                "weight": { "type": "number" },
+                                "mod": { "$ref": "#/definitions/mod" }
+                            }
+                        }
+       
 					}
 				}
 			}
 		},
 		"modTree": {
 			"type": "object",
+            "required": ["numPointsPerLevel", "unassignCost"],
 			"properties": {
 				"numPointsPerLevel": { "type": "number" },
 				"unassignCost": { "type": "number" },
@@ -227,6 +220,7 @@
 					"type": "array",
 					"items": {
 						"type": "object",
+                        "required": ["name", "maxPoints", "levelReq", "mods"],
 						"properties": {
 							"name": { "$ref": "#/definitions/name" },
 							"maxPoints": { "type": "integer" },
@@ -242,7 +236,7 @@
 		"name": {
 			"type": "string",
 			"minLength": 3,
-			"pattern": "^[A-Za-z0-9 ]+$"
+			"pattern": "^[A-Za-z0-9 &]+$"
 		},
 		"levelReq": {
 			"type": "integer",
@@ -253,15 +247,7 @@
 			"items": { "$ref": "#/definitions/mod" }
 		},
 		"mod": {
-			"type": "object",
-			"required": ["id", "description"],
-			"properties": {
-				"id": { "type": "string" },
-				"description": {
-					"type": "string",
-					"pattern": "^[A-Za-z0-9 {}.+%-]+$"
-				}
-			}
+            "type": "string"
 		}
 	}
 }

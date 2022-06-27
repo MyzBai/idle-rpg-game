@@ -3,6 +3,7 @@ import Global from '../global.js';
 import * as gameLoop from "./gameLoop.js";
 import * as save from "./save.js";
 import * as eventListener from '../eventListener.js';
+import {convertModuleMods} from '../modUtils.js';
 
 eventListener.add(eventListener.EventType.SAVE_GAME, (savedObj) => {
 	savedObj.config = {
@@ -18,6 +19,7 @@ const gameButton = document.querySelector("body .p-home .game-btn");
 const tabs = [homeButton, gameButton];
 if(tabs.every(x => x)){
     gameButton.classList.remove('hide');
+    //@ts-expect-error
     registerTabs(tabs);
 }
 
@@ -40,6 +42,8 @@ export async function init(module) {
     }
     //create a copy of the module to prevent any external changes to it
     module = jsonCopy(module);
+
+    convertModuleMods(module);
 
     //Initialize
     const player = await import('./player.js');

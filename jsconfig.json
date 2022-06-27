@@ -7,5 +7,5 @@
       "lib": ["dom", "dom.iterable", "esnext"],
       "allowSyntheticDefaultImports": true,
     },
-    "exclude": ["libs"]
+    "exclude": ["libs"],
   }

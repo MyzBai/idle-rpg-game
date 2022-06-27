@@ -103,7 +103,7 @@ function setLevel(newLevel) {
 }
 
 /**
- * @param {StatMod | StatMod[]} statMods
+ * @param {StatMod | StatModList} statMods
  * @param {object} [source]
  */
 export function addStatMods(statMods, source) {

@@ -34,49 +34,48 @@ export async function init(module) {
 
 	maxMods = module.maxMods;
 
-	modTables = module.modTables;
+    const s = module.modTables[0][0];
 
-	modCollection = [];
-	modCollection.push(
-		...modTables.reduce((a, c) => {
-			const { id, mods } = c;
-			const tableSize = mods.length;
-			for (let i = 0; i < tableSize; i++) {
-				const mod = mods[i];
-                const readonlyDescriptor = {
-                    writable: false
-                }
-				Object.defineProperties(mod, {
-					id: {
-						value: id,
-                        ...readonlyDescriptor
-					},
-					tableIndex: {
-						value: i,
-						...readonlyDescriptor
-					},
-                    levelReq: {
-                        ...readonlyDescriptor
-                    },
-                    weight: {
-                        ...readonlyDescriptor
-                    },
-                    tier: {
-                        get: function(){
-                            const index = i;
-                            const playerLevel = getLevel();
-                            const size = c.mods.map(x => x.levelReq).filter(x => x <= playerLevel).length;
-                            return size - index;
-                        }
+    modCollection = [];
+    for (const table of module.modTables) {
+        const tableSize = table.length;
+        for(let i = 0; i < tableSize; i++){
+
+            let itemMod = table[i];
+            const mod = /**@type {Mod} */(itemMod.mod);
+            // const itemMod = table[i];
+            /**@type {TypedPropertyDescriptor} */
+            const propDescriptor = {
+                writable: false,
+                enumerable: true,
+                configurable: false
+            };
+
+            /**@type {Items.ItemModifier} */
+            const newItemMod = Object.defineProperties({...mod }, {
+                levelReq: {
+                    value: itemMod.levelReq,
+                    ...propDescriptor
+                },
+                weight: {
+                    value: itemMod.weight,
+                    ...propDescriptor
+                },
+                tier: {
+                    enumerable: propDescriptor.enumerable,
+                    configurable: propDescriptor.configurable,
+                    get: function(){
+                        const playerLevel = getLevel();
+                        const validModsCount = table.map(x => x.levelReq <= playerLevel).length;
+                        return validModsCount - i;
                     }
-				});
-                convertRawMods(mod);
-				a.push(mod);
-			}
-			return a;
-		}, [])
-	);
-	Object.freeze(modCollection);
+                }
+            });
+
+            modCollection.push(newItemMod);
+        }
+    }
+    Object.freeze(modCollection);
 
 	createItems(module.items);
 
@@ -124,7 +123,7 @@ function showItem(item) {
 	const frag = document.createDocumentFragment();
 	for (const mod of item.getMods()) {
 		let tier = mod.tier;
-		const parsedDesc = parseModDescription(mod.description, mod.stats);
+		const parsedDesc = parseModDescription(mod.desc, mod.stats);
 		const tr = document.createElement("tr");
 		tr.insertAdjacentHTML("beforeend", `<td>T${tier}</td><td class="description">${parsedDesc}</td><td style="visibility: hidden">T${tier}</td>`);
 		frag.appendChild(tr);

@@ -3,6 +3,25 @@
     display: flex;
 }
 
+/*monaco editor*/
+/* .s-editor-container{
+    flex: 1;
+    position: relative;
+}
+.s-editor-container .text-editor{
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+} */
+
+.text-editor-container{
+    display: flex;
+    flex:1;
+    min-height: 0;
+}
+
 /*#region Editor*/
 .p-editor.active{
     min-height: 0;
@@ -11,59 +30,49 @@
     flex-direction: column;
 }
 
-.p-editor .s-editor-container{
-    flex: 1;
-    position: relative;
-}
-
 .p-editor .text-editor{
-    position: absolute;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
 }
 
 /*#region Sim*/
 .p-sim.active{
+    min-height: 0;
     flex: 1;
     display: flex;
     flex-direction: column;
+}
+/*Text Editor*/
+.p-sim .text-editor{
+    width: 50%;
+    min-width: 20%;
+    resize: horizontal;
+    overflow: hidden;
+}
+
+/*Graph*/
+.p-sim .s-graph{
+    display: flex;
+    flex: 1;
+    width: 50%;
+    min-width: 25%;
+}
+
+/*Chart*/
+.p-sim .s-graph svg{
+    flex: 1;
+}
+
+.p-sim .s-graph .s-chart-stats{
+    flex: 1;
     min-height: 0;
-
+    display: flex;
+    flex-direction: column;
 }
-.p-sim .s-progress-bar{
-    display: none;
+.p-sim .s-graph .s-chart-stats .content{
+    overflow-y: auto;
 }
-.p-sim .s-progress-bar.active{
-    display: block;
-    text-align: center;
-    position: relative;
-
-}
-.p-sim .progress-bar{
-    position: absolute;
-    width: 100px;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    z-index: -1;
-}
-.p-sim #chart svg{
-    height: 300px;
-}
-
-.p-sim .p-configs .s-mod-table th{
-    background-color: bisque;
-}
-.p-sim .s-mod-table-container table{
+.p-sim .s-graph .s-chart-stats .content table{
     width: 100%;
 }
-.p-sim .s-mod-table-container table th{
-    text-align: left;
-    font-weight: 100;
-}
-.p-sim .s-mod-table-container table tr.hide{
-    display: none;
-}
+
 /*#endregion*/

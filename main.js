@@ -2,7 +2,6 @@ import Global from "./global.js";
 import * as loadModule from "./loadModule.js";
 import { isLocalNetwork } from "./helperFunctions.js";
 
-
 window.addEventListener("keyup", (e) => {
     if(document.activeElement !== document.body){
         return;
@@ -17,7 +16,6 @@ init();
 async function init() {
 	await loadEnvironment();
 	await registerServiceWorker();
-
 	await loadModule.init();
 }
 

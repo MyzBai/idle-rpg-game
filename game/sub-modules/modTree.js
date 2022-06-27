@@ -41,11 +41,9 @@ export async function init(data) {
 
 	nodes = [];
 	nodeContainer.replaceChildren();
-	for (const nodeData of data.nodes) {
-		const { name, maxPoints, levelReq } = nodeData;
+	for (const node of data.nodes) {
 
-		const mods = convertRawMods(nodeData.mods);
-		const node = Object.assign({ ...nodeData }, { mods, levelReq: levelReq || 0 });
+        node.levelReq = node.levelReq || 0;
 		createNodeElement(node);
 		nodes.push(node);
 	}
@@ -100,7 +98,7 @@ function setNodeInfo(node) {
 	nodeInfoContainer.querySelector(".name").textContent = node.name;
 	var modsText = "";
 	node.mods.forEach((x) => {
-		const description = parseModDescription(x.description, x.stats);
+		const description = parseModDescription(x.desc, x.stats);
 		modsText += `${description}\n`;
 	});
 	nodeInfoContainer.querySelector(".content").textContent = modsText;

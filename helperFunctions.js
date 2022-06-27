@@ -135,6 +135,7 @@ export function registerTabs(btns, index = -1) {
     if(index !== -1){
         btns[index].click();
     }
+
 }
 
 /**

@@ -2,7 +2,6 @@ import { registerTabs } from "./helperFunctions.js";
 import { getLocalModule, getLocalModulesInfo } from "./modules/module-exporter.js";
 import Global from "./global.js";
 import * as save from "./game/save.js";
-
 /** import ('./types') */
 
 /**
@@ -19,7 +18,7 @@ import * as save from "./game/save.js";
 const homePage = document.querySelector("body > .p-home");
 /**@type {NodeListOf<HTMLElement>} */
 const tabs = homePage.querySelectorAll(".s-buttons [data-tab-target]");
-registerTabs(tabs);
+registerTabs([...tabs]);
 tabs[0].click();
 
 //@ts-ignore

@@ -1,45 +1,90 @@
-import { getFormattedTableFragment } from '../stats.js';
-import { registerTabs } from '../helperFunctions.js';
+import { getFormattedTableFragment } from '../../stats.js';
+// import { registerTabs } from '../../helperFunctions.js';
 
-/**@typedef {import('./simNew.js').SimData} SimData */
-/**@typedef {import('./simNew.js').SimInstance} SimInstance */
-/**@typedef {import('./simNew.js').SimResult} SimResult */
+/**@typedef {import('./sim.js').SimResult} SimResult */
+/**@typedef {import('./sim.js').SimInstance} SimInstance */
+
+
+/**
+ * @typedef LineSerie
+ * @property {string} key
+ * @property {number[][]} values
+ * @property {DamageCalc.StatsOutput[]} statsOutputs
+ */
+
+
+/**@type {HTMLElement} */
+const graphPage = document.querySelector('.p-sim .s-graph');
 
 /**@type {nv.LineChart} */
 var chart = undefined;
 
-/**@type {d3.Selection} */
+/**@type {d3.Selection<LineSerie[]>} */
 var chartData = undefined;
 
-/**@type {SimInstance[]} */
-var results = undefined;
+let selectedConfigIndex = 0;
 
-/**@param {SimData} simData */
-export async function draw(simData) {
+/**@param {SimResult} simResults */
+export async function draw(simResults) {
 	if (!chart) {
 		await createChart();
 	}
-    results = JSON.parse(JSON.stringify(simData.instances));
-	const data = [];
-    //each element is a label
-    for (const simInstance of simData.instances) {
-        data.push({
-            key: simInstance.config.label,
-            values: [...simInstance.results.map((x,i) => [simData.startLevel + i, x.value])]
-        });
+
+    /**@type {LineSerie[]} */
+    const lineSeries = [];
+
+    for (const config of simResults) {
+        /**@type {LineSerie} */
+        const lineSerie = {
+            key: config.name,
+            values: [],
+            statsOutputs: config.results.map(x => x.result.statsOutput)
+        };
+
+        let level = 1;
+        for (const result of config.results) {
+            const dps = result.result.dps;
+            lineSerie.values.push([level++, dps]);
+        }
+
+        lineSeries.push(lineSerie);
     }
 
-	chartData.datum(data).call(chart);
-    
+	chartData.datum(lineSeries).call(chart);
+
+
+    {
+        // const dpsArr = [...chartData.datum().map(x => x.values.map(y => y[1])).flatMap(x => x)];
+        // dpsArr.sort((a,b) => a-b);
+        // const highestDps = dpsArr[dpsArr.length-1];
+        // const lowestDps = dpsArr[0];
+        // const offset = highestDps * 0.2;
+        // chart.yDomain([-offset, highestDps + offset ]);
+        // chart.xDomain([0, simResult.endLevel + 1]);
+    }
+
+    {
+        const resizewatcher = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                if (entry.target === graphPage) {
+                    chart.update();
+                }
+            }
+        });
+        resizewatcher.observe(graphPage);
+    }
     nv.utils.windowResize(chart.update);
+
+    const s = chartData[0][0];
+    s.dispatchEvent(new Event('click'));
 }
 
 function createChart() {
     return new Promise(resolve => {
         nv.addGraph(function () {
             chart = nv.models.lineChart();
-            chart.margin({ left: 100 });
-            chart.height(300);
+            chart.margin({ left: 100 , top: 50, bottom: 50});
+            chart.height(400);
             chart.showLegend(true);
             chart.showXAxis(true);
             chart.showYAxis(true);
@@ -81,7 +126,7 @@ function createChart() {
                 showConfigs(e);
             });
     
-            chartData = d3.select("#chart").append("svg").datum([]);
+            chartData = d3.select(".s-graph svg").datum([]);
             return chart;
         }, function(){
             resolve();
@@ -90,21 +135,20 @@ function createChart() {
 }
 
 function showConfigs(selections){
-    const data = chartData.datum();
+    const lineSeries = chartData.datum();
     const statsOutputs = [];
     for (const selection of selections) {
         const yIndex = selection.seriesIndex;
         const xIndex = selection.pointIndex;
-        const simData = results[yIndex];
-        const statsOutput = simData.results[xIndex].statsOutput;
-        statsOutputs.push({label: simData.config.label, statsOutput});
+        const statsOutput = lineSeries[yIndex].statsOutputs[xIndex];
+        statsOutputs.push({label: lineSeries[yIndex].key, statsOutput});
     }
     displayFormattedStats(statsOutputs);
 }
 
 /**@param {{label: string, statsOutput: DamageCalc.StatsOutput}[]} data */
 function displayFormattedStats(data) {
-    const chartStatsContainer = document.querySelector('.p-sim .s-chart-stats');
+    const chartStatsContainer = graphPage.querySelector('.s-chart-stats');
     const tabsContainer = chartStatsContainer.querySelector('.tabs');
     const contentContainer = chartStatsContainer.querySelector('.content');
     tabsContainer.replaceChildren();
@@ -122,7 +166,11 @@ function displayFormattedStats(data) {
             contentContainer.replaceChildren();
             contentContainer.appendChild(frag.cloneNode(true));
             btn.classList.add('active');
+            selectedConfigIndex = btns.indexOf(btn);
         });
     }
-    btns[0].click();
+    if(selectedConfigIndex >= btns.length){
+        selectedConfigIndex = btns.length-1;
+    }
+    btns[selectedConfigIndex].click();
 }

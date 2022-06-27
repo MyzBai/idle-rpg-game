@@ -1,15 +1,18 @@
 type BitFlag = number;
 
 type StatModList = StatMod[];
+type RawMod = string;
+type RawModList = RawMod[];
 type ModList = Mod[];
 type StatName = string;
 type StatModKeywordType = string;
 
 interface Mod {
     id: string;
-    description: string;
+    desc: string;
     stats: StatModList;
 }
+
 
 type StatModKeyword = {
     name: StatName;
@@ -51,13 +54,15 @@ namespace Modules {
     }
 
     interface Config {
-        name?: string;
+        name: string;
         description?: string;
-        id: number | string;
-        src: string;
+        id?: number | string;
+        src?: string;
         include?: string[];
         exclude?: string[];
     }
+
+    /**Player */
 
     interface PlayerDefaultStatValues {
         hitChance: number;
@@ -77,22 +82,29 @@ namespace Modules {
         defaultStatValues: PlayerDefaultStatValues;
     }
 
+    /**Enemies */
     interface Enemies {
         enemyList: { health: number }[]
     }
 
-    type AttackSkill = Omit<Skills.AttackSkill, 'mods'> & {
-        mods: ModList;
+    /**Skills */
+    type AttackSkill = Pick<Skills.AttackSkill, 'name' | 'levelReq' | 'stats' | 'mods'> & {
+        mods: RawModList | ModList;
     }
-    type SupportSkill = Omit<Skills.SupportSkill, 'mods'> & {
-        mods: ModList;
+    type SupportSkill = Pick<Skills.SupportSkill, 'name' | 'levelReq' | 'stats' | 'mods'> & {
+        mods: RawModList | ModList;
     }
+
     interface Skills {
         maxSupports: number;
         attackSkills: AttackSkill[];
         supportSkills?: SupportSkill[];
     }
 
+    type ItemModifier = Pick<Items.ItemModifier, 'levelReq' | 'weight'> & {
+        mod: RawMod | Mod;
+    }
+    type ModTable = ItemModifier[];
     interface Items {
         maxMods: number;
         items: {
@@ -100,13 +112,17 @@ namespace Modules {
             levelReq: number;
         }[];
         crafting: Items.Crafting;
-        modTables: Items.ModTable[];
+        modTables: ModTable[];
+    }
+
+    type Node = Pick<ModTree.Node, 'name' | 'levelReq' | 'maxPoints' | 'mods'> & {
+        mods: RawModList | ModList;
     }
 
     interface ModTree {
         numPointsPerLevel: number;
         unassignCost: number;
-        nodes: ModTree.Node[];
+        nodes: Node[];
     }
 }
 
@@ -114,7 +130,7 @@ namespace Skills {
     interface AbstractSkill {
         name: string;
         levelReq?: number;
-        type: string;
+        type?: string;
         stats: any;
         mods?: ModList;
     }
@@ -139,16 +155,14 @@ namespace Skills {
 }
 
 namespace Items {
-    interface ModTable {
-        id: string;
-        mods: ItemModifier[];
-    }
+    type ModTable = ItemModifier[];
+    
     interface ItemModifier extends Mod {
         levelReq?: number;
         weight?: number;
-        tableIndex: number;
-        tier: number;
+        tier?: number;
     }
+    
     namespace Crafting {
         interface Crafs {
             basic: Basic;
@@ -170,7 +184,7 @@ namespace Items {
 namespace ModTree {
     interface Node {
         name: string;
-        levelReq: number;
+        levelReq?: number;
         curPoints?: number;
         maxPoints: number;
         mods: ModList;
@@ -274,7 +288,7 @@ namespace DamageCalc {
     }
 }
 
-interface StatModFlags{
+interface StatModFlags {
     None: number;
     Attack: number;
     Bleed: number;
@@ -315,9 +329,9 @@ namespace Ailments {
     }
 }
 
-namespace Stats{
+namespace Stats {
     type FormattedText = string;
-    interface FormattedTextOutput{
+    interface FormattedTextOutput {
         dps: FormattedText;
         physicalAttackDps: FormattedText;
         physicalAttackDamage: FormattedText;

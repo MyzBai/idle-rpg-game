@@ -1,5 +1,5 @@
 import { calcModTotal } from "./damageCalc.js";
-import { deepFreeze } from "./helperFunctions.js";
+import { deepFreeze, jsonCopy } from "./helperFunctions.js";
 
 export const modRegexes = {
 	modDesc: /{(?<v1>[0-9]+(?:\.[0-9]+)?)(?:-(?<v2>[0-9]+(?:\.[0-9]+)?))?}/g,
@@ -8,9 +8,9 @@ export const modRegexes = {
 
 /**@type {StatModFlags} */
 export const statModFlags = Object.freeze({
-    None: 0,
-    Attack: 1,
-    Bleed: 2
+	None: 0,
+	Attack: 1,
+	Bleed: 2,
 });
 
 export const keywordTypes = deepFreeze({
@@ -22,26 +22,8 @@ export const valueTypes = deepFreeze({
 	inc: "inc",
 	more: "more",
 });
-export const statModNames = deepFreeze(getStatModNames());
-export const modTemplates = deepFreeze(getMods());
-
-export const modTemplateList = (function () {
-	const templateList = Object.values(modTemplates);
-	return templateList;
-})();
-
-/**
- * @param {string} id
- * @returns {Mod}
- */
-export function getModTemplateById(id) {
-	const template = modTemplates[id];
-	if (!template) {
-		console.error(`mod with id: ${id} does not exists`);
-		return;
-	}
-	return JSON.parse(JSON.stringify(template));
-}
+// export const statModNames = deepFreeze(getStatModNames());
+// export const modTemplates = deepFreeze(getMods());
 
 /**
  * @returns {Modifiers.ModList}
@@ -63,33 +45,31 @@ export function parseModDescription(description, stats) {
 	});
 }
 
-function getStatModNames() {
-	return {
-		damage: "damage",
-		minPhysicalDamage: "minPhysicalDamage",
-		maxPhysicalDamage: "maxPhysicalDamage",
-		physicalDamage: "physicalDamage",
-		minElementalDamage: "minElementalDamage",
-		maxElementalDamage: "maxElementalDamage",
-		elementalDamage: "elementalDamage",
-		minChaosDamage: "minChaosDamage",
-		maxChaosDamage: "maxChaosDamage",
-		chaosDamage: "chaosDamage",
-		hitChance: "hitChance",
-		attackSpeed: "attackSpeed",
-		critChance: "critChance",
-		critMulti: "critMulti",
-		bleedChance: "bleedChance",
-		bleedCount: "bleedCount",
-		duration: "duration",
-		mana: "mana",
-		manaRegen: "manaRegen",
-		manaCost: "manaCost",
-		strength: "strength",
-		dexterity: "dexterity",
-		intelligence: "intelligence",
-	};
-}
+export const statModNames = Object.freeze({
+	damage: "damage",
+	minPhysicalDamage: "minPhysicalDamage",
+	maxPhysicalDamage: "maxPhysicalDamage",
+	physicalDamage: "physicalDamage",
+	minElementalDamage: "minElementalDamage",
+	maxElementalDamage: "maxElementalDamage",
+	elementalDamage: "elementalDamage",
+	minChaosDamage: "minChaosDamage",
+	maxChaosDamage: "maxChaosDamage",
+	chaosDamage: "chaosDamage",
+	hitChance: "hitChance",
+	attackSpeed: "attackSpeed",
+	critChance: "critChance",
+	critMulti: "critMulti",
+	bleedChance: "bleedChance",
+	bleedCount: "bleedCount",
+	duration: "duration",
+	mana: "mana",
+	manaRegen: "manaRegen",
+	manaCost: "manaCost",
+	strength: "strength",
+	dexterity: "dexterity",
+	intelligence: "intelligence",
+});
 
 /**
  *
@@ -115,17 +95,17 @@ export function createBaseStatMod(name, value, { flags = 0, keyword } = {}) {
 }
 
 /**
- * @typedef RawMod
- * @property {string} id
- * @property {string} description
- *
- * @param {RawMod | RawMod[]} rawMods
- * @returns {Mod[]} rawMods
+ * @param {any} rawMods
+ * @returns {ModList}
  */
 export function convertRawMods(rawMods) {
+	if (!rawMods) {
+		return;
+	}
 	if (!Array.isArray(rawMods)) {
 		rawMods = [rawMods];
 	}
+
 	const mods = [];
 	for (const rawMod of rawMods) {
 		mods.push(convert(rawMod));
@@ -137,111 +117,226 @@ export function convertRawMods(rawMods) {
 	 * @returns {Mod}
 	 */
 	function convert(rawMod) {
-		const { id, description } = rawMod;
+		if (!(typeof rawMod === "string")) {
+            if(/**@type {Mod}*/(rawMod).id){
+                console.warn('Mod has already been converted');
+                return rawMod;
+            }
+			return;
+		}
+		const split = rawMod.split("|");
+		const id = split[0];
+		const desc = split[1];
 
-		const template = getModTemplateById(id);
+		const template = jsonCopy(modTemplateList.find((x) => x.id === id));
 
-		const modDescStats = [...description.matchAll(modRegexes.modDesc)];
-		const templateDescStats = [...template.description.matchAll(modRegexes.templateDesc)];
+		// const template = getModTemplateById(id);
+
+		const modDescStats = [...desc.matchAll(modRegexes.modDesc)];
+		const templateDescStats = [...template.desc.matchAll(modRegexes.templateDesc)];
 		if (modDescStats.length !== templateDescStats.length) {
 			//TODO: Add a check in config to ignore errors and continue anyways
 			const proceed = confirm("An error has occured!\nIf you continue, things may not work as intended");
 			if (!proceed) {
-				throw new Error(`A Modifier with id: '${id}' contains the wrong number of stat values. ${rawMod.description} must match with ${template.description}`);
+				throw new Error(`A Modifier with id: '${id}' contains the wrong number of stat values. ${desc} must match with ${template.desc}`);
 			}
 		}
 
 		for (let i = 0; i < modDescStats.length; i++) {
 			const min = parseFloat(modDescStats[i].groups.v1);
 			const max = parseFloat(modDescStats[i].groups.v2) || undefined;
+			const propDescriptor = {
+				configurable: false,
+				enumerable: true,
+			};
 			Object.defineProperties(template.stats[i], {
 				min: {
 					value: min,
-					configurable: false,
+					...propDescriptor,
 				},
 				max: {
 					value: max,
-					configurable: false,
+					...propDescriptor,
 				},
 				value: {
 					value: min,
-                    configurable: false,
 					writable: max !== undefined,
-                    enumerable: true
+					...propDescriptor,
 				},
 			});
 		}
-        // rawMod.description = template.description;
-        Object.defineProperty(rawMod, 'description', {
-            value: template.description,
-            configurable: false
-        });
-        Object.defineProperty(rawMod, 'stats', {
-            value: template.stats,
-            configurable: false
-        });
-		return template;
+
+		return Object.defineProperties(template, {
+			id: {
+				enumerable: true,
+				writable: false,
+				configurable: false,
+			},
+			desc: {
+				enumerable: true,
+				writable: false,
+				configurable: false,
+			},
+			stats: {
+				enumerable: true,
+				writable: false,
+				configurable: false,
+			},
+		});
 	}
 }
 
-function getMods() {
-	return {
-		moreDamage: createMod("moreDamage", "{}% More Damage", [createStat(statModNames.damage, valueTypes.more)]),
-		basePhysicalDamage: createMod("basePhysicalDamage", "Adds {} To {} Physical Damage", [
-			createStat(statModNames.minPhysicalDamage, valueTypes.base),
-			createStat(statModNames.maxPhysicalDamage, valueTypes.base),
-		]),
-		incPhysicalDamage: createMod("incPhysicalDamage", "{}% Increased Physical Damage", [createStat(statModNames.physicalDamage, valueTypes.inc)]),
-		morePhysicalDamage: createMod("morePhysicalDamage", "{}% More Physical Damage", [createStat(statModNames.physicalDamage, valueTypes.more)]),
-		baseHitChance: createMod("baseHitChance", "+{}% To Hit Chance", [createStat(statModNames.hitChance, valueTypes.base)]),
-		incAttackSpeed: createMod("incAttackSpeed", "{}% Increased Attack Speed", [createStat(statModNames.attackSpeed, valueTypes.inc)]),
-		moreAttackSpeed: createMod("moreAttackSpeed", "{}% More Attack Speed", [createStat(statModNames.attackSpeed, valueTypes.more)]),
-		baseCritChance: createMod("baseCritChance", "+{}% To Critical Strike Chance", [createStat(statModNames.critChance, valueTypes.base)]),
-		baseCritMulti: createMod("baseCritMulti", "+{}% To Critical Strike Multiplier", [createStat(statModNames.critMulti, valueTypes.base)]),
-		//bleed
-		baseBleedChance: createMod("baseBleedChance", "+{}% Chance To Bleed", [createStat(statModNames.bleedChance, valueTypes.base, { flags: statModFlags.Bleed })]),
-		incBleedDamage: createMod("incBleedDamage", "+{}% Increaed Bleed Damage", [createStat(statModNames.physicalDamage, valueTypes.inc, { flags: statModFlags.Bleed })]),
-		moreBleedDamage: createMod("moreBleedDamage", "{}% More Bleed Damage", [createStat(statModNames.physicalDamage, valueTypes.more, { flags: statModFlags.Bleed })]),
-		baseBleedDuration: createMod("baseBleedDuration", "+{} To Bleed Duration", [createStat(statModNames.duration, valueTypes.base, { flags: statModFlags.Bleed })]),
-		incBleedDuration: createMod("incBleedDuration", "+{}% Increased Bleed Duration", [createStat(statModNames.duration, valueTypes.inc, { flags: statModFlags.Bleed })]),
-		baseBleedCount: createMod("baseBleedCount", "+{} To Number Of Bleed Instances", [createStat(statModNames.bleedCount, valueTypes.inc)]),
-		//mana
-		baseMaxMana: createMod("baseMaxMana", "+{} To Maximum Mana", [createStat(statModNames.mana, valueTypes.base)]),
-		incMaxMana: createMod("incMaxMana", "+{}% Increased Maximum Mana", [createStat(statModNames.mana, valueTypes.inc)]),
-		moreMaxMana: createMod("moreMaxMana", "+{}% More Maximum Mana", [createStat(statModNames.mana, valueTypes.more)]),
-		baseManaRegen: createMod("baseManaRegen", "+{} To Mana Regeneration", [createStat(statModNames.manaRegen, valueTypes.base)]),
-		incManaRegen: createMod("incManaRegen", "+{}% Increased Mana Regeneration", [createStat(statModNames.manaRegen, valueTypes.inc)]),
-		moreManaRegen: createMod("moreManaRegen", "+{}% More Mana Regeneration", [createStat(statModNames.manaRegen, valueTypes.more)]),
-
-		//attributes
-		//strength
-		baseStrength: createMod("baseStrength", "+{} To Strength", [createStat(statModNames.strength, valueTypes.base)]),
-		incStrength: createMod("incStrength", "+{}% Increased Strength", [createStat(statModNames.strength, valueTypes.inc)]),
-		moreStrength: createMod("moreStrength", "+{}% More Strength", [createStat(statModNames.strength, valueTypes.more)]),
-		incPhysicalDamagePerBaseStrength: createMod("incPhysicalDamagePerBaseStrength", "{}% Increased Physical Damage Per {} Strength", [
-			createStat(statModNames.physicalDamage, valueTypes.inc, { keyword: createStatKeyword(statModNames.strength, keywordTypes.perStat, 1) }),
-		]),
-		//dexterity
-		baseDexterity: createMod("baseDexterity", "+{} To Dexterity", [createStat(statModNames.dexterity, valueTypes.base)]),
-		incDexterity: createMod("incDexterity", "+{}% Increased Dexterity", [createStat(statModNames.dexterity, valueTypes.inc)]),
-		moreDexterity: createMod("moreDexterity", "+{}% More Dexterity", [createStat(statModNames.dexterity, valueTypes.more)]),
-		baseHitChancePerBaseDexterity: createMod("baseHitChancePerBaseDexterity", "+{}% To Hit Chance Per {} Dexterity", [
-			createStat(statModNames.hitChance, valueTypes.base, { keyword: createStatKeyword(statModNames.dexterity, keywordTypes.perStat, 1) }),
-		]),
-		//intelligence
-		baseIntelligence: createMod("baseIntelligence", "+{} To Intelligence", [createStat(statModNames.intelligence, valueTypes.base)]),
-		incIntelligence: createMod("incIntelligence", "+{}% Increased Intelligence", [createStat(statModNames.intelligence, valueTypes.inc)]),
-		moreIntelligence: createMod("moreIntelligence", "+{}% More Intelligence", [createStat(statModNames.intelligence, valueTypes.more)]),
-		baseMaxManaPerBaseIntelligence: createMod("baseMaxManaPerBaseIntelligence", "+{}% To Maximum Mana Per {} Intelligence", [
-			createStat(statModNames.mana, valueTypes.base, { keyword: createStatKeyword(statModNames.intelligence, keywordTypes.perStat, 1) }),
-		]),
-	};
-}
+/**@type {Mod[]} */
+export const modTemplateList = deepFreeze([
+	{
+		id: "moreDamage",
+		desc: "{}% More Damage",
+		stats: [{ name: statModNames.damage, valueType: valueTypes.more }],
+	},
+	{
+		id: "basePhysicalDamage",
+		desc: "Adds {} To {} Physical Damage",
+		stats: [
+			{ name: statModNames.physicalDamage, valueType: valueTypes.base },
+			{ name: statModNames.physicalDamage, valueType: valueTypes.base },
+		],
+	},
+	{
+		id: "incPhysicalDamage",
+		desc: "{}% Increased Physical Damage",
+		stats: [{ name: statModNames.physicalDamage, valueType: valueTypes.inc }],
+	},
+	{
+		id: "morePhysicalDamage",
+		desc: "{}% More Physical Damage",
+		stats: [{ name: statModNames.physicalDamage, valueType: valueTypes.more }],
+	},
+	{
+		id: "baseHitChance",
+		desc: "+{}% To Hit Chance",
+		stats: [{ name: statModNames.hitChance, valueType: valueTypes.base }],
+	},
+	{
+		id: "incAttackSpeed",
+		desc: "{}% Increased Attack Speed",
+		stats: [{ name: statModNames.attackSpeed, valueType: valueTypes.inc }],
+	},
+	{
+		id: "moreAttackSpeed",
+		desc: "{}% More Attack Speed",
+		stats: [{ name: statModNames.attackSpeed, valueType: valueTypes.more }],
+	},
+	{
+		id: "baseCritChance",
+		desc: "+{}% To Critical Strike Chance",
+		stats: [{ name: statModNames.critChance, valueType: valueTypes.base }],
+	},
+	{
+		id: "baseCritMulti",
+		desc: "+{}% To Critical Strike Multiplier",
+		stats: [{ name: statModNames.critMulti, valueType: valueTypes.base }],
+	},
+	{
+		id: "baseBleedChance",
+		desc: "+{}% Chance To Bleed",
+		stats: [{ name: statModNames.bleedChance, valueType: valueTypes.base }],
+	},
+	{
+		id: "incBleedDamage",
+		desc: "{}% Increased Bleed Damage",
+		stats: [{ name: statModNames.physicalDamage, valueType: valueTypes.inc, flags: statModFlags.Bleed }],
+	},
+	{
+		id: "moreBleedDamage",
+		desc: "{}% More Bleed Damage",
+		stats: [{ name: statModNames.physicalDamage, valueType: valueTypes.more, flags: statModFlags.Bleed }],
+	},
+	{
+		id: "incBleedDuration",
+		desc: "{}% Increased Bleed Duration",
+		stats: [{ name: statModNames.duration, valueType: valueTypes.inc, flags: statModFlags.Bleed }],
+	},
+	{
+		id: "baseBleedCount",
+		desc: "+{} To Number Of Bleed Instances",
+		stats: [{ name: statModNames.bleedCount, valueType: valueTypes.base }],
+	},
+	{
+		id: "baseMaxMana",
+		desc: "+{} To Maximum Mana",
+		stats: [{ name: statModNames.mana, valueType: valueTypes.base }],
+	},
+	{
+		id: "incMaxMana",
+		desc: "{}% Increased Maximum Mana",
+		stats: [{ name: statModNames.mana, valueType: valueTypes.inc }],
+	},
+	{
+		id: "moreMaxMana",
+		desc: "{}% More Maximum Mana",
+		stats: [{ name: statModNames.mana, valueType: valueTypes.more }],
+	},
+	{
+		id: "baseManaRegen",
+		desc: "+{} To Mana Regeneration",
+		stats: [{ name: statModNames.manaRegen, valueType: valueTypes.base }],
+	},
+	{
+		id: "incManaRegen",
+		desc: "{}% Increased Mana Regeneration",
+		stats: [{ name: statModNames.manaRegen, valueType: valueTypes.inc }],
+	},
+	{
+		id: "baseStrength",
+		desc: "+{} To Strength",
+		stats: [{ name: statModNames.strength, valueType: valueTypes.base }],
+	},
+	{
+		id: "incStrength",
+		desc: "{}% Increased Strength",
+		stats: [{ name: statModNames.strength, valueType: valueTypes.inc }],
+	},
+	{
+		id: "incPhysicalDamagePerBaseStrength",
+		desc: "{}% Increased Physical Damage Per {} Strength",
+		stats: [{ name: statModNames.physicalDamage, valueType: valueTypes.inc, keyword: { name: statModNames.strength, type: keywordTypes.perStat, index: 1 } }],
+	},
+	{
+		id: "baseDexterity",
+		desc: "+{} To Dexterity",
+		stats: [{ name: statModNames.dexterity, valueType: valueTypes.base }],
+	},
+	{
+		id: "incDexterity",
+		desc: "{}% Increased Dexterity",
+		stats: [{ name: statModNames.dexterity, valueType: valueTypes.inc }],
+	},
+	{
+		id: "baseHitChancePerDexterity",
+		desc: "+{}% To Hit Chance Per {} Dexterity",
+		stats: [{ name: statModNames.hitChance, valueType: valueTypes.base, keyword: { name: statModNames.strength, type: keywordTypes.perStat, index: 1 } }],
+	},
+	{
+		id: "baseIntelligence",
+		desc: "+{} To Intelligence",
+		stats: [{ name: statModNames.intelligence, valueType: valueTypes.base }],
+	},
+	{
+		id: "incIntelligence",
+		desc: "{}% Increased Intelligence",
+		stats: [{ name: statModNames.intelligence, valueType: valueTypes.inc }],
+	},
+	{
+		id: "baseManaPerIntelligence",
+		desc: "+{} To Maximum Mana Per {} Intelligence",
+		stats: [{ name: statModNames.mana, valueType: valueTypes.base, keyword: { name: statModNames.strength, type: keywordTypes.perStat, index: 1 } }],
+	},
+]);
 
 /**
- * 
- * @param {StatModList} statModList 
- * @returns {ModCache} 
+ *
+ * @param {StatModList} statModList
+ * @returns {ModCache}
  */
 export function createModCache(statModList) {
 	return Object.freeze({
@@ -258,39 +353,25 @@ export function createModCache(statModList) {
 }
 
 /**
- *
- * @param {string} id
- * @param {string} description
- * @param {StatModList} stats
- * @returns
- */
-function createMod(id, description, stats) {
-    const descriptor = {
-        writable: false
-    }
-    return Object.defineProperties({id, description, stats}, {
-        id: descriptor,
-        description: descriptor,
-        stats: descriptor,
-    });
-}
-
-/**
  * @param {string} name
  * @param {string} valueType
  * @param {{flags?: number, keyword?: StatModKeyword}} param
  * @returns {StatMod}
  */
 export function createStat(name, valueType, { flags = 0, keyword } = {}) {
-    const descriptor = {
-        writable: false
-    }
-    return Object.defineProperties({name, valueType, flags, keyword}, {
-        name: descriptor,
-        valueType: descriptor,
-        flags: descriptor,
-        keyword: descriptor
-    });
+	const descriptor = {
+		writable: false,
+		enumerable: true,
+	};
+	return Object.defineProperties(
+		{ name, valueType, flags, keyword },
+		{
+			name: descriptor,
+			valueType: descriptor,
+			flags: descriptor,
+			keyword: descriptor,
+		}
+	);
 }
 
 /**
@@ -300,9 +381,10 @@ export function createStat(name, valueType, { flags = 0, keyword } = {}) {
  * @returns {StatModKeyword}
  */
 function createStatKeyword(name, type, index) {
-    const descriptor = {
-        writable: false
-    }
+	const descriptor = {
+		writable: false,
+		enumerable: true,
+	};
 	return Object.defineProperties(
 		{ name, type, index },
 		{
@@ -315,6 +397,7 @@ function createStatKeyword(name, type, index) {
 
 /**@param {Object.<string, object>} statKeyValuePairs */
 export function getStatModsFromDefaultStatValues(statKeyValuePairs) {
+	statKeyValuePairs = statKeyValuePairs || {};
 	const statMods = [];
 	for (const [key, value] of Object.entries(statKeyValuePairs)) {
 		let statMod = undefined;
