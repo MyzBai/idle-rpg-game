@@ -127,18 +127,23 @@ async function createEditor() {
 			}
 		});
 
-		function handleCustomMarkers(obj) {
+		/**@param {Modules.ModuleData} moduleData */
+		function handleCustomMarkers(moduleData) {
 			markers = [];
-			const modTables = obj.items.modTables;
+
+			//ensure same mods in modtable, warn if table contains different mods
+			const modTables = moduleData.items.modTables;
 			for (const table of modTables) {
 				let mods = [];
 				for (const mod of table) {
+					//@ts-expect-error
 					let id = mod.mod.match(/^[^\|]+/)[0];
 					mods.push({ mod, id });
 				}
 				if (new Set(mods.map((x) => x.id)).size !== 1) {
+					//@ts-expect-error
 					const ranges = mods.map((x) => x.mod.modelRange);
-                    const searchString = `"mod"\\s*:\\s*"[^"]+"`;
+					const searchString = `"mod"\\s*:\\s*"[^"]+"`;
 					for (const range of ranges) {
 						const searchStart = { lineNumber: range.startLineNumber, column: range.startColumn };
 						const match = model.findNextMatch(searchString, searchStart, true, true, null, false);
@@ -147,27 +152,56 @@ async function createEditor() {
 				}
 			}
 
-            {
-                const matches = model.findMatches(`"mods"\\s*:\\s*(\\[\\n*[^\\]]*\\n*\\])`, true, true, true, null, true);
-                for (const match of matches) {
-                    const arr = JSON.parse(match.matches[1]);
-                    const mods = arr.map(x => x.match(/^\w*[^|]/)[0]);
-                    if(new Set(mods).size !== mods.length){
-                        //must have unique ids
-                        let range = {
-                            lineNumber: match.range.startLineNumber,
-                            column: match.range.startColumn
-                        };
-                        for (const mod of mods) {
-                            const m = model.findNextMatch(mod, range, false, true, null, false);
-                            range.lineNumber = m.range.endLineNumber;
-                            range.column = m.range.endColumn;
-                            setMarker(m.range, 'Mods must be unique', monaco.MarkerSeverity.Warning);
-                        }
+			//ensure mod array contains unique mods
+			{
+				const matches = model.findMatches(`"mods"\\s*:\\s*(\\[\\n*[^\\]]*\\n*\\])`, true, true, true, null, true);
+				for (const match of matches) {
+					const arr = JSON.parse(match.matches[1]);
+					const mods = arr.map((x) => x.match(/^\w*[^|]/)[0]);
+					if (new Set(mods).size !== mods.length) {
+						//must have unique ids
+						let range = {
+							lineNumber: match.range.startLineNumber,
+							column: match.range.startColumn,
+						};
+						for (const mod of mods) {
+							const m = model.findNextMatch(mod, range, false, true, null, false);
+							range.lineNumber = m.range.endLineNumber;
+							range.column = m.range.endColumn;
+							setMarker(m.range, "Mods must be unique", monaco.MarkerSeverity.Warning);
+						}
+					}
+				}
+			}
+
+			//ensure unique skill names
+			{
+				const getDuplicates = function (arr) {
+					const lookup = arr.reduce((a, c) => {
+						a[c] = ++a[c] || 0;
+						return a;
+					}, {});
+					return [...new Set(arr.filter((x) => lookup[x]))];
+				};
+
+                /**@param {{name: string}[]} targetArray */
+                const process = function(targetArray){
+                    const duplicateNames = getDuplicates(targetArray.map((x) => x.name));
+                    const duplicateObjects = targetArray.filter((x) => duplicateNames.some((y) => x.name === y));
+    
+                    for (const duplicateObj of duplicateObjects) {
+                        //@ts-expect-error
+                        const range = duplicateObj.modelRange;
+                        const searchString = `"name"\\s*:\\s*"${duplicateObj.name}"`;
+                        const match = model.findNextMatch(searchString, { lineNumber: range.startLineNumber, column: range.startColumn }, true, true, null, false);
+                        setMarker(match.range, "Skills must have unique names", monaco.MarkerSeverity.Warning);
                     }
                 }
 
-            }
+                process(moduleData.skills.attackSkills);
+                process(moduleData.skills.supportSkills);
+
+			}
 
 			monaco.editor.setModelMarkers(model, "json", markers);
 		}
