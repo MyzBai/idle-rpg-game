@@ -52,13 +52,11 @@ export async function init(module) {
             };
 
             /**@type {Items.ItemModifier} */
-            const newItemMod = Object.defineProperties({...mod }, {
+            const newItemMod = Object.defineProperties({...mod, levelReq: itemMod.levelReq, weight: itemMod.weight }, {
                 levelReq: {
-                    value: itemMod.levelReq,
                     ...propDescriptor
                 },
                 weight: {
-                    value: itemMod.weight,
                     ...propDescriptor
                 },
                 tier: {

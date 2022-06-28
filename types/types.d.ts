@@ -129,7 +129,7 @@ namespace Modules {
 namespace Skills {
     interface AbstractSkill {
         name: string;
-        levelReq?: number;
+        levelReq: number;
         type?: string;
         stats: any;
         mods?: ModList;
@@ -158,7 +158,7 @@ namespace Items {
     type ModTable = ItemModifier[];
     
     interface ItemModifier extends Mod {
-        levelReq?: number;
+        levelReq: number;
         weight?: number;
         tier?: number;
     }
@@ -184,7 +184,7 @@ namespace Items {
 namespace ModTree {
     interface Node {
         name: string;
-        levelReq?: number;
+        levelReq: number;
         curPoints?: number;
         maxPoints: number;
         mods: ModList;
