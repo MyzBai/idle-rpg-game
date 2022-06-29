@@ -19,7 +19,6 @@ const gameButton = document.querySelector("body .p-home .game-btn");
 const tabs = [homeButton, gameButton];
 if(tabs.every(x => x)){
     gameButton.classList.remove('hide');
-    //@ts-expect-error
     registerTabs(tabs);
 }
 
@@ -55,7 +54,7 @@ export async function init(module) {
     const combat = await import('./combat.js');
     combat.init();
     
-    const skills = await import('./sub-modules/skills.js');
+    const skills = await import('./sub-modules/skillsNew.js');
     skills.init(module.skills);
 
     if(module.items){
@@ -76,6 +75,18 @@ export async function init(module) {
         //auto save
         gameLoop.subscribe(save.save, {intervalMS: 10 * 1000});
         gameLoop.start();
+    } else{
+        globalThis.gameDev = {
+            startGame: () => {
+                gameLoop.start();
+            },
+            stopGame: () => {
+                gameLoop.stop();
+            },
+            saveGame: () => {
+                save.save();
+            }
+        }
     }
 
     document.querySelector('#game-page .home-btn').classList.toggle('hide', document.querySelector('.p-home') ? false : true);

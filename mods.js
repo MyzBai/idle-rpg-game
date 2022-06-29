@@ -32,18 +32,7 @@ export const valueTypes = deepFreeze({
 // 	return jsonCopy(Object.values(mods));
 // }
 
-/**
- * @param {string} description
- * @param {StatModList} stats
- */
-export function parseModDescription(description, stats) {
-	let i = 0;
-	return description.replaceAll(modRegexes.templateDesc, function () {
-		const stat = stats[i++];
-		const numDescimals = stat.min.toString().match(/\.\d+/)?.[0].length - 1 || 0;
-		return stat.value.toFixed(numDescimals);
-	});
-}
+
 
 export const statModNames = Object.freeze({
 	damage: "damage",
@@ -127,10 +116,7 @@ export function convertRawMods(rawMods) {
 		const split = rawMod.split("|");
 		const id = split[0];
 		const desc = split[1];
-
 		const template = jsonCopy(modTemplateList.find((x) => x.id === id));
-
-		// const template = getModTemplateById(id);
 
 		const modDescStats = [...desc.matchAll(modRegexes.modDesc)];
 		const templateDescStats = [...template.desc.matchAll(modRegexes.templateDesc)];
@@ -166,27 +152,18 @@ export function convertRawMods(rawMods) {
 			});
 		}
 
-		return Object.defineProperties(template, {
-			id: {
-				enumerable: true,
-				writable: false,
-				configurable: false,
-			},
-			desc: {
-				enumerable: true,
-				writable: false,
-				configurable: false,
-			},
-			stats: {
-				enumerable: true,
-				writable: false,
-				configurable: false,
-			},
-		});
+        return Object.freeze({...template, rawDesc: desc});
 	}
 }
 
-/**@type {Mod[]} */
+/**
+ * @typedef ModTemplate
+ * @property {string} id
+ * @property {string} desc
+ * @property {StatModList} stats
+ * @property {string}[rawDesc]
+ * @type {ModTemplate[]} 
+ */
 export const modTemplateList = deepFreeze([
 	{
 		id: "moreDamage",

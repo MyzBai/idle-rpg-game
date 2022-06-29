@@ -1,5 +1,6 @@
-import { randomRange, deepFreeze } from "../../helperFunctions.js";
-import { convertRawMods, modTemplateList, parseModDescription } from "../../mods.js";
+import { randomRange } from "../../helperFunctions.js";
+import { modTemplateList } from "../../mods.js";
+import { parseModDescription } from "../../modUtils.js";
 import * as player from "../player.js";
 import * as eventListener from "../../eventListener.js";
 import { getLevel } from "../player.js";
@@ -16,9 +17,6 @@ var items = [];
 
 /**@type {Item} */
 var selectedItem = undefined;
-
-/**@type {Items.ModTable[]} */
-var modTables = [];
 
 /**@type {Items.ItemModifier[]} */
 var modCollection = [];

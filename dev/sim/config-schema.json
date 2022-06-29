@@ -12,7 +12,7 @@
 			"type": "array",
 			"items": {
 				"type": "object",
-				"required": ["name"],
+				"required": ["name", "skills"],
 				"additionalProperties": false,
 				"properties": {
 					"name": {
@@ -27,22 +27,26 @@
 					},
 					"skills": {
 						"type": "object",
+						"required": ["attackSkills"],
 						"properties": {
-							"attacks": {
+							"attackSkills": {
 								"type": "array",
+                                "description": "Must contain a skill with a levelReq of at least 1",
+                                "minItems": 1,
+                                "uniqueItems": true,
 								"items": {
 									"type": "string"
 								}
 							},
-							"supports": {
+							"supportSkills": {
 								"type": "array",
 								"items": {
 									"type": "object",
-                                    "required": ["name"],
-                                    "properties": {
-                                        "name": {"type": "string"},
-                                        "priority": {"type": "boolean"}
-                                    }
+									"required": ["name"],
+									"properties": {
+										"name": { "type": "string" },
+										"priority": { "type": "boolean" }
+									}
 								}
 							}
 						}
@@ -50,15 +54,15 @@
 					"items": {
 						"type": "object",
 						"properties": {
-							"modTables": {
+							"mods": {
 								"type": "array",
 								"items": {
-                                    "type": "object",
-                                    "required": ["name"],
-                                    "properties": {
-                                        "name": {"type": "string"},
-                                        "priority": {"type": "boolean"}
-                                    }
+									"type": "object",
+									"required": ["name"],
+									"properties": {
+										"name": { "type": "string" },
+										"priority": { "type": "boolean" }
+									}
 								}
 							}
 						}
@@ -69,12 +73,12 @@
 							"nodes": {
 								"type": "array",
 								"items": {
-                                    "type": "object",
-                                    "required": ["name"],
-                                    "properties": {
-                                        "name": {"type": "string"},
-                                        "priority": {"type": "boolean"}
-                                    }
+									"type": "object",
+									"required": ["name"],
+									"properties": {
+										"name": { "type": "string" },
+										"priority": { "type": "boolean" }
+									}
 								}
 							}
 						}

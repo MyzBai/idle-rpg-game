@@ -1,13 +1,13 @@
-import * as simTextEditor from "./simTextEditor.js";
+// import * as simTextEditor from "./simTextEditor.js";
 import * as helperFunctions from "../../helperFunctions.js";
-import * as moduleTextEditor from "../jsonEditor.js";
+// import * as moduleTextEditor from "../jsonEditor.js";
 import { createModCache, getStatModsFromDefaultStatValues, ModDB, modTemplateList } from "../../mods.js";
 import { extractAttackSkillStats, convertModuleMods } from "../../modUtils.js";
 import * as calcDamage from "../../damageCalc.js";
 import * as chart from "./simChart.js";
 import * as pako from "../../libs/pako.js";
+import * as monacoEditor from '../monacoEditor.js';
 
-/** @typedef {import('./simTextEditor').Config} Config */
 
 /**
  * //Per Config
@@ -38,6 +38,9 @@ import * as pako from "../../libs/pako.js";
  * @property {StatModList} statModList
  */
 
+/**@typedef {import('../monacoEditor.js').ConfigData} ConfigData */
+/**@typedef {import('../monacoEditor.js').Config} Config */
+
 class Simulator {
 	constructor(name) {
 		this.name = name;
@@ -50,21 +53,17 @@ class Simulator {
 }
 
 export async function init() {
-	await simTextEditor.init();
 
-	simTextEditor.onConfigDataChanges.listen((simData) => {
-		run();
-	});
 }
 
-async function run() {
-	const module = helperFunctions.jsonCopy(moduleTextEditor.module);
+export async function run() {
+	const module = helperFunctions.jsonCopy(monacoEditor.module);
 	if (!module) {
 		console.warn("no module available");
 		return;
 	}
 
-	const configData = helperFunctions.deepFreeze(helperFunctions.jsonCopy(simTextEditor.modelData));
+	const configData = helperFunctions.deepFreeze(helperFunctions.jsonCopy(monacoEditor.config));
 	if (!configData) {
 		console.warn("no configData available");
 		return;
@@ -77,9 +76,6 @@ async function run() {
 
 	const iterations = configData.iterations;
 	const endLevel = module.enemies.enemyList.length;
-
-	//convert mods - mods in the module has raw unparsed statMods
-	convertModuleMods(module);
 
 	const defaultStatMods = getStatModsFromDefaultStatValues(module.player?.defaultStatValues);
 
@@ -203,8 +199,7 @@ function getConfigDataAtLevel(module, config, level) {
 	{
 		//Attack Skills
 		const simulator = new Simulator("Attack Skills");
-		const attackSkills = module.skills.attackSkills.filter((x) => x.levelReq <= level && config.skills.attacks.some((y) => y === x.name));
-
+		const attackSkills = module.skills.attackSkills.filter((x) => x.levelReq <= level && config.skills?.attacks?.some((y) => y === x.name));
 		data.push(attackSkills);
 		simulator.getStatMods = () => {
 			const skill = getRandoms(attackSkills, 1)[0];
@@ -218,7 +213,7 @@ function getConfigDataAtLevel(module, config, level) {
 	if (module.skills.supportSkills) {
 		//Support Skills
 		const simulator = new Simulator("Support Skills");
-		const supports = module.skills.supportSkills.filter((x) => x.levelReq <= level && config.skills.supports.some((y) => y.name === x.name));
+		const supports = module.skills.supportSkills.filter((x) => x.levelReq <= level && config.skills?.supports?.some((y) => y.name === x.name));
 
 		const maxSupports = module.skills.maxSupports;
 		data.push({ supports, maxSupports });
@@ -238,12 +233,12 @@ function getConfigDataAtLevel(module, config, level) {
 
 	if (module.items) {
 		const simulator = new Simulator("Items");
-
-        const modTables = module.items.modTables.filter(x => config.items.mods.some(y => x.some(z => z.mod.id === y.name)));
+		//@ts-expect-error
+		const modTables = module.items.modTables.filter((x) => config.items?.mods?.some((y) => x.some((z) => z.mod.id === y.name)));
 
 		const itemMods = modTables.reduce((a, c) => {
-            const highestLevelReqMod = [...c].filter(x => x.levelReq <= level).sort((a, b) => b.levelReq - a.levelReq)[0];
-            a.push(highestLevelReqMod);
+			const highestLevelReqMod = [...c].filter((x) => x.levelReq <= level).sort((a, b) => b.levelReq - a.levelReq)[0];
+			a.push(highestLevelReqMod);
 			return a;
 		}, []);
 
@@ -254,14 +249,18 @@ function getConfigDataAtLevel(module, config, level) {
 			const totalStatMods = [];
 			for (let i = 0; i < numItems; i++) {
 				let numModsRemaining = maxMods;
-				const prioritizedMods = itemMods.filter((x) => config.items.mods.some((y) => y.priority && y.name === x.mod.id));
+				//@ts-expect-error
+				const prioritizedMods = itemMods.filter((x) => config.items.mods?.some((y) => y.priority && y.name === x.mod.id));
 
 				const statMods = [];
 				numModsRemaining -= prioritizedMods.length;
 				if (numModsRemaining < 0) {
+					//@ts-expect-error
 					statMods.push(...getRandoms(prioritizedMods, maxMods, idComparer).flatMap((x) => x.mod.stats));
 				} else {
+					//@ts-expect-error
 					statMods.push(...prioritizedMods.flatMap((x) => x.mod.stats));
+                            //@ts-expect-error
 					statMods.push(...getRandoms(itemMods, numModsRemaining, idComparer).flatMap((x) => x.mod.stats));
 				}
 				totalStatMods.push(...statMods);

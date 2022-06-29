@@ -1,8 +1,6 @@
 type BitFlag = number;
 
 type StatModList = StatMod[];
-type RawMod = string;
-type RawModList = RawMod[];
 type ModList = Mod[];
 type StatName = string;
 type StatModKeywordType = string;
@@ -10,9 +8,9 @@ type StatModKeywordType = string;
 interface Mod {
     id: string;
     desc: string;
+    rawDesc: string;
     stats: StatModList;
 }
-
 
 type StatModKeyword = {
     name: StatName;
@@ -88,11 +86,11 @@ namespace Modules {
     }
 
     /**Skills */
-    type AttackSkill = Pick<Skills.AttackSkill, 'name' | 'levelReq' | 'stats' | 'mods'> & {
-        mods: RawModList | ModList;
+    type AttackSkill = Omit<Skills.AttackSkill, 'mods' | 'stats'> & {
+        stats: Skills.AttackSkillStats;
     }
-    type SupportSkill = Pick<Skills.SupportSkill, 'name' | 'levelReq' | 'stats' | 'mods'> & {
-        mods: RawModList | ModList;
+    type SupportSkill = Omit<Skills.SupportSkill, 'mods' | 'stats'> & {
+        stats: Skills.SupportSkillStats;
     }
 
     interface Skills {
@@ -102,7 +100,7 @@ namespace Modules {
     }
 
     type ItemModifier = Pick<Items.ItemModifier, 'levelReq' | 'weight'> & {
-        mod: RawMod | Mod;
+        mod: Mod;
     }
     type ModTable = ItemModifier[];
     interface Items {
@@ -116,7 +114,7 @@ namespace Modules {
     }
 
     type Node = Pick<ModTree.Node, 'name' | 'levelReq' | 'maxPoints' | 'mods'> & {
-        mods: RawModList | ModList;
+        mods: ModList;
     }
 
     interface ModTree {
@@ -131,16 +129,15 @@ namespace Skills {
         name: string;
         levelReq: number;
         type?: string;
-        stats: any;
         mods?: ModList;
     }
 
     interface AttackSkill extends AbstractSkill {
-        override stats: AttackSkillStats;
+        stats: AttackSkillStats;
     }
 
     interface SupportSkill extends AbstractSkill {
-        override stats: SupportSkillStats;
+        stats: SupportSkillStats;
     }
 
     interface AttackSkillStats {

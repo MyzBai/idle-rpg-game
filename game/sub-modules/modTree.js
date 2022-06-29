@@ -1,6 +1,7 @@
 import * as player from "../player.js";
 import * as eventListener from "../../eventListener.js";
-import { convertRawMods, parseModDescription } from "../../mods.js";
+import { convertRawMods } from "../../mods.js";
+import { parseModDescription } from "../../modUtils.js";
 import { jsonCopy } from "../../helperFunctions.js";
 
 const modTreeElement = document.querySelector(".p-game .s-mod-tree");

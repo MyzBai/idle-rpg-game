@@ -19,45 +19,91 @@
 
 <body>
     <div class="s-top">
-        <div class="editor g-button" data-tab-target=".p-editor">Editor</div>
-        <div class="sim g-button" data-tab-target=".p-sim">Sim</div>
-        <div class="game g-button" data-tab-target=".p-game">Game</div>
-    </div>
-    <!--Editor-->
-    <div class="p-editor" data-tab-content>
-        <div class="s-options" style="display: flex;">
-            <input class="import" type="file" accept="json" style="display: none">
-            <div class="import-button g-button">Import</div>
-            <div class="compile-button g-button">Compile</div>
-        </div>
-        <div class="text-editor-container">
-            <div class="text-editor"></div>
-        </div>
-    </div>
-    <!--Sim-->
-    <div class="p-sim" data-tab-content>
-        <div class="s-options" style="display: flex;">
-            <input class="import" type="file" accept="json" style="display: none">
-            <div class="import-button g-button">Import</div>
-            <div class="compile-button g-button">Compile</div>
-            <div class="save-button g-button">Save</div>
+        <div class="g-horizontal-menu">
+            <div class="editor g-button" data-tab-target=".p-editor">Editor</div>
+            <div class="game g-button" data-tab-target=".p-game">Game</div>
         </div>
 
-        <div class="text-editor-container">
-            <div class="text-editor"></div>
-            <!-- <div class="s-editor-container">
-            </div> -->
-            <div class="s-graph">
-                <svg></svg>
-                <!-- <div class="s-chart" style="height: 400px;">
-                </div> -->
+        <div class="buttons-wrapper">
+            <div class="s-model-buttons g-horizontal-menu">
+                <div class="g-button" data-model-uri-path="/module.json">Module</div>
+                <div class="g-button" data-model-uri-path="/config.json">Config</div>
+            </div>
+            <div class="s-sim-buttons g-horizontal-menu">
+                <div class="run-sim-button g-button">Simulate</div>
+            </div>
+            <div class="s-action-buttons g-horizontal-menu">
+                <div class="compile g-button">Compile</div>
+            </div>
+        </div>
+    </div>
+
+    <!--Monaco Editor-->
+    <div class="monaco-editor-container">
+        <div id="monaco-editor">
+
+        </div>
+    </div>
+
+    <div class="graph-modal g-modal">
+        <div class="g-modal-content">
+            <div class="g-modal-header">
+                <div class="title">Graph</div>
+                <button class="close-button">&times</button>
+            </div>
+            <div class="g-modal-body">
+                <div class="s-graph">
+                    <svg></svg>
+                </div>
                 <div class="s-chart-stats" style="flex: 1; min-height: 0;">
                     <div class="tabs"></div>
                     <div class="content" style="overflow: auto;"></div>
                 </div>
             </div>
         </div>
+
     </div>
+
+    <!-- <div class="g-overlay"></div> -->
+
+    <div style="display: none;">
+        <!--Editor-->
+        <div class="p-editor" data-tab-content>
+            <div class="s-options" style="display: flex;">
+                <input class="import" type="file" accept="json" style="display: none">
+                <div class="import-button g-button">Import</div>
+                <div class="compile-button g-button">Compile</div>
+            </div>
+            <div class="text-editor-container">
+                <div class="text-editor"></div>
+            </div>
+        </div>
+        <!--Sim-->
+        <div class="p-sim" data-tab-content>
+            <div class="s-options" style="display: flex;">
+                <input class="import" type="file" accept="json" style="display: none">
+                <div class="import-button g-button">Import</div>
+                <div class="compile-button g-button">Compile</div>
+                <div class="save-button g-button">Save</div>
+            </div>
+
+            <div class="text-editor-container">
+                <div class="text-editor"></div>
+                <!-- <div class="s-editor-container">
+            </div> -->
+                <div class="s-graph">
+                    <svg></svg>
+                    <!-- <div class="s-chart" style="height: 400px;">
+                </div> -->
+                    <div class="s-chart-stats" style="flex: 1; min-height: 0;">
+                        <div class="tabs"></div>
+                        <div class="content" style="overflow: auto;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="main.js"></script>
 </body>
 

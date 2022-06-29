@@ -1,4 +1,4 @@
-import { convertRawMods } from "./mods.js";
+import { convertRawMods, modRegexes } from "./mods.js";
 
 /**
  * @param {Skills.AttackSkillStats} stats
@@ -36,4 +36,17 @@ export function convertModuleMods(module) {
             node.mods = convertRawMods(node.mods);
         }
     }
+}
+
+/**
+ * @param {string} description
+ * @param {StatModList} stats
+ */
+ export function parseModDescription(description, stats) {
+	let i = 0;
+	return description.replaceAll(modRegexes.templateDesc, function () {
+		const stat = stats[i++];
+		const numDescimals = stat.min.toString().match(/\.\d+/)?.[0].length - 1 || 0;
+		return stat.value.toFixed(numDescimals);
+	});
 }

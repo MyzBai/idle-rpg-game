@@ -101,6 +101,7 @@ async function createEditor() {
 
         configProps.modTree.properties.nodes.items.properties.name.enum = module.modTree.nodes.map(x => x.name);
         configSchema.properties.configs.items.properties = configProps;
+
     }
     updateSchema(module)
     onModuleChanged.listen(updateSchema);

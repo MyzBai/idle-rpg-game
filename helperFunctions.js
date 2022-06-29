@@ -1,3 +1,5 @@
+import EventEmitter from "./EventEmitter.js";
+
 /**
  * @param {number} min
  * @param {number} max
@@ -61,26 +63,25 @@ export function weightedRandom(weights) {
  * @returns {T}
  */
 export function deepFreeze(original, ...freezeImmune) {
+	return freeze(original);
 
-    return freeze(original);
-
-    function freeze(obj){
-        for (const key in obj) {
-            if (Object.hasOwnProperty.call(obj, key)) {
-                const value = obj[key];
-                if(value === original){
-                    continue;
-                }
-                if (freezeImmune.some((x) => x === value)) {
-                    continue;
-                }
-                if (value && typeof value === "object") {
-                    freeze(value);
-                }
-            }
-        }
-        return Object.freeze(obj);
-    }
+	function freeze(obj) {
+		for (const key in obj) {
+			if (Object.hasOwnProperty.call(obj, key)) {
+				const value = obj[key];
+				if (value === original) {
+					continue;
+				}
+				if (freezeImmune.some((x) => x === value)) {
+					continue;
+				}
+				if (value && typeof value === "object") {
+					freeze(value);
+				}
+			}
+		}
+		return Object.freeze(obj);
+	}
 }
 
 /**@returns {string} */
@@ -94,20 +95,20 @@ export function uuidv4() {
 }
 
 /**
- * @param {string} str 
+ * @param {string} str
  * @returns {string}
  */
-export function hashCode (str){
-    var hash = 0;
-    if (str.length == 0) {
-        return "";
-    }
-    for (let i = 0; i < str.length; i++) {
-        const char = str.charCodeAt(i);
-        hash = ((hash<<5)-hash)+char;
-        hash = hash & hash; // Convert to 32bit integer
-    }
-    return hash.toString();
+export function hashCode(str) {
+	var hash = 0;
+	if (str.length == 0) {
+		return "";
+	}
+	for (let i = 0; i < str.length; i++) {
+		const char = str.charCodeAt(i);
+		hash = (hash << 5) - hash + char;
+		hash = hash & hash; // Convert to 32bit integer
+	}
+	return hash.toString();
 }
 
 export function isLocalNetwork(hostname = window.location.hostname) {
@@ -115,14 +116,15 @@ export function isLocalNetwork(hostname = window.location.hostname) {
 }
 
 /**
- * @param {HTMLElement[]} btns
+ * Handle tabs that toggles the active state of a tabTarget
+ * @param {HTMLElement[] | Element[]} btns
  * @param {number} index click btn at index
  */
 export function registerTabs(btns, index = -1) {
 	for (const btn of btns) {
 		btn.addEventListener("click", (e) => {
 			for (const otherBtn of btns) {
-				const target = document.querySelector(otherBtn.dataset.tabTarget);
+				const target = document.querySelector(otherBtn.getAttribute("data-tab-target"));
 				otherBtn.classList.toggle("active", otherBtn === btn);
 				if (!target) {
 					continue;
@@ -132,10 +134,10 @@ export function registerTabs(btns, index = -1) {
 			}
 		});
 	}
-    if(index !== -1){
-        btns[index].click();
-    }
-
+	if (index !== -1) {
+		//@ts-expect-error
+		btns[index].click();
+	}
 }
 
 /**
@@ -158,6 +160,9 @@ export function registerToggles(btns, callback) {
  * @return {T}
  */
 export function jsonCopy(obj) {
+	if (!obj) {
+		return;
+	}
 	try {
 		return JSON.parse(JSON.stringify(obj));
 	} catch (error) {
@@ -166,6 +171,49 @@ export function jsonCopy(obj) {
 }
 
 /**@returns {Uint8Array} */
-export function strToUint8Array(str){
-    return new Uint8Array([...str].map(x => x.charCodeAt(0)));
+export function strToUint8Array(str) {
+	return new Uint8Array([...str].map((x) => x.charCodeAt(0)));
+}
+
+export function toggleModal(modal, overlay, state) {
+	modal.classList.toggle("active", state);
+	overlay.classList.toggle("active", state);
+	if (state) {
+		const closeButton = modal.querySelector(".close-button");
+		const clickOffEvent = function () {
+			overlay.removeEventListener("click", clickOffEvent);
+			closeButton.removeEventListener("click", clickOffEvent);
+			toggleModal(modal, overlay, false);
+		};
+		overlay.addEventListener("click", clickOffEvent);
+		closeButton.addEventListener("click", clickOffEvent);
+		modal.onCancel = new EventEmitter();
+	} else {
+		modal.onCancel = undefined;
+	}
+}
+
+export function cloneAndReplace(node) {
+	let tempNode = node.cloneNode(true);
+	node.parentNode.replaceChild(tempNode, node);
+	return tempNode;
+}
+
+/**
+ * @template T
+ * @param {T[]} arr
+ * @returns {T[]}
+ */
+export function getDuplicateObjectsByPropertyNameInArray(arr, propName) {
+	const set = new Set();
+	for (let i = 0; i < arr.length - 1; i++) {
+		const prop1 = arr[i][propName];
+		for (let j = i + 1; j < arr.length; j++) {
+			const prop2 = arr[j][propName];
+			if (prop1 === prop2) {
+				set.add(prop1);
+			}
+		}
+	}
+	return arr.filter((x) => set.has(x[propName]));
 }

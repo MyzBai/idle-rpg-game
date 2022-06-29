@@ -39,6 +39,7 @@ var editor = undefined;
 /**@type {Modules.ModuleData} */
 export var module = undefined;
 
+
 /**
  * @type {EventEmitter<Modules.ModuleData>}
  */

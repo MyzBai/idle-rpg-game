@@ -123,6 +123,7 @@
 		},
 		"items": {
 			"type": "object",
+            "required": ["maxMods", "items", "crafting", "modTables"],
 			"properties": {
 				"maxMods": { "type": "integer" },
 				"items": {
@@ -198,6 +199,7 @@
 					"items": {
 						"type": "array",
                         "items": {
+                            "type": "object",
                             "required": ["levelReq", "weight", "mod"],
                             "properties": {
                                 "levelReq": { "$ref": "#/definitions/levelReq" },

@@ -1,6 +1,6 @@
 import * as player from "../player.js";
 import { deepFreeze } from "../../helperFunctions.js";
-import { convertRawMods, createBaseStatMod, parseModDescription, statModNames } from "../../mods.js";
+import { convertRawMods, createBaseStatMod, statModNames } from "../../mods.js";
 import * as modUtils from '../../modUtils.js';
 import * as eventListener from "../../eventListener.js";
 
@@ -19,9 +19,6 @@ const skillView = document.querySelector(".s-skills .s-skill-info");
 const attackSkillContainer = document.querySelector(".s-skills .s-attack-skills");
 /**@type {HTMLElement} */
 const supportSkillContainer = document.querySelector(".s-skills .s-supports");
-
-/**@type {Modules.Skills} data */
-var skillsModule = undefined;
 
 var skillViewButtonCallback = undefined;
 
@@ -188,7 +185,7 @@ function showSkill(skill, type) {
 	//Mods
 	let modsText = "";
 	skill.mods.forEach((x) => {
-		const description = parseModDescription(x.desc, x.stats);
+		const description = modUtils.parseModDescription(x.desc, x.stats);
 		modsText += `${description}\n`;
 	});
 	modsText = modsText.substring(0, modsText.length - 1);
@@ -235,33 +232,6 @@ function isSupportActive(support) {
 	return supports.some((x) => x?.name === support.name);
 }
 
-/**@param {{skills: SaveObj}} obj*/
-function save(obj) {
-	obj.skills = {
-		attackSkill: attackSkill.name,
-		supports: supports.map((x) => x?.name),
-	};
-}
 
-/**@param {{skills: SaveObj}} obj*/
-function load(obj) {
-	if (!obj.skills) {
-		return;
-	}
-
-	const skill = attackSkillsCollection.find((x) => x.name === obj.skills.attackSkill);
-	setAttackSkill(skill);
-	showSkill(skill, "attack");
-
-	supports = [];
-	const supportNames = obj.skills.supports || [];
-	for (let i = 0; i < supportNames.length; i++) {
-		const support = supportsCollection.find((x) => x.name === supportNames[i]);
-		toggleSupport(support);
-	}
-
-	//@ts-expect-error
-	attackSkillContainer.firstElementChild.click();
-}
 
 export { maxSupports, attackSkill, supports };

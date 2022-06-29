@@ -94,6 +94,12 @@ input{
     border-bottom: 1px solid var(--primary-color-button-disabled);
 }
 
+.g-horizontal-menu{
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+}
+
 .g-separator{
     content: '';
     margin: auto;
@@ -132,7 +138,7 @@ input{
 }
 
 .p-home .game-btn{
-    display: block;
+    /* display: block; */
     align-self: flex-start;
 }
 
